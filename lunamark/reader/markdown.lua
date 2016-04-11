@@ -33,30 +33,30 @@ end
 -- *   `options` is a table with parsing options.
 --     The following fields are significant:
 --
---     `preserve_tabs`
+--     `preserveTabs`
 --     :   Preserve tabs instead of converting to spaces.
 --
---     `smart_ellipses`
+--     `smartEllipses`
 --     :   Parse ellipses intelligently.
 --
---     `startnum`
+--     `startNumber`
 --     :   Make the opening number in an ordered list significant.
 --
 --     `notes`
 --     :   Enable footnotes as in pandoc.
 --
---     `definition_lists`
+--     `definitionLists`
 --     :   Enable definition lists as in pandoc.
 --
---     `require_blank_before_blockquote`
+--     `requireBlankBeforeBlockquote`
 --     :   Require a blank line between a paragraph and a following
 --         block quote.
 --
---     `require_blank_before_header`
+--     `requireBlankBeforeHeader`
 --     :   Require a blank line between a paragraph and a following
 --         header.
 --
---     `hash_enumerators`
+--     `hashEnumerators`
 --     :   Allow `#` instead of a digit for an ordered list enumerator
 --         (equivalent to `1`).
 --
@@ -75,7 +75,7 @@ function M.new(writer, options)
     end
   end
 
-  if options.preserve_tabs then
+  if options.preserveTabs then
     expandtabs = function(s) return s end
   end
 
@@ -167,7 +167,7 @@ function M.new(writer, options)
   local tightblocksep          = P("\001")
 
   local specialchar
-  if options.smart_ellipses then
+  if options.smartEllipses then
     specialchar                = S("*_`&[]!\\.")
   else
     specialchar                = S("*_`&[]!\\")
@@ -226,7 +226,7 @@ function M.new(writer, options)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
-  if options.hash_enumerators then
+  if options.hashEnumerators then
     dig = digit + hash
   else
     dig = digit
@@ -442,11 +442,11 @@ function M.new(writer, options)
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
 
-  if options.require_blank_before_blockquote then
+  if options.requireBlankBeforeBlockquote then
     bqstart = fail
   end
 
-  if options.require_blank_before_header then
+  if options.requireBlankBeforeHeader then
     headerstart = fail
   end
 
@@ -593,13 +593,13 @@ function M.new(writer, options)
                      + Ct(LooseListItem(bullet)^1)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
-  local function ordered_list(s,tight,startnum)
-    if options.startnum then
-      startnum = tonumber(listtype) or 1  -- fallback for '#'
+  local function ordered_list(s,tight,startNumber)
+    if options.startNumber then
+      startNumber = tonumber(listtype) or 1  -- fallback for '#'
     else
-      startnum = nil
+      startNumber = nil
     end
-    return writer.orderedlist(s,tight,startnum)
+    return writer.orderedlist(s,tight,startNumber)
   end
 
   local OrderedList = Cg(enumerator, "listtype") *
@@ -745,7 +745,7 @@ function M.new(writer, options)
       Symbol                = Symbol,
     }
 
-  if not options.definition_lists then
+  if not options.definitionLists then
     syntax.DefinitionList = fail
   end
 
@@ -753,7 +753,7 @@ function M.new(writer, options)
     syntax.NoteRef = fail
   end
 
-  if not options.smart_ellipses then
+  if not options.smartEllipses then
     syntax.Smart = fail
   end
 
