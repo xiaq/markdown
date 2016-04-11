@@ -155,16 +155,6 @@ function M.new(options)
     return util.intersperse(items,W.interblocksep)
   end
 
-  --- Inline HTML.
-  function W.inline_html(s)
-    return ""
-  end
-
-  --- Display HTML (HTML block).
-  function W.display_html(s)
-    return ""
-  end
-
   --- Emphasized text.
   function W.emphasis(s)
     return s
