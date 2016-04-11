@@ -112,22 +112,6 @@ function M.new(options)
   --- Ellipsis (string).
   W.ellipsis = "…"
 
-  --- Em dash (string).
-  W.mdash = "—"
-
-  --- En dash (string).
-  W.ndash = "–"
-
-  --- String in curly single quotes.
-  function W.singlequoted(s)
-    return {"‘", s, "’"}
-  end
-
-  --- String in curly double quotes.
-  function W.doublequoted(s)
-    return {"“", s, "”"}
-  end
-
   --- String, escaped as needed for the output format.
   function W.string(s)
     return s

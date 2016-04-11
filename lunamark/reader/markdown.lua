@@ -50,8 +50,8 @@ end
 --     `preserve_tabs`
 --     :   Preserve tabs instead of converting to spaces.
 --
---     `smart`
---     :   Parse quotation marks, dashes, ellipses intelligently.
+--     `smart_ellipses`
+--     :   Parse ellipses intelligently.
 --
 --     `startnum`
 --     :   Make the opening number in an ordered list significant.
@@ -190,8 +190,8 @@ function M.new(writer, options)
   local tightblocksep          = P("\001")
 
   local specialchar
-  if options.smart then
-    specialchar                = S("*_`&[]!\\'\"-.")
+  if options.smart_ellipses then
+    specialchar                = S("*_`&[]!\\.")
   else
     specialchar                = S("*_`&[]!\\")
   end
@@ -455,23 +455,7 @@ function M.new(writer, options)
 
   local Ellipsis  = P("...") / writer.ellipsis
 
-  local Dash      = P("---") * -dash / writer.mdash
-                  + P("--") * -dash / writer.ndash
-                  + P("-") * #digit * B(digit, 2) / writer.ndash
-
-  local DoubleQuoted = dquote * Ct((Inline - dquote)^1) * dquote
-                     / writer.doublequoted
-
-  local squote_start = squote * -spacing
-
-  local squote_end = squote * B(nonspacechar, 2)
-
-  local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
-                     / writer.singlequoted
-
-  local Apostrophe = squote * B(nonspacechar, 2) / "’"
-
-  local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
+  local Smart     = Ellipsis
 
   local Symbol    = (specialchar - tightblocksep) / writer.string
 
@@ -813,7 +797,7 @@ function M.new(writer, options)
     syntax.NoteRef = fail
   end
 
-  if not options.smart then
+  if not options.smart_ellipses then
     syntax.Smart = fail
   end
 
