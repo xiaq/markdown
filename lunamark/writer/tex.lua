@@ -12,7 +12,19 @@ local entities = require("lunamark.entities")
 local format = string.format
 
 --- Returns a new TeX writer.
--- For a list of fields, see [lunamark.writer.generic].
+-- For a list of fields, see [lunamark.writer.generic]. `options` is a table
+-- that can contain the following fields:
+--
+-- `hybrid`
+-- :   Prevents the escaping of special-purpose TeX characters. This
+--     makes it possible to intersperse the Markdown markup with TeX code.
+--
+-- `verbatim`
+-- :   Prevents the escaping of special-purpose TeX characters within the code
+--     block, which will be returned as-is instead. Instead of the
+--     `\markdownCodeBlockBegin` and `\markdownCodeBlockEnd` macros, a code
+--     block will now be surrounded by `\markdownVerbatimBegin` and
+--     `\markdownVerbatimEnd` macros instead.
 function M.new(options)
   local options = options or {}
   local TeX = generic.new(options)
@@ -40,27 +52,20 @@ function M.new(options)
      ["["] = "{[}", -- to avoid interpretation as optional argument
      ["]"] = "{]}",
    }
-
-  local str_escaped = {
-     ["\226\128\156"] = "``",
-     ["\226\128\157"] = "''",
-     ["\226\128\152"] = "`",
-     ["\226\128\153"] = "'",
-     ["\226\128\148"] = "---",
-     ["\226\128\147"] = "--",
-     ["\194\160"]     = "~",
-   }
-
-  local escaper = util.escaper(TeX.escaped, str_escaped)
-
-  TeX.string = escaper
+  
+  local escape = util.escaper(TeX.escaped)
+  if options.hybrid then
+    TeX.string = function(s) return s end
+  else
+    TeX.string = escape
+  end
 
   function TeX.paragraph(s)
     return s
   end
 
   function TeX.code(s)
-    return {"\\markdownCodeSpan{",TeX.string(s),"}"}
+    return {"\\markdownCodeSpan{",escape(s),"}"}
   end
 
   function TeX.link(lab,src,tit)
@@ -148,7 +153,11 @@ function M.new(options)
   end
 
   function TeX.verbatim(s)
-    return {"\\markdownCodeBlockBegin\n",TeX.string(s),"\\markdownCodeBlockEnd "}
+    if options.verbatim then
+      return {"\\markdownVerbatimBegin\n",s,"\\markdownVerbatimEnd "}
+    else
+      return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
+    end
   end
 
   function TeX.header(s,level)
