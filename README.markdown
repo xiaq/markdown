@@ -9,8 +9,6 @@ package.
 
 # Authors
 
-lunamark is released under the MIT license.
-
 Most of the library is written by John MacFarlane.  Hans Hagen made some major
 performance improvements.  Khaled Hosny added the original ConTeXt writer.  Vít
 Novotný modified the library for use within the `markdown` TeX package.

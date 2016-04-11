@@ -12,7 +12,7 @@ local entities = require("lunamark.entities")
 local format = string.format
 
 --- Returns a new TeX writer.
--- For a list ofy fields, see [lunamark.writer.generic].
+-- For a list of fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local TeX = generic.new(options)
