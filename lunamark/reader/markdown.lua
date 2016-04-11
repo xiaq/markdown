@@ -69,15 +69,6 @@ end
 --             % Author1; Author2
 --             % Date
 --
---     `lua_metadata`
---     :   Enable lua metadata.  This is an HTML comment block
---         that starts with `<!--@` and contains lua code.
---         The lua code is interpreted in a sandbox, and
---         any variables defined are added to the metadata.
---         The function `markdown` (also `m`) is defined and can
---         be used to ensure that string fields are parsed
---         as markdown; otherwise, they will be read literally.
---
 --     `require_blank_before_blockquote`
 --     :   Require a blank line between a paragraph and a following
 --         block quote.
@@ -187,7 +178,7 @@ function M.new(writer, options)
   local fail                   = any - 1
   local always                 = P("")
 
-  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
+  local escapable              = S("\\`*_{}[]()+_.!#-~:^")
   local anyescaped             = P("\\") / "" * escapable
                                + any
 
@@ -200,9 +191,9 @@ function M.new(writer, options)
 
   local specialchar
   if options.smart then
-    specialchar                = S("*_`&[]<!\\'\"-.")
+    specialchar                = S("*_`&[]!\\'\"-.")
   else
-    specialchar                = S("*_`&[]<!\\")
+    specialchar                = S("*_`&[]!\\")
   end
 
   local normalchar             = any -
@@ -455,108 +446,6 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- HTML
-  ------------------------------------------------------------------------------
-
-  -- case-insensitive match (we assume s is lowercase)
-  local function keyword_exact(s)
-    local parser = P(0)
-    s = utf8.lower(s)
-    for i=1,#s do
-      local c = s:sub(i,i)
-      local m = c .. upper(c)
-      parser = parser * S(m)
-    end
-    return parser
-  end
-
-  local block_keyword =
-      keyword_exact("address") + keyword_exact("blockquote") +
-      keyword_exact("center") + keyword_exact("del") +
-      keyword_exact("dir") + keyword_exact("div") +
-      keyword_exact("p") + keyword_exact("pre") + keyword_exact("li") +
-      keyword_exact("ol") + keyword_exact("ul") + keyword_exact("dl") +
-      keyword_exact("dd") + keyword_exact("form") + keyword_exact("fieldset") +
-      keyword_exact("isindex") + keyword_exact("ins") +
-      keyword_exact("menu") + keyword_exact("noframes") +
-      keyword_exact("frameset") + keyword_exact("h1") + keyword_exact("h2") +
-      keyword_exact("h3") + keyword_exact("h4") + keyword_exact("h5") +
-      keyword_exact("h6") + keyword_exact("hr") + keyword_exact("script") +
-      keyword_exact("noscript") + keyword_exact("table") +
-      keyword_exact("tbody") + keyword_exact("tfoot") +
-      keyword_exact("thead") + keyword_exact("th") +
-      keyword_exact("td") + keyword_exact("tr")
-
-  -- There is no reason to support bad html, so we expect quoted attributes
-  local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
-                            + dquote * (any - (blankline + dquote))^0 * dquote
-
-  local htmlattribute       = spacing^1 * (alphanumeric + S("_-"))^1 * sp * equal
-                            * sp * htmlattributevalue
-
-  local htmlcomment         = P("<!--") * (any - P("-->"))^0 * P("-->")
-
-  local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
-
-  local openelt_any = less * keyword * htmlattribute^0 * sp * more
-
-  local function openelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
-  end
-
-  local openelt_block = less * sp * block_keyword * htmlattribute^0 * sp * more
-
-  local closeelt_any = less * sp * slash * keyword * sp * more
-
-  local function closeelt_exact(s)
-    return (less * sp * slash * keyword_exact(s) * sp * more)
-  end
-
-  local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
-
-  local function emptyelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * slash * more)
-  end
-
-  local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
-
-  local displaytext         = (any - less)^1
-
-  -- return content between two matched HTML tags
-  local function in_matched(s)
-    return { openelt_exact(s)
-           * (V(1) + displaytext + (less - closeelt_exact(s)))^0
-           * closeelt_exact(s) }
-  end
-
-  local function parse_matched_tags(s,pos)
-    local t = utf8.lower(lpegmatch(less * C(keyword),s,pos))
-    return lpegmatch(in_matched(t),s,pos)
-  end
-
-  local in_matched_block_tags = Cmt(#openelt_block, parse_matched_tags)
-
-  local displayhtml = htmlcomment
-                    + emptyelt_block
-                    + openelt_exact("hr")
-                    + in_matched_block_tags
-                    + htmlinstruction
-
-  local inlinehtml  = emptyelt_any
-                    + htmlcomment
-                    + htmlinstruction
-                    + openelt_any
-                    + closeelt_any
-
-  ------------------------------------------------------------------------------
-  -- Entities
-  ------------------------------------------------------------------------------
-
-  local hexentity = ampersand * hash * S("Xx") * C(hexdigit    ^1) * semicolon
-  local decentity = ampersand * hash           * C(digit       ^1) * semicolon
-  local tagentity = ampersand *                  C(alphanumeric^1) * semicolon
-
-  ------------------------------------------------------------------------------
   -- Inline elements
   ------------------------------------------------------------------------------
 
@@ -669,19 +558,11 @@ function M.new(writer, options)
 
   local EscapedChar   = S("\\") * C(escapable) / writer.string
 
-  local InlineHtml    = C(inlinehtml) / writer.inline_html
-
-  local HtmlEntity    = hexentity / entities.hex_entity  / writer.string
-                      + decentity / entities.dec_entity  / writer.string
-                      + tagentity / entities.char_entity / writer.string
-
   ------------------------------------------------------------------------------
   -- Block elements
   ------------------------------------------------------------------------------
 
   local Block          = V("Block")
-
-  local DisplayHtml    = C(displayhtml) / expandtabs / writer.display_html
 
   local Verbatim       = Cs( (blanklines
                            * ((indentedline - blankline))^1)^1
@@ -796,33 +677,6 @@ function M.new(writer, options)
                           ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
-  -- Lua metadata
-  ------------------------------------------------------------------------------
-
-  local function lua_metadata(s)  -- run lua code in comment in sandbox
-    local env = { m = parse_markdown, markdown = parse_blocks }
-    local scode = s:match("^<!%-%-@%s*(.*)%-%->")
-    local untrusted_table, message = loadstring(scode)
-    if not untrusted_table then
-      util.err(message, 37)
-    end
-    setfenv(untrusted_table, env)
-    local ok, msg = pcall(untrusted_table)
-    if not ok then
-      util.err(msg)
-    end
-    for k,v in pairs(env) do
-      writer.set_metadata(k,v)
-    end
-    return ""
-  end
-
-  local LuaMeta = fail
-  if options.lua_metadata then
-    LuaMeta = #P("<!--@") * htmlcomment / lua_metadata
-  end
-
-  ------------------------------------------------------------------------------
   -- Pandoc title block parser
   ------------------------------------------------------------------------------
 
@@ -848,7 +702,6 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local Blank          = blankline / ""
-                       + LuaMeta
                        + NoteBlock
                        + Reference
                        + (tightblocksep / "\n")
@@ -903,7 +756,6 @@ function M.new(writer, options)
                             + V("OrderedList")
                             + V("Header")
                             + V("DefinitionList")
-                            + V("DisplayHtml")
                             + V("Paragraph")
                             + V("Plain"),
 
@@ -930,8 +782,6 @@ function M.new(writer, options)
                             + V("Code")
                             + V("AutoLinkUrl")
                             + V("AutoLinkEmail")
-                            + V("InlineHtml")
-                            + V("HtmlEntity")
                             + V("EscapedChar")
                             + V("Smart")
                             + V("Symbol"),

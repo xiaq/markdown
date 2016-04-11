@@ -227,13 +227,6 @@ function M.new(options)
     return util.intersperse(buffer,W.interblocksep)
   end
 
-  --- A cosmo template to be used in producing a standalone document.
-  -- `$body` is replaced with the document body, `$title` with the
-  -- title, and so on.
-  W.template = [[
-$body
-]]
-
   return util.table_copy(W)
 end
 

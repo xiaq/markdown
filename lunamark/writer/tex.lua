@@ -50,8 +50,6 @@ function M.new(options)
      ["\\"] = "\\char92{}",
      ["~"] = "\\char126{}",
      ["|"] = "\\char124{}",
-     ["<"] = "\\char60{}",
-     [">"] = "\\char62{}",
      ["["] = "{[}", -- to avoid interpretation as optional argument
      ["]"] = "{]}",
    }
