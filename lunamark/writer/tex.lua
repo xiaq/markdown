@@ -23,7 +23,7 @@ function M.new(options)
 
   TeX.linebreak = "\\\\"
 
-  TeX.ellipsis = "\\ldots{}"
+  TeX.ellipsis = "\\markdownEllipsis "
 
   TeX.escaped = {
      ["{"] = "\\{",
@@ -60,87 +60,121 @@ function M.new(options)
   end
 
   function TeX.code(s)
-    return {"\\texttt{",TeX.string(s),"}"}
+    return {"\\markdownCodeSpan{",TeX.string(s),"}"}
   end
 
   function TeX.link(lab,src,tit)
-    return {"\\href{",TeX.string(src),"}{",lab,"}"}
+    return {"\\markdownLink{",TeX.string(lab[1]),"}",
+                          "{",TeX.string(src),"}",
+                          "{",TeX.string(tit),"}"}
   end
 
   function TeX.image(lab,src,tit)
-    return {"\\includegraphics{",TeX.string(src),"}"}
+    return {"\\markdownImage{",TeX.string(lab[1]),"}",
+                           "{",TeX.string(src),"}",
+                           "{",TeX.string(tit),"}"}
   end
 
-  local function listitem(s)
-    return {"\\item ",s}
+  local function ulitem(s)
+    return {"\\markdownUlItem ",s}
   end
 
-  function TeX.bulletlist(items)
+  function TeX.bulletlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1] = ulitem(item)
     end
     local contents = util.intersperse(buffer,"\n")
-    return {"\\begin{itemize}\n",contents,"\n\\end{itemize}"}
+    if tight then
+      return {"\\markdownUlBeginTight\n",contents,"\n\\markdownUlEndTight "}
+    else
+      return {"\\markdownUlBegin\n",contents,"\n\\markdownUlEnd "}
+    end
   end
 
-  function TeX.orderedlist(items)
+  local function olitem(s,num)
+    if num ~= nil then
+      return {"\\markdownOlItemWithNumber{",num,"} ",s}
+    else
+      return {"\\markdownOlItem ",s}
+    end
+  end
+
+  function TeX.orderedlist(items,tight,startnum)
     local buffer = {}
+    local num = startnum
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1] = olitem(item,num)
+      if num ~= nil then
+        num = num + 1
+      end
     end
     local contents = util.intersperse(buffer,"\n")
-    return {"\\begin{enumerate}\n",contents,"\n\\end{enumerate}"}
+    if tight then
+      return {"\\markdownOlBeginTight\n",contents,"\n\\markdownOlEndTight "}
+    else
+      return {"\\markdownOlBegin\n",contents,"\n\\markdownOlEnd "}
+    end
+  end
+
+  local function dlitem(term,defs)
+      return {"\\markdownDlItem{",term,"}\n",defs}
+  end
+
+  function TeX.definitionlist(items,tight)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = dlitem(item.term,
+        util.intersperse(item.definitions, TeX.interblocksep))
+    end
+    local contents = util.intersperse(buffer, TeX.containersep)
+    if tight then
+      return {"\\markdownDlBeginTight\n",contents,"\n\\markdownDlEndTight "}
+    else
+      return {"\\markdownDlBegin\n",contents,"\n\\markdownDlEnd "}
+    end
   end
 
   function TeX.emphasis(s)
-    return {"\\emph{",s,"}"}
+    return {"\\markdownEmphasis{",s,"}"}
   end
 
   function TeX.strong(s)
-    return {"\\textbf{",s,"}"}
+    return {"\\markdownStrongEmphasis{",s,"}"}
   end
 
   function TeX.blockquote(s)
-    return {"\\begin{quote}\n",s,"\n\\end{quote}"}
+    return {"\\markdownBlockQuoteBegin\n",s,"\n\\markdownBlockQuoteEnd "}
   end
 
   function TeX.verbatim(s)
-    return {"\\begin{verbatim}\n",s,"\\end{verbatim}"}
+    return {"\\markdownCodeBlockBegin\n",TeX.string(s),"\\markdownCodeBlockEnd "}
   end
 
   function TeX.header(s,level)
     local cmd
     if level == 1 then
-      cmd = "\\section"
+      cmd = "\\markdownHeaderOne"
     elseif level == 2 then
-      cmd = "\\subsection"
+      cmd = "\\markdownHeaderTwo"
     elseif level == 3 then
-      cmd = "\\subsubsection"
+      cmd = "\\markdownHeaderThree"
     elseif level == 4 then
-      cmd = "\\paragraph"
+      cmd = "\\markdownHeaderFour"
     elseif level == 5 then
-      cmd = "\\subparagraph"
+      cmd = "\\markdownHeaderFive"
+    elseif level == 6 then
+      cmd = "\\markdownHeaderSix"
     else
       cmd = ""
     end
     return {cmd,"{",s,"}"}
   end
 
-  TeX.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"
+  TeX.hrule = "\\markdownHorizontalRule "
 
   function TeX.note(contents)
-    return {"\\footnote{",contents,"}"}
-  end
-
-  function TeX.definitionlist(items)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format("\\item[%s]\n%s",
-        item.term, util.intersperse(item.definitions, TeX.interblocksep))
-    end
-    local contents = util.intersperse(buffer, TeX.containersep)
-    return {"\\begin{description}\n",contents,"\n\\end{description}"}
+    return {"\\markdownFootnote{",contents,"}"}
   end
 
   return TeX
