@@ -33,20 +33,6 @@ end
 -- *   `options` is a table with parsing options.
 --     The following fields are significant:
 --
---     `alter_syntax`
---     :   Function from syntax table to syntax table,
---         allowing the user to change or extend the markdown syntax.
---         For an example, see the documentation for `lunamark`.
---
---     `references`
---     :   A table of references to be used in resolving links
---         in the document.  The keys should be all lowercase, with
---         spaces and newlines collapsed into single spaces.
---         Example:
---
---             { foo: { url = "/url", title = "my title" },
---               bar: { url = "http://fsf.org" } }
---
 --     `preserve_tabs`
 --     :   Preserve tabs instead of converting to spaces.
 --
@@ -771,10 +757,6 @@ function M.new(writer, options)
     syntax.Smart = fail
   end
 
-  if options.alter_syntax and type(options.alter_syntax) == "function" then
-    syntax = options.alter_syntax(syntax)
-  end
-
   blocks = Ct(syntax)
 
   local inlines_t = util.table_copy(syntax)
@@ -793,7 +775,7 @@ function M.new(writer, options)
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
   return function(inp)
-      references = options.references or {}
+      references = {}
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
       return rope_to_string(result)
   end
