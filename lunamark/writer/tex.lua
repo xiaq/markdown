@@ -2,8 +2,7 @@
 -- See the file LICENSE in the source for details.
 
 --- Generic TeX writer for lunamark.
--- It extends [lunamark.writer.generic] and is extended by
--- [lunamark.writer.latex] and [lunamark.writer.context].
+-- Extends [lunamark.writer.generic].
 
 local M = {}
 
@@ -68,16 +67,92 @@ function M.new(options)
 
   TeX.string = escaper
 
-  function TeX.inline_html(s)
-    return ""
-  end
-
-  function TeX.display_html(s)
-    return ""
-  end
-
   function TeX.paragraph(s)
     return s
+  end
+
+  function TeX.code(s)
+    return {"\\texttt{",TeX.string(s),"}"}
+  end
+
+  function TeX.link(lab,src,tit)
+    return {"\\href{",TeX.string(src),"}{",lab,"}"}
+  end
+
+  function TeX.image(lab,src,tit)
+    return {"\\includegraphics{",TeX.string(src),"}"}
+  end
+
+  local function listitem(s)
+    return {"\\item ",s}
+  end
+
+  function TeX.bulletlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = listitem(item)
+    end
+    local contents = util.intersperse(buffer,"\n")
+    return {"\\begin{itemize}\n",contents,"\n\\end{itemize}"}
+  end
+
+  function TeX.orderedlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = listitem(item)
+    end
+    local contents = util.intersperse(buffer,"\n")
+    return {"\\begin{enumerate}\n",contents,"\n\\end{enumerate}"}
+  end
+
+  function TeX.emphasis(s)
+    return {"\\emph{",s,"}"}
+  end
+
+  function TeX.strong(s)
+    return {"\\textbf{",s,"}"}
+  end
+
+  function TeX.blockquote(s)
+    return {"\\begin{quote}\n",s,"\n\\end{quote}"}
+  end
+
+  function TeX.verbatim(s)
+    return {"\\begin{verbatim}\n",s,"\\end{verbatim}"}
+  end
+
+  function TeX.header(s,level)
+    local cmd
+    if level == 1 then
+      cmd = "\\section"
+    elseif level == 2 then
+      cmd = "\\subsection"
+    elseif level == 3 then
+      cmd = "\\subsubsection"
+    elseif level == 4 then
+      cmd = "\\paragraph"
+    elseif level == 5 then
+      cmd = "\\subparagraph"
+    else
+      cmd = ""
+    end
+    return {cmd,"{",s,"}"}
+  end
+
+  TeX.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"
+
+  function TeX.note(contents)
+    return {"\\footnote{",contents,"}"}
+  end
+
+  function TeX.definitionlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format("\\item[%s]\n%s",
+        item.term, util.intersperse(item.definitions, TeX.interblocksep))
+    end
+    local contents = util.intersperse(buffer, TeX.containersep)
+    return {"\\begin{description}\n",contents,"\n\\end{description}"}
   end
 
   return TeX
