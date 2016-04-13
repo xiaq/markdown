@@ -9,22 +9,28 @@ local M = {}
 local util = require("lunamark.util")
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
+local md5 = require("md5")
 local format = string.format
 
 --- Returns a new TeX writer.
 -- For a list of fields, see [lunamark.writer.generic]. `options` is a table
--- that can contain the following fields:
+-- that must contain the following fields:
+--
+-- `cacheDir`
+-- :   The directory in which temporary files are stored.
+--
+-- and that may contain the following fields:
 --
 -- `hybrid`
--- :   Prevents the escaping of special-purpose TeX characters. This
---     makes it possible to intersperse the Markdown markup with TeX code.
+-- :   Prevents the escaping of special TeX characters. This makes it possible
+--     to intersperse the Markdown markup with TeX code.
 --
 -- `verbatim`
--- :   Prevents the escaping of special-purpose TeX characters within the code
---     block, which will be returned as-is instead. Instead of the
---     `\markdownCodeBlockBegin` and `\markdownCodeBlockEnd` macros, a code
---     block will now be surrounded by `\markdownVerbatimBegin` and
---     `\markdownVerbatimEnd` macros instead.
+-- :   Code blocks will not be surrounded by \markdownCodeBlockBegin and
+--     \markdownCodeBlockEnd and have the special TeX characters escaped in
+--     their contents. Instead, their contents will be stored in a temporary
+--     file inside `cachedir`. The pathname of this file will be passed to the
+--     \markdownInputVerbatim macro.
 function M.new(options)
   local options = options or {}
   local TeX = generic.new(options)
@@ -152,9 +158,25 @@ function M.new(options)
     return {"\\markdownBlockQuoteBegin\n",s,"\n\\markdownBlockQuoteEnd "}
   end
 
+  local function pathname(file)
+    if #options.cacheDir == 0 then
+      return file
+    else
+      return options.cacheDir .. "/" .. file
+    end
+  end
+
   function TeX.verbatim(s)
     if options.verbatim then
-      return {"\\markdownVerbatimBegin\n",s,"\\markdownVerbatimEnd "}
+      local name = pathname(md5.sumhexa(s) .. ".verbatim")
+      local file = io.open(name, "r")
+      if file == nil then -- If no cache entry exists, then create a new one.
+        -- TODO: Cache autocleaning.
+        local file = assert(io.open(name, "w"))
+        assert(file:write(s))
+        assert(file:close())
+      end
+      return {"\\markdownInputVerbatim{",name,"}"}
     else
       return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
     end
