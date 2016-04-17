@@ -1,82 +1,556 @@
--- (c) 2009-2011 John MacFarlane, Hans Hagen.  Released under MIT license.
--- See the file LICENSE in the source for details.
+% \iffalse
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{microtype}
+\usepackage{blindtext}
+\usepackage{hologo}
 
-local util = require("lunamark.util")
+% Make paragraphs numbered.
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+% Define some user markup.
+\let\pkg\textsf
+
+\begin{document}
+  \RecordChanges
+  \MakeShortVerb{`}
+  \DocInput{markdown.dtx}
+  \PrintIndex
+  \PrintChanges
+\end{document}
+%</driver>
+% \fi
+%
+% \title{A Markdown interpreter for \TeX{}}
+% \author{Vít Novotný}
+% \date{\today}
+% \maketitle
+% \tableofcontents
+%
+% \section{Introduction}
+% This document is a reference manual for the \pkg{Markdown} package.
+% \blindtext
+%
+% \subsection{About \pkg{Markdown}}
+% \blindtext
+%
+% \subsection{License}
+% \blindtext
+%
+% \subsection{Feedback}
+% \blindtext
+%
+% \subsection{Acknowledgements}
+% \blindtext
+%
+% \subsection{Prerequisites}
+% \blindtext
+%
+%  \begin{macrocode}
+%<*lua>
 local lpeg = require("lpeg")
-local entities = require("lunamark.entities")
+local md5 = require("md5")
+local unicode = require("unicode")
+%</lua>
+%    \end{macrocode}
+%
+% \section{User Guide}
+% \blindtext
+%
+% \subsection{Lua Interface}
+% \blindtext
+%
+% \subsubsection{The recognized options}
+% \blindtext
+%
+%  \begin{macrocode}
+%  `cacheDir`
+%  :   The directory in which temporary files are stored.
+% 
+%  and that may contain the following fields:
+% 
+%  `hybrid`
+%  :   Prevents the escaping of special TeX characters. This makes it possible
+%      to intersperse the Markdown markup with TeX code.
+% 
+%  `verbatim`
+%  :   Code blocks will not be surrounded by \markdownCodeBlockBegin and
+%      \markdownCodeBlockEnd and have the special TeX characters escaped in
+%      their contents. Instead, their contents will be stored in a temporary
+%      file inside `cachedir`. The pathname of this file will be passed to the
+%      \markdownInputVerbatim macro.
+% 
+%      `preserveTabs`
+%      :   Preserve tabs instead of converting to spaces.
+% 
+%      `smartEllipses`
+%      :   Parse ellipses intelligently.
+% 
+%      `startNumber`
+%      :   Make the opening number in an ordered list significant.
+% 
+%      `notes`
+%      :   Enable footnotes as in pandoc.
+% 
+%      `definitionLists`
+%      :   Enable definition lists as in pandoc.
+% 
+%      `requireBlankBeforeBlockquote`
+%      :   Require a blank line between a paragraph and a following
+%          block quote.
+% 
+%      `requireBlankBeforeHeader`
+%      :   Require a blank line between a paragraph and a following
+%          header.
+% 
+%      `hashEnumerators`
+%      :   Allow `#` instead of a digit for an ordered list enumerator
+%          (equivalent to `1`).
+%    \end{macrocode}
+% 
+% \section{Implementation}
+% \iffalse
+%<*lua>
+% \fi\subsection{Lua interface}
+% \blindtext
+%
+%  \begin{macrocode}
 local lower, upper, gsub, rep, gmatch, format, length =
   string.lower, string.upper, string.gsub, string.rep, string.gmatch,
   string.format, string.len
 local concat = table.concat
-local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs =
+local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs, any =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs
+  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
 local lpegmatch = lpeg.match
-local expand_tabs_in_line = util.expand_tabs_in_line
-local unicode = require("unicode")
 local utf8 = unicode.utf8
-
 local M = {}
-
-local rope_to_string = util.rope_to_string
-
--- Normalize a markdown reference tag.  (Make lowercase, and collapse
--- adjacent whitespace characters.)
-local function normalize_tag(tag)
-  return utf8.lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
+%    \end{macrocode}
+% 
+% \subsubsection{Utility functions}
+% \blindtext
+% 
+% Prints an error message and exits.
+%  \begin{macrocode}
+local util = {}
+function util.err(msg, exit_code)
+  io.stderr:write("lunamark: " .. msg .. "\n")
+  os.exit(exit_code or 1)
 end
-
---- Create a new markdown parser.
---
--- *   `writer` is a writer table (see [lunamark.writer.generic]).
---
--- *   `options` is a table with parsing options.
---     The following fields are significant:
---
---     `preserveTabs`
---     :   Preserve tabs instead of converting to spaces.
---
---     `smartEllipses`
---     :   Parse ellipses intelligently.
---
---     `startNumber`
---     :   Make the opening number in an ordered list significant.
---
---     `notes`
---     :   Enable footnotes as in pandoc.
---
---     `definitionLists`
---     :   Enable definition lists as in pandoc.
---
---     `requireBlankBeforeBlockquote`
---     :   Require a blank line between a paragraph and a following
---         block quote.
---
---     `requireBlankBeforeHeader`
---     :   Require a blank line between a paragraph and a following
---         header.
---
---     `hashEnumerators`
---     :   Allow `#` instead of a digit for an ordered list enumerator
---         (equivalent to `1`).
---
--- *   Returns a converter function that converts a markdown string
---     using `writer`, returning the parsed document. The converter assumes
---     that the input has unix line endings (newline).  If the input might have
---     DOS line endings, a simple `gsub("\r","")` should take care of them.
-function M.new(writer, options)
-  local options = options or {}
-
-  local function expandtabs(s)
-    if s:find("\t") then
-      return s:gsub("[^\n]*",expand_tabs_in_line)
+%    \end{macrocode}
+% Creates a shallow copy of a table including metatables.
+%  \begin{macrocode}
+function util.table_copy(t)
+  local u = { }
+  for k, v in pairs(t) do u[k] = v end
+  return setmetatable(u, getmetatable(t))
+end
+%    \end{macrocode}
+% Expands tabs in a single line of text.
+%  \begin{macrocode}
+function util.expand_tabs_in_line(s, tabstop)
+  local tab = tabstop or 4
+  local corr = 0
+  return (s:gsub("()\t", function(p)
+            local sp = tab - (p - 1 + corr) % tab
+            corr = corr - 1 + sp
+            return string.rep(" ", sp)
+          end))
+end
+%    \end{macrocode}
+% Walks a rope `t`, applying a function `f` to each leaf element in order. A
+% rope is an array whose elements may be ropes, strings, numbers, or functions.
+% If a leaf element is a function, call it and get the return value before
+% proceeding.
+%  \begin{macrocode}
+function util.walk(t, f)
+    local typ = type(t)
+    if typ == "string" then
+      f(t)
+    elseif typ == "table" then
+      local i = 1
+      local n
+      n = t[i]
+      while n do
+        util.walk(n, f)
+        i = i + 1
+        n = t[i]
+      end
+    elseif typ == "function" then
+      local ok, val = pcall(t)
+      if ok then
+        util.walk(val,f)
+      end
     else
-      return s
+      f(tostring(t))
+    end
+end
+%    \end{macrocode}
+% Flattens an array.
+%  \begin{macrocode}
+function util.flatten(ary)
+  local new = {}
+  for i,v in ipairs(ary) do
+    if type(v) == "table" then
+      for j,w in ipairs(util.flatten(v)) do
+        new[#new + 1] = w
+      end
+    else
+      new[#new + 1] = v
+    end
+  end
+  return new
+end
+%    \end{macrocode}
+% Converts a rope to a string.
+%  \begin{macrocode}
+function util.rope_to_string(rope)
+  local buffer = {}
+  util.walk(rope, function(x) buffer[#buffer + 1] = x end)
+  return table.concat(buffer)
+end
+%    \end{macrocode}
+% Retrieves the last item in a rope.
+%  \begin{macrocode}
+function util.rope_last(rope)
+  if #rope == 0 then
+    return nil
+  else
+    local l = rope[#rope]
+    if type(l) == "table" then
+      return util.rope_last(l)
+    else
+      return l
+    end
+  end
+end
+%    \end{macrocode}
+% Given an array `ary`, returns a new array with `x` interspersed between
+% elements of `ary`.
+%  \begin{macrocode}
+function util.intersperse(ary, x)
+  local new = {}
+  local l = #ary
+  for i,v in ipairs(ary) do
+    local n = #new
+    new[n + 1] = v
+    if i ~= l then
+      new[n + 2] = x
+    end
+  end
+  return new
+end
+%    \end{macrocode}
+% Given an array `ary`, returns a new array with each element `x` of `ary`
+% replaced by `f(x)`.
+%  \begin{macrocode}
+function util.map(ary, f)
+  local new = {}
+  for i,v in ipairs(ary) do
+    new[i] = f(v)
+  end
+  return new
+end
+%    \end{macrocode}
+% Given a table `char_escapes` mapping escapable characters onto their escaped
+% versions and optionally `string_escapes` mapping escapable strings (or
+% multibyte UTF-8 characters) onto their escaped versions, returns a function
+% that escapes a string. This function uses \pkg{lpeg} and is faster than
+% `gsub`.
+%  \begin{macrocode}
+function util.escaper(char_escapes, string_escapes)
+  local char_escapes_list = ""
+  for i,_ in pairs(char_escapes) do
+    char_escapes_list = char_escapes_list .. i
+  end
+  local escapable = S(char_escapes_list) / char_escapes
+  if string_escapes then
+    for k,v in pairs(string_escapes) do
+      escapable = P(k) / v + escapable
+    end
+  end
+  local escape_string = Cs((escapable + any)^0)
+  return function(s)
+    return lpegmatch(escape_string, s)
+  end
+end
+%    \end{macrocode}
+% \subsubsection{The \TeX{} writer}
+% \blindtext
+%
+% Creates a new \TeX{} writer, where `options` is a table with options.
+%  \begin{macrocode}
+M.writer = {}
+function M.writer.new(options)
+  local self = {}
+  local options = options or {}
+%    \end{macrocode}
+% A space character.
+%  \begin{macrocode}
+  self.space = " "
+%    \end{macrocode}
+% The plain text block formatter.
+%  \begin{macrocode}
+  function self.plain(s)
+    return s
+  end
+%    \end{macrocode}
+% The paragraph formatter.
+%  \begin{macrocode}
+  function self.paragraph(s)
+    return s
+  end
+%    \end{macrocode}
+% Line breaks for use between block elements.
+%  \begin{macrocode}
+  self.interblocksep = "\n\n"
+%    \end{macrocode}
+% A line break.
+%  \begin{macrocode}
+  self.linebreak = "\\\\"
+%    \end{macrocode}
+% An ellipsis.
+%  \begin{macrocode}
+  self.ellipsis = "\\markdownEllipsis "
+%    \end{macrocode}
+% The horizontal rule.
+%  \begin{macrocode}
+  self.hrule = "\\markdownHorizontalRule "
+%    \end{macrocode}
+% A special character escaping function.
+%  \begin{macrocode}
+  self.escaped = {
+     ["{"] = "\\{",
+     ["}"] = "\\}",
+     ["$"] = "\\$",
+     ["%"] = "\\%",
+     ["&"] = "\\&",
+     ["_"] = "\\_",
+     ["#"] = "\\#",
+     ["^"] = "\\^{}",
+     ["\\"] = "\\char92{}",
+     ["~"] = "\\char126{}",
+     ["|"] = "\\char124{}",
+  }
+  local escape = util.escaper(self.escaped)
+  if options.hybrid then
+    self.string = function(s) return s end
+  else
+    self.string = escape
+  end
+%    \end{macrocode}
+% The inline verbatim code formatter.
+%  \begin{macrocode}
+  function self.code(s)
+    return {"\\markdownCodeSpan{",escape(s),"}"}
+  end
+%    \end{macrocode}
+% A formatter for a link with the text `label`, the URI `uri`, and the title
+% `title`.
+%  \begin{macrocode}
+  function self.link(lab,src,tit)
+    return {"\\markdownLink{",self.string(lab[1]),"}",
+                          "{",self.string(src),"}",
+                          "{",self.string(tit),"}"}
+  end
+%    \end{macrocode}
+% A formatter for an image with the alternative text `label`, the source URI
+% `src`, and the title `title`.
+%  \begin{macrocode}
+  function self.image(lab,src,tit)
+    return {"\\markdownImage{",self.string(lab[1]),"}",
+                           "{",self.string(src),"}",
+                           "{",self.string(tit),"}"}
+  end
+%    \end{macrocode}
+% The formatter for a bullet list with contents `items` (an array).  If `tight`
+% is true, the list should have minimal spacing between items.
+%  \begin{macrocode}
+  local function ulitem(s)
+    return {"\\markdownUlItem ",s}
+  end
+
+  function self.bulletlist(items,tight)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = ulitem(item)
+    end
+    local contents = util.intersperse(buffer,"\n")
+    if tight then
+      return {"\\markdownUlBeginTight\n",contents,"\n\\markdownUlEndTight "}
+    else
+      return {"\\markdownUlBegin\n",contents,"\n\\markdownUlEnd "}
+    end
+  end
+%    \end{macrocode}
+% The formatter for an ordered list with contents `items` (an array). If
+% `tight` is true, the list should have minimal spacing between items. If the
+% optional number `startnum` is present, it should be used as the number of
+% the first list item.
+%  \begin{macrocode}
+  local function olitem(s,num)
+    if num ~= nil then
+      return {"\\markdownOlItemWithNumber{",num,"} ",s}
+    else
+      return {"\\markdownOlItem ",s}
     end
   end
 
+  function self.orderedlist(items,tight,startnum)
+    local buffer = {}
+    local num = startnum
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = olitem(item,num)
+      if num ~= nil then
+        num = num + 1
+      end
+    end
+    local contents = util.intersperse(buffer,"\n")
+    if tight then
+      return {"\\markdownOlBeginTight\n",contents,"\n\\markdownOlEndTight "}
+    else
+      return {"\\markdownOlBegin\n",contents,"\n\\markdownOlEnd "}
+    end
+  end
+%    \end{macrocode}
+% The formatter for a definition list. `items` is an array of tables, each of
+% the form `{ term = t, definitions = defs, tight = tight }`, where `t` is a
+% string and `defs` is an array of strings.  If `tight` is true, the list
+% should have minimal spacing between items.
+%  \begin{macrocode}
+  local function dlitem(term,defs)
+      return {"\\markdownDlItem{",term,"}\n",defs}
+  end
+
+  function self.definitionlist(items,tight)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = dlitem(item.term,
+        util.intersperse(item.definitions, self.interblocksep))
+    end
+    local contents = util.intersperse(buffer, self.containersep)
+    if tight then
+      return {"\\markdownDlBeginTight\n",contents,"\n\\markdownDlEndTight "}
+    else
+      return {"\\markdownDlBegin\n",contents,"\n\\markdownDlEnd "}
+    end
+  end
+%    \end{macrocode}
+% The emphasized text formatter.
+%  \begin{macrocode}
+  function self.emphasis(s)
+    return {"\\markdownEmphasis{",s,"}"}
+  end
+%    \end{macrocode}
+% The strongly emphasized text formatter.
+%  \begin{macrocode}
+  function self.strong(s)
+    return {"\\markdownStrongEmphasis{",s,"}"}
+  end
+%    \end{macrocode}
+% The block quotation formatter.
+%  \begin{macrocode}
+  function self.blockquote(s)
+    return {"\\markdownBlockQuoteBegin\n",s,"\n\\markdownBlockQuoteEnd "}
+  end
+%    \end{macrocode}
+% The block verbatim code formatter.
+%  \begin{macrocode}
+  local function pathname(file)
+    if #options.cacheDir == 0 then
+      return file
+    else
+      return options.cacheDir .. "/" .. file
+    end
+  end
+
+  function self.verbatim(s)
+    if options.verbatim then
+      local name = pathname(md5.sumhexa(s) .. ".verbatim")
+      local file = io.open(name, "r")
+      if file == nil then -- If no cache entry exists, then create a new one.
+        -- TODO: Cache autocleaning.
+        local file = assert(io.open(name, "w"))
+        assert(file:write(s))
+        assert(file:close())
+      end
+      return {"\\markdownInputVerbatim{",name,"}"}
+    else
+      return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
+    end
+  end
+%    \end{macrocode}
+% The formatter of a header `s` at level `level`.
+%  \begin{macrocode}
+  function self.header(s,level)
+    local cmd
+    if level == 1 then
+      cmd = "\\markdownHeaderOne"
+    elseif level == 2 then
+      cmd = "\\markdownHeaderTwo"
+    elseif level == 3 then
+      cmd = "\\markdownHeaderThree"
+    elseif level == 4 then
+      cmd = "\\markdownHeaderFour"
+    elseif level == 5 then
+      cmd = "\\markdownHeaderFive"
+    elseif level == 6 then
+      cmd = "\\markdownHeaderSix"
+    else
+      cmd = ""
+    end
+    return {cmd,"{",s,"}"}
+  end
+%    \end{macrocode}
+% The footnote formatter.
+%  \begin{macrocode}
+  function self.note(contents)
+    return {"\\markdownFootnote{",contents,"}"}
+  end
+
+  return self
+end
+%    \end{macrocode}
+% 
+% \subsubsection{Markdown Reader}
+% \blindtext
+% 
+% Normalizes a markdown reference tag. (Turns it lowercase, and collapses any
+% adjacent whitespace characters.)
+%  \begin{macrocode}
+local function normalize_tag(tag)
+  return utf8.lower(gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
+end
+%    \end{macrocode}
+% Creates a new markdown parser, where `writer` is a writer and where `options`
+% is a table with options. The return value is a converter function that
+% converts a markdown string using `writer`, returning the parsed document.
+% The converter assumes that the input has unix line endings (newline).
+%  \begin{macrocode}
+M.reader = {}
+function M.reader.new(writer, options)
+  local options = options or {}
+
+  local expandtabs
   if options.preserveTabs then
     expandtabs = function(s) return s end
+  else
+    expandtabs = function(s)
+                   if s:find("\t") then
+                     return s:gsub("[^\n]*", util.expand_tabs_in_line)
+                   else
+                     return s
+                   end
+                 end
   end
 
   ------------------------------------------------------------------------------
@@ -111,11 +585,9 @@ function M.new(writer, options)
         else return res
         end
     end
-
-  ------------------------------------------------------------------------------
-  -- Generic parsers
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Generic Parsers}
+%  \begin{macrocode}
   local percent                = P("%")
   local asterisk               = P("*")
   local dash                   = P("-")
@@ -203,11 +675,9 @@ function M.new(writer, options)
              * (blankline^1 * indent * -blankline * bl)^0
              * blankline^1 )
   end
-
-  -----------------------------------------------------------------------------
-  -- Parsers used for markdown lists
-  -----------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{List Parsers}
+%  \begin{macrocode}
   -- gobble spaces to make the whole bullet or enumerator four spaces wide:
   local function gobbletofour(s,pos,c)
       if length(c) >= 3
@@ -238,11 +708,9 @@ function M.new(writer, options)
                    + space * C(dig^2 * period) * #spacing
                    + space * C(dig * period) * #spacing * (tab + space^-1)
                    + space * space * C(dig^1 * period) * #spacing
-
-  -----------------------------------------------------------------------------
-  -- Parsers used for markdown code spans
-  -----------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Code Span Parsers}
+%  \begin{macrocode}
   local openticks   = Cg(backtick^1, "ticks")
 
   local function captures_equal_length(s,i,a,b)
@@ -258,11 +726,9 @@ function M.new(writer, options)
                     + (backtick^1 - closeticks)
 
   local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
-
-  -----------------------------------------------------------------------------
-  -- Parsers used for markdown tags and links
-  -----------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Tags and Links Parsers}
+%  \begin{macrocode}
   local leader        = space^-3
 
   -- in balanced brackets, parentheses, quotes:
@@ -307,11 +773,9 @@ function M.new(writer, options)
 
   local optionaltitle = spnl * title * spacechar^0
                       + Cc("")
-
-  ------------------------------------------------------------------------------
-  -- Footnotes
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Footnotes}
+%  \begin{macrocode}
   local rawnotes = {}
 
   local function strip_first_char(s)
@@ -347,11 +811,9 @@ function M.new(writer, options)
   else
     NoteBlock = fail
   end
-
-  ------------------------------------------------------------------------------
-  -- Helpers for links and references
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Links and References Helpers}
+%  \begin{macrocode}
   -- List of references defined in the document
   local references
 
@@ -421,11 +883,9 @@ function M.new(writer, options)
       end
     end
   end
-
-  ------------------------------------------------------------------------------
-  -- Inline elements
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Inline Elements}
+%  \begin{macrocode}
   local Inline    = V("Inline")
 
   local Str       = normalchar^1 / writer.string
@@ -518,11 +978,9 @@ function M.new(writer, options)
   local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
 
   local EscapedChar   = S("\\") * C(escapable) / writer.string
-
-  ------------------------------------------------------------------------------
-  -- Block elements
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Block Elements}
+%  \begin{macrocode}
   local Block          = V("Block")
 
   local Verbatim       = Cs( (blanklines
@@ -555,11 +1013,9 @@ function M.new(writer, options)
                        / writer.paragraph
 
   local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
-
-  ------------------------------------------------------------------------------
-  -- Lists
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Lists}
+%  \begin{macrocode}
   local starter = bullet + enumerator
 
   -- we use \001 as a separator between a tight list item and a
@@ -636,20 +1092,16 @@ function M.new(writer, options)
                           +  Ct(DefinitionListItemTight^1)
                              * (skipblanklines * -DefinitionListItemLoose * Cc(true))
                           ) / writer.definitionlist
-
-  ------------------------------------------------------------------------------
-  -- Blank
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Blanks}
+%  \begin{macrocode}
   local Blank          = blankline / ""
                        + NoteBlock
                        + Reference
                        + (tightblocksep / "\n")
-
-  ------------------------------------------------------------------------------
-  -- Headers
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Headers}
+%  \begin{macrocode}
   -- parse Atx heading start and return level
   local HeadingStart = #hash * C(hash^-6) * -hash / length
 
@@ -673,11 +1125,9 @@ function M.new(writer, options)
                      * HeadingLevel
                      * optionalspace * newline
                      / writer.header
-
-  ------------------------------------------------------------------------------
-  -- Syntax specification
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Syntax Specification}
+%  \begin{macrocode}
   syntax =
     { "Blocks",
 
@@ -767,19 +1217,127 @@ function M.new(writer, options)
   inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
-
-  ------------------------------------------------------------------------------
-  -- Exported conversion function
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \paragraph{Exported Conversion Function}
+%  \begin{macrocode}
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
   return function(inp)
       references = {}
-      local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
-      return rope_to_string(result)
+      return util.rope_to_string(parse_blocks(inp))
   end
-
 end
 
 return M
+%    \end{macrocode}
+% \blindtext
+% \iffalse
+%</lua>
+% \fi
+% 
+% \iffalse
+%<*tex>
+% \fi\section{\TeX{} interface}
+% \blindtext
+%
+% \subsection{Package Interface}
+% \blindtext
+%
+%  \begin{macrocode}
+\def\markdownEllipsis{\markdownEllipsisPrototype}
+\def\markdownCodeSpan{\markdownCodeSpanPrototype}
+\def\markdownLink{\markdownLinkPrototype}
+\def\markdownImage{\markdownImagePrototype}
+\def\markdownUlBegin{\markdownUlBeginPrototype}
+\def\markdownUlBeginTight{\markdownUlBeginTightPrototype}
+\def\markdownUlItem{\markdownUlItemPrototype}
+\def\markdownUlEnd{\markdownUlEndPrototype}
+\def\markdownUlEndTight{\markdownUlEndTightPrototype}
+\def\markdownOlBegin{\markdownOlBeginPrototype}
+\def\markdownOlBeginTight{\markdownOlBeginTightPrototype}
+\def\markdownOlItem{\markdownOlItemPrototype}
+\def\markdownOlItemWithNumber{\markdownOlItemWithNumberPrototype}
+\def\markdownOlEnd{\markdownOlEndPrototype}
+\def\markdownOlEndTight{\markdownOlEndTightPrototype}
+\def\markdownDlBegin{\markdownDlBeginPrototype}
+\def\markdownDlBeginTight{\markdownDlBeginTightPrototype}
+\def\markdownDlItem{\markdownDlItemPrototype}
+\def\markdownDlEnd{\markdownDlEndPrototype}
+\def\markdownDlEndTight{\markdownDlEndTightPrototype}
+\def\markdownEmphasis{\markdownEmphasisPrototype}
+\def\markdownStrongEmphasis{\markdownStrongEmphasisPrototype}
+\def\markdownBlockQuoteBegin{\markdownBlockQuoteBeginPrototype}
+\def\markdownBlockQuoteEnd{\markdownBlockQuoteEndPrototype}
+\def\markdownCodeBlockBegin{\markdownCodeBlockBeginPrototype}
+\def\markdownCodeBlockEnd{\markdownCodeBlockEndPrototype}
+\def\markdownInputVerbatim{\markdownInputVerbatimPrototype}
+\def\markdownHeaderOne{\markdownHeaderOnePrototype}
+\def\markdownHeaderTwo{\markdownHeaderTwoPrototype}
+\def\markdownHeaderThree{\markdownHeaderThreePrototype}
+\def\markdownHeaderFour{\markdownHeaderFourPrototype}
+\def\markdownHeaderFive{\markdownHeaderFivePrototype}
+\def\markdownHeaderSix{\markdownHeaderSixPrototype}
+\def\markdownHorizontalRule{\markdownHorizontalRulePrototype}
+\def\markdownFootnote{\markdownFootnotePrototype}
+%    \end{macrocode}
+% \subsection{User Interface}
+% \blindtext
+% 
+%  \begin{macrocode}
+\def\markdownEllipsisPrototype{...}
+\def\markdownCodeSpanPrototype#1{#1}
+\def\markdownLinkPrototype#1#2#3{#1}  % #1 = Label, #2 = Src, #3 = Title
+\def\markdownImagePrototype#1#2#3{#1} % #1 = Label, #2 = Src, #3 = Title
+\def\markdownUlBeginPrototype{}
+\def\markdownUlBeginTightPrototype{}
+\def\markdownUlItemPrototype{}
+\def\markdownUlEndPrototype{}
+\def\markdownUlEndTightPrototype{}
+\def\markdownOlBeginPrototype{}
+\def\markdownOlBeginTightPrototype{}
+\def\markdownOlItemPrototype{}
+\def\markdownOlItemWithNumberPrototype#1{}
+\def\markdownOlEndPrototype{}
+\def\markdownOlEndTightPrototype{}
+\def\markdownDlBeginPrototype{}
+\def\markdownDlBeginTightPrototype{}
+\def\markdownDlItemPrototype#1{#1}
+\def\markdownDlEndPrototype{}
+\def\markdownDlEndTightPrototype{}
+\def\markdownEmphasisPrototype#1{#1}
+\def\markdownStrongEmphasisPrototype#1{#1}
+\def\markdownBlockQuoteBeginPrototype{}
+\def\markdownBlockQuoteEndPrototype{}
+\def\markdownCodeBlockBeginPrototype{}
+\def\markdownCodeBlockEndPrototype{}
+\def\markdownInputVerbatimPrototype#1{\input#1\relax}
+\def\markdownHeaderOnePrototype#1{#1}
+\def\markdownHeaderTwoPrototype#1{#1}
+\def\markdownHeaderThreePrototype#1{#1}
+\def\markdownHeaderFourPrototype#1{#1}
+\def\markdownHeaderFivePrototype#1{#1}
+\def\markdownHeaderSixPrototype#1{#1}
+\def\markdownHorizontalRulePrototype{}
+\def\markdownFootnotePrototype#1{#1}
+%    \end{macrocode}
+% \iffalse
+%</tex>
+% \fi
+%
+% \iffalse
+%<*latex>
+% \fi\section{\LaTeX{} interface}
+% \blindtext
+%
+% \iffalse
+%</latex>
+% \fi
+%
+% \iffalse
+%<*context>
+% \fi\section{\Hologo{ConTeXt} interface}
+% \blindtext
+%
+% \iffalse
+%</context>
+% \fi
