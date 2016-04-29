@@ -72,6 +72,9 @@ local unicode = require("unicode")
 % \subsubsection{The recognized options}
 % \blindtext
 %
+% \begin{description}
+%   \item[\blindtext] \blindtext
+% \end{description}
 %  \begin{macrocode}
 %  `cacheDir`
 %  :   The directory in which temporary files are stored.
@@ -124,13 +127,12 @@ local unicode = require("unicode")
 % \blindtext
 %
 %  \begin{macrocode}
-local lower, upper, gsub, rep, gmatch, format, length =
-  string.lower, string.upper, string.gsub, string.rep, string.gmatch,
-  string.format, string.len
+local upper, gsub, format, length =
+  string.upper, string.gsub, string.format, string.len
 local concat = table.concat
-local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs, any =
+local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
+  lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
 local lpegmatch = lpeg.match
 local utf8 = unicode.utf8
 local M = {}
@@ -678,16 +680,6 @@ function M.reader.new(writer, options)
 %    \end{macrocode}
 % \paragraph{List Parsers}
 %  \begin{macrocode}
-  -- gobble spaces to make the whole bullet or enumerator four spaces wide:
-  local function gobbletofour(s,pos,c)
-      if length(c) >= 3
-         then return lpegmatch(space^-1,s,pos)
-      elseif length(c) == 2
-         then return lpegmatch(space^-2,s,pos)
-      else return lpegmatch(space^-3,s,pos)
-      end
-  end
-
   local bulletchar = C(plus + asterisk + dash)
 
   local bullet     = ( bulletchar * #spacing * (tab + space^-3)
@@ -1240,7 +1232,7 @@ return M
 % \fi\section{\TeX{} interface}
 % \blindtext
 %
-% \subsection{Package Interface}
+% \subsection{User Interface}
 % \blindtext
 %
 %  \begin{macrocode}
@@ -1280,7 +1272,8 @@ return M
 \def\markdownHorizontalRule{\markdownHorizontalRulePrototype}
 \def\markdownFootnote{\markdownFootnotePrototype}
 %    \end{macrocode}
-% \subsection{User Interface}
+%
+% \subsection{Package Interface}
 % \blindtext
 % 
 %  \begin{macrocode}
