@@ -1,41 +1,60 @@
 % \iffalse
 %<*driver>
-\documentclass{ltxdoc}
+\documentclass{ltxdockit}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[american]{babel}
 \usepackage{microtype}
-\usepackage{minted}
 \usepackage{blindtext}
 \usepackage{hologo}
+\usepackage{xcolor}
+\usepackage{doc}
 
 % Make paragraphs numbered.
 \makeatletter
-\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-            {-2.5ex\@plus -1ex \@minus -.25ex}%
-            {1.25ex \@plus .25ex}%
-            {\normalfont\normalsize\bfseries}}
 \makeatother
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
 
+% Set up the style.
+\addtokomafont{title}{\sffamily}
+\addtokomafont{paragraph}{\spotcolor}
+\addtokomafont{section}{\spotcolor}
+\addtokomafont{subsection}{\spotcolor}
+\addtokomafont{subsubsection}{\spotcolor}
+\addtokomafont{descriptionlabel}{\spotcolor}
+\setkomafont{caption}{\bfseries\sffamily\spotcolor}
+\setkomafont{captionlabel}{\bfseries\sffamily\spotcolor}
+\let\oldCodelineNo\theCodelineNo
+\def\theCodelineNo{\textcolor{gray}{\oldCodelineNo}}
+
 % Define some user markup.
-\let\pkg\textsf
+\let\pkg\relax
+\def\m#1{%
+  %\expandafter\DescribeMacro\csname#1\endcsname
+  \textcolor{spot}{\cs{#1}}}
+\def\t`#1`{\textcolor{spot}{\texttt{#1}}}
+
+% Set up the title page.
+\titlepage{%
+  title={A Markdown interpreter for \TeX{}},
+  subtitle={},
+  url={https://github.com/witiko/markdown},
+  author={Vít Novotný (based on the work of John MacFarlane and Hans Hagen)},
+  email={witiko@mail.muni.cz},
+  revision={0.0.1},
+  date={\today}}
+\CodelineIndex
+\EnableCrossrefs
+\RecordChanges
 
 \begin{document}
-  \RecordChanges
-  \MakeShortVerb{`}
+  \printtitlepage
+  \tableofcontents
   \DocInput{markdown.dtx}
-  \PrintIndex
-  \PrintChanges
 \end{document}
 %</driver>
 % \fi
-%
-% \title{A Markdown interpreter for \TeX{}}
-% \author{Vít Novotný}
-% \date{\today}
-% \maketitle
-% \tableofcontents
 %
 % \section{Introduction}
 % This document is a reference manual for the \pkg{Markdown} package.
@@ -46,9 +65,9 @@
 % MacFarlane, which was slimmed down and heavily modified for the purposes of
 % this package. This library provides quick markdown parsing for the rest of the
 % package. On top of \pkg{lunamark} sits a shell wrapper, which enables the
-% usage of the library from within `\write18`-capable \TeX{} engines without
-% direct support of Lua. The user interacts with the package through the \TeX{}
-% and \LaTeX{} interfaces.
+% usage of the library from within \t`\cs{write}18`-capable \TeX{} engines
+% without direct support of Lua. The user interacts with the package through
+% the \TeX{} and \LaTeX{} interfaces.
 %
 % \blindtext
 %
@@ -81,110 +100,107 @@ local unicode = require("unicode")
 % \subsubsection{Options}
 % \blindtext
 %
-% \begin{description}
+% \begin{marglist}
 %
-%   \item[`cacheDir`]
+%   \item[cacheDir]
 %     The directory in which temporary files are stored. If no value is
 %     specified, the temporary files will be stored directly in the current
 %     directory.
 %
-%   \item[`definitionLists`]
-%     When set to `true`, this option will enable the pandoc definition list
+%   \item[definitionLists]
+%     When set to \t`true`, this option will enable the pandoc definition list
 %     syntax extension:
-%     \begin{minted}{markdown}
-Term 1
-
-:   Definition 1
-
-Term 2 with *inline markup*
-
-:   Definition 2
-
-        { some code, part of Definition 2 }
-
-    Third paragraph of definition 2.
-%     \end{minted}
+%     \begin{verbatim}
+% Term 1
+% 
+% :   Definition 1
+% 
+% Term 2 with *inline markup*
+% 
+% :   Definition 2
+% 
+%         { some code, part of Definition 2 }
+% 
+%     Third paragraph of definition 2.
+%     \end{verbatim}
 %
-%   \item[`hashEnumerator`]
-%     When set to `true`, this option will enable the usage of hash (`#`)
+%   \item[hashEnumerator]
+%     When set to \t`true`, this option will enable the usage of hash (\t`\#`)
 %     symbols as ordered list item markers.
 %
-%   \item[`hybrid`]
-%      When set to `true`, this option events the escaping of special \TeX{}
+%   \item[hybrid]
+%      When set to \t`true`, this option events the escaping of special \TeX{}
 %      characters, which makes it possible to intersperse your markdown markup
 %      with TeX code. The intended usage is in documents prepared manually by a
 %      human author with the package in mind. In such documents, it can often
 %      be desirable to mix \TeX{} and markdown markup freely.
 %
-%      When set to `false`, this option escapes special \TeX{} characters
+%      When set to \t`false`, this option escapes special \TeX{} characters
 %      outside verbatim environments, so that they are not interpretted by
 %      \TeX{}. This is encouraged when typesetting automatically generated
 %      content or markdown documents that were not prepared with this package
 %      in mind.
 %
-%   \item[`notes`]
-%     When set to `true`, this option will enable the pandoc footnote syntax
+%   \item[notes]
+%     When set to \t`true`, this option will enable the pandoc footnote syntax
 %     extension:
-%     \begin{minted}{markdown}
-Here is a footnote reference,[^1] and another.[^longnote]
-
-[^1]: Here is the footnote.
-
-[^longnote]: Here's one with multiple blocks.
-
-    Subsequent paragraphs are indented to show that they
-belong to the previous footnote.
-
-        { some.code }
-
-    The whole paragraph can be indented, or just the first
-    line.  In this way, multi-paragraph footnotes work like
-    multi-paragraph list items.
-
-This paragraph won't be part of the note, because it
-isn't indented.
-%     \end{minted}
+%     \begin{verbatim}
+% Here is a footnote reference,[^1] and another.[^longnote]
+% 
+% [^1]: Here is the footnote.
+% 
+% [^longnote]: Here's one with multiple blocks.
+% 
+%     Subsequent paragraphs are indented to show that they
+% belong to the previous footnote.
+% 
+%         { some.code }
+% 
+%     The whole paragraph can be indented, or just the first
+%     line.  In this way, multi-paragraph footnotes work like
+%     multi-paragraph list items.
+% 
+% This paragraph won't be part of the note, because it
+% isn't indented.
+%     \end{verbatim}
 %
-%   \item[`preserveTabs`]
-%     When set to `true`, this option will not cause the preservation of tabs.
-%     When set to `false`, this option will cause the conversion of tabs to
+%   \item[preserveTabs]
+%     When set to \t`true`, this option will not cause the preservation of tabs.
+%     When set to \t`false`, this option will cause the conversion of tabs to
 %     spaces.
 %
-%   \item[`requireBlankBeforeBlockquote`]
-%     When set to `true`, this option will cause a blank line to be required
+%   \item[blankBeforeBlockquote]
+%     When set to \t`true`, this option will cause a blank line to be required
 %     between a paragraph and a following block quote.
 %
-%   \item[`requireBlankBeforeHeader`]
-%     When set to `true`, this option will cause a blank line to be required
+%   \item[blankBeforeHeader]
+%     When set to \t`true`, this option will cause a blank line to be required
 %     between a paragraph and a following header.
 %
-%   \item[`smartEllipses`]
-%     When set to `true`, this option will cause the conversion of ellipses to
-%     the \DescribeMacro{\markdownEllipsis}`\markdownEllipsis` \TeX{} macro.
+%   \item[smartEllipses]
+%     When set to \t`true`, this option will cause the conversion of ellipses to
+%     the \m{markdownEllipsis} \TeX{} macro.
 %
-%   \item[`startNumber`]
-%     When set to `true`, this option will make the number in the first item in
+%   \item[startNumber]
+%     When set to \t`true`, this option will make the number in the first item in
 %     an ordered list significant. The number for each item will then be passed
-%     to the \DescribeMacro{\markdownOlItemWithNumber}^^A
-%     `\markdownOlItemWithNumber` \TeX{} macro.
+%     to the \m{markdownOlItemWithNumber} \TeX{} macro.
 %
-%     When set to `false`, this option will ignore the number in the items in
+%     When set to \t`false`, this option will ignore the number in the items of
 %     an ordered list. Each item will just generate a
-%     \DescribeMacro{\markdownOlItem}`\markdownOlItem` \TeX{} macro.
+%     \m{markdownOlItem} \TeX{} macro.
 %
-%   \item[`verbatim`]
-%      When set to `true`, this option will store the contents of code blocks
-%      in temporary files inside `cacheDir`. The filename containing the contents
+%   \item[verbatim]
+%      When set to \t`true`, this option will store the contents of code blocks
+%      in temporary files inside \t`cacheDir`. The filename containing the contents
 %      of a corresponding code block will be passed to the
-%      \DescribeMacro{\markdownInputVerbatim}`\markdownInputVerbatim` \TeX{}
-%      macro.
+%      \m{markdownInputVerbatim} \TeX{} macro.
 %
-%      When set to `false`, this option will cause code blocks to be surrounded
-%      by the \DescribeMacro{\markdownCodeBlockBegin}`\markdownCodeBlockBegin`
-%      and \DescribeMacro{\markdownCodeBlockEnd}`\markdownCodeBlockEnd` \TeX{}
+%      When set to \t`false`, this option will cause code blocks to be surrounded
+%      by the \m{markdownCodeBlockBegin} and \m{markdownCodeBlockEnd} \TeX{}
 %      macros and have special TeX characters escaped in their contents.
 %
-% \end{description}
+% \end{marglist}
 % 
 % \section{Implementation}
 % \iffalse
@@ -234,7 +250,7 @@ function util.expand_tabs_in_line(s, tabstop)
           end))
 end
 %    \end{macrocode}
-% Walks a rope `t`, applying a function `f` to each leaf element in order. A
+% Walks a rope \t`t`, applying a function \t`f` to each leaf element in order. A
 % rope is an array whose elements may be ropes, strings, numbers, or functions.
 % If a leaf element is a function, call it and get the return value before
 % proceeding.
@@ -301,8 +317,8 @@ function util.rope_last(rope)
   end
 end
 %    \end{macrocode}
-% Given an array `ary`, returns a new array with `x` interspersed between
-% elements of `ary`.
+% Given an array \t`ary`, returns a new array with \t`x` interspersed between
+% elements of \t`ary`.
 %  \begin{macrocode}
 function util.intersperse(ary, x)
   local new = {}
@@ -317,8 +333,8 @@ function util.intersperse(ary, x)
   return new
 end
 %    \end{macrocode}
-% Given an array `ary`, returns a new array with each element `x` of `ary`
-% replaced by `f(x)`.
+% Given an array \t`ary`, returns a new array with each element \t`x` of
+% \t`ary` replaced by \t`f(x)`.
 %  \begin{macrocode}
 function util.map(ary, f)
   local new = {}
@@ -328,11 +344,11 @@ function util.map(ary, f)
   return new
 end
 %    \end{macrocode}
-% Given a table `char_escapes` mapping escapable characters onto their escaped
-% versions and optionally `string_escapes` mapping escapable strings (or
-% multibyte UTF-8 characters) onto their escaped versions, returns a function
-% that escapes a string. This function uses \pkg{lpeg} and is faster than
-% `gsub`.
+% Given a table \t`char\_escapes` mapping escapable characters onto their
+% escaped versions and optionally \t`string\_escapes` mapping escapable strings
+% (or multibyte UTF-8 characters) onto their escaped versions, returns a
+% function that escapes a string. This function uses \pkg{lpeg} and is faster
+% than \t`gsub`.
 %  \begin{macrocode}
 function util.escaper(char_escapes, string_escapes)
   local char_escapes_list = ""
@@ -354,7 +370,7 @@ end
 % \subsubsection{The \TeX{} writer}
 % \blindtext
 %
-% Creates a new \TeX{} writer, where `options` is a table with options.
+% Creates a new \TeX{} writer, where \t`options` is a table with options.
 %  \begin{macrocode}
 M.writer = {}
 function M.writer.new(options)
@@ -421,8 +437,8 @@ function M.writer.new(options)
     return {"\\markdownCodeSpan{",escape(s),"}"}
   end
 %    \end{macrocode}
-% A formatter for a link with the text `label`, the URI `uri`, and the title
-% `title`.
+% A formatter for a link with the text \t`label`, the URI \t`uri`, and the
+% title \t`title`.
 %  \begin{macrocode}
   function self.link(lab,src,tit)
     return {"\\markdownLink{",self.string(lab[1]),"}",
@@ -430,8 +446,8 @@ function M.writer.new(options)
                           "{",self.string(tit),"}"}
   end
 %    \end{macrocode}
-% A formatter for an image with the alternative text `label`, the source URI
-% `src`, and the title `title`.
+% A formatter for an image with the alternative text \t`label`, the source URI
+% \t`src`, and the title \t`title`.
 %  \begin{macrocode}
   function self.image(lab,src,tit)
     return {"\\markdownImage{",self.string(lab[1]),"}",
@@ -439,8 +455,8 @@ function M.writer.new(options)
                            "{",self.string(tit),"}"}
   end
 %    \end{macrocode}
-% The formatter for a bullet list with contents `items` (an array).  If `tight`
-% is true, the list should have minimal spacing between items.
+% The formatter for a bullet list with contents \t`items` (an array).  If
+% \t`tight` is true, the list should have minimal spacing between items.
 %  \begin{macrocode}
   local function ulitem(s)
     return {"\\markdownUlItem ",s}
@@ -459,10 +475,10 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter for an ordered list with contents `items` (an array). If
-% `tight` is true, the list should have minimal spacing between items. If the
-% optional number `startnum` is present, it should be used as the number of
-% the first list item.
+% The formatter for an ordered list with contents \t`items` (an array). If
+% \t`tight` is true, the list should have minimal spacing between items. If the
+% optional number \t`num` is present, it should be used as the number of the
+% first list item.
 %  \begin{macrocode}
   local function olitem(s,num)
     if num ~= nil then
@@ -489,9 +505,9 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter for a definition list. `items` is an array of tables, each of
-% the form `{ term = t, definitions = defs, tight = tight }`, where `t` is a
-% string and `defs` is an array of strings.  If `tight` is true, the list
+% The formatter for a definition list. \t`items` is an array of tables, each of
+% the form \t`{ term = t, definitions = defs, tight = tight }`, where \t`t` is a
+% string and \t`defs` is an array of strings.  If \t`tight` is true, the list
 % should have minimal spacing between items.
 %  \begin{macrocode}
   local function dlitem(term,defs)
@@ -556,7 +572,7 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter of a header `s` at level `level`.
+% The formatter of a header \t`s` at level \t`level`.
 %  \begin{macrocode}
   function self.header(s,level)
     local cmd
@@ -598,10 +614,11 @@ local function normalize_tag(tag)
   return unicode.utf8.lower(gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 %    \end{macrocode}
-% Creates a new markdown parser, where `writer` is a writer and where `options`
-% is a table with options. The return value is a converter function that
-% converts a markdown string using `writer`, returning the parsed document.
-% The converter assumes that the input has unix line endings (newline).
+% Creates a new markdown parser, where \t`writer` is a writer and where
+% \t`options` is a table with options. The return value is a converter function
+% that converts a markdown string using \t`writer`, returning the parsed
+% document.  The converter assumes that the input has unix line endings
+% (newline).
 %  \begin{macrocode}
 M.reader = {}
 function M.reader.new(writer, options)
@@ -952,11 +969,11 @@ function M.reader.new(writer, options)
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
 
-  if options.requireBlankBeforeBlockquote then
+  if options.blankBeforeBlockquote then
     bqstart = fail
   end
 
-  if options.requireBlankBeforeHeader then
+  if options.blankBeforeHeader then
     headerstart = fail
   end
 

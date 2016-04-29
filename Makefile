@@ -20,6 +20,7 @@ $(TEXFILE) $(LUAFILE): $(INSTALLER) $(DTXARCHIVE)
 # This target typesets the technical documentation.
 %.pdf: %.dtx
 	pdflatex -shell-escape $<
+	pdflatex -shell-escape $<
 	#pdflatex $<
 	#makeindex -s gind.ist                       $(basename $@)
 	#makeindex -s gglo.ist -o $(basename $@).gls $(basename $@).glo
