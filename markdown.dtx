@@ -41,6 +41,13 @@
 % \blindtext
 %
 % \subsection{About \pkg{Markdown}}
+% \pkg{Markdown} consists of the \pkg{lunamark} Lua library v0.4.0 by John
+% MacFarlane, which was slimmed down and heavily modified for the purposes of
+% this package. This library provides quick markdown parsing for the rest of the
+% package. On top of \pkg{lunamark} sits a shell wrapper, which enables the
+% usage of the library from within `\write8`-capable \TeX{} engines without
+% direct support of Lua. The user interacts with the package through the \TeX{}
+% and \LaTeX{} interfaces.
 % \blindtext
 %
 % \subsection{License}
@@ -1215,6 +1222,10 @@ end
 return M
 %    \end{macrocode}
 % \blindtext
+%
+% \subsubsection{The shell wrapper}
+% \blindtext
+%
 % \iffalse
 %</lua>
 % \fi
