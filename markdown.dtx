@@ -201,9 +201,9 @@ end
 %  \begin{macrocode}
 function util.flatten(ary)
   local new = {}
-  for i,v in ipairs(ary) do
+  for _,v in ipairs(ary) do
     if type(v) == "table" then
-      for j,w in ipairs(util.flatten(v)) do
+      for _,w in ipairs(util.flatten(v)) do
         new[#new + 1] = w
       end
     else
