@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{microtype}
+\usepackage{minted}
 \usepackage{blindtext}
 \usepackage{hologo}
 
@@ -45,9 +46,10 @@
 % MacFarlane, which was slimmed down and heavily modified for the purposes of
 % this package. This library provides quick markdown parsing for the rest of the
 % package. On top of \pkg{lunamark} sits a shell wrapper, which enables the
-% usage of the library from within `\write8`-capable \TeX{} engines without
+% usage of the library from within `\write18`-capable \TeX{} engines without
 % direct support of Lua. The user interacts with the package through the \TeX{}
 % and \LaTeX{} interfaces.
+%
 % \blindtext
 %
 % \subsection{License}
@@ -76,56 +78,113 @@ local unicode = require("unicode")
 % \subsection{Lua Interface}
 % \blindtext
 %
-% \subsubsection{The recognized options}
+% \subsubsection{Options}
 % \blindtext
 %
 % \begin{description}
-%   \item[\blindtext] \blindtext
+%
+%   \item[`cacheDir`]
+%     The directory in which temporary files are stored. If no value is
+%     specified, the temporary files will be stored directly in the current
+%     directory.
+%
+%   \item[`definitionLists`]
+%     When set to `true`, this option will enable the pandoc definition list
+%     syntax extension:
+%     \begin{minted}{markdown}
+Term 1
+
+:   Definition 1
+
+Term 2 with *inline markup*
+
+:   Definition 2
+
+        { some code, part of Definition 2 }
+
+    Third paragraph of definition 2.
+%     \end{minted}
+%
+%   \item[`hashEnumerator`]
+%     When set to `true`, this option will enable the usage of hash (`#`)
+%     symbols as ordered list item markers.
+%
+%   \item[`hybrid`]
+%      When set to `true`, this option events the escaping of special \TeX{}
+%      characters, which makes it possible to intersperse your markdown markup
+%      with TeX code. The intended usage is in documents prepared manually by a
+%      human author with the package in mind. In such documents, it can often
+%      be desirable to mix \TeX{} and markdown markup freely.
+%
+%      When set to `false`, this option escapes special \TeX{} characters
+%      outside verbatim environments, so that they are not interpretted by
+%      \TeX{}. This is encouraged when typesetting automatically generated
+%      content or markdown documents that were not prepared with this package
+%      in mind.
+%
+%   \item[`notes`]
+%     When set to `true`, this option will enable the pandoc footnote syntax
+%     extension:
+%     \begin{minted}{markdown}
+Here is a footnote reference,[^1] and another.[^longnote]
+
+[^1]: Here is the footnote.
+
+[^longnote]: Here's one with multiple blocks.
+
+    Subsequent paragraphs are indented to show that they
+belong to the previous footnote.
+
+        { some.code }
+
+    The whole paragraph can be indented, or just the first
+    line.  In this way, multi-paragraph footnotes work like
+    multi-paragraph list items.
+
+This paragraph won't be part of the note, because it
+isn't indented.
+%     \end{minted}
+%
+%   \item[`preserveTabs`]
+%     When set to `true`, this option will not cause the preservation of tabs.
+%     When set to `false`, this option will cause the conversion of tabs to
+%     spaces.
+%
+%   \item[`requireBlankBeforeBlockquote`]
+%     When set to `true`, this option will cause a blank line to be required
+%     between a paragraph and a following block quote.
+%
+%   \item[`requireBlankBeforeHeader`]
+%     When set to `true`, this option will cause a blank line to be required
+%     between a paragraph and a following header.
+%
+%   \item[`smartEllipses`]
+%     When set to `true`, this option will cause the conversion of ellipses to
+%     the \DescribeMacro{\markdownEllipsis}`\markdownEllipsis` \TeX{} macro.
+%
+%   \item[`startNumber`]
+%     When set to `true`, this option will make the number in the first item in
+%     an ordered list significant. The number for each item will then be passed
+%     to the \DescribeMacro{\markdownOlItemWithNumber}^^A
+%     `\markdownOlItemWithNumber` \TeX{} macro.
+%
+%     When set to `false`, this option will ignore the number in the items in
+%     an ordered list. Each item will just generate a
+%     \DescribeMacro{\markdownOlItem}`\markdownOlItem` \TeX{} macro.
+%
+%   \item[`verbatim`]
+%      When set to `true`, this option will store the contents of code blocks
+%      in temporary files inside `cacheDir`. The filename containing the contents
+%      of a corresponding code block will be passed to the
+%      \DescribeMacro{\markdownInputVerbatim}`\markdownInputVerbatim` \TeX{}
+%      macro.
+%
+%      When set to `false`, this option will cause code blocks to be surrounded
+%      by the \DescribeMacro{\markdownCodeBlockBegin}`\markdownCodeBlockBegin`
+%      and \DescribeMacro{\markdownCodeBlockEnd}`\markdownCodeBlockEnd` \TeX{}
+%      macros and have special TeX characters escaped in their contents.
+%
 % \end{description}
-%  \begin{macrocode}
-%  `cacheDir`
-%  :   The directory in which temporary files are stored.
-% 
-%  and that may contain the following fields:
-% 
-%  `hybrid`
-%  :   Prevents the escaping of special TeX characters. This makes it possible
-%      to intersperse the Markdown markup with TeX code.
-% 
-%  `verbatim`
-%  :   Code blocks will not be surrounded by \markdownCodeBlockBegin and
-%      \markdownCodeBlockEnd and have the special TeX characters escaped in
-%      their contents. Instead, their contents will be stored in a temporary
-%      file inside `cachedir`. The pathname of this file will be passed to the
-%      \markdownInputVerbatim macro.
-% 
-%      `preserveTabs`
-%      :   Preserve tabs instead of converting to spaces.
-% 
-%      `smartEllipses`
-%      :   Parse ellipses intelligently.
-% 
-%      `startNumber`
-%      :   Make the opening number in an ordered list significant.
-% 
-%      `notes`
-%      :   Enable footnotes as in pandoc.
-% 
-%      `definitionLists`
-%      :   Enable definition lists as in pandoc.
-% 
-%      `requireBlankBeforeBlockquote`
-%      :   Require a blank line between a paragraph and a following
-%          block quote.
-% 
-%      `requireBlankBeforeHeader`
-%      :   Require a blank line between a paragraph and a following
-%          header.
-% 
-%      `hashEnumerators`
-%      :   Allow `#` instead of a digit for an ordered list enumerator
-%          (equivalent to `1`).
-%    \end{macrocode}
 % 
 % \section{Implementation}
 % \iffalse
