@@ -134,7 +134,6 @@ local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
   lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
 local lpegmatch = lpeg.match
-local utf8 = unicode.utf8
 local M = {}
 %    \end{macrocode}
 % 
@@ -530,7 +529,7 @@ end
 % adjacent whitespace characters.)
 %  \begin{macrocode}
 local function normalize_tag(tag)
-  return utf8.lower(gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
+  return unicode.utf8.lower(gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 %    \end{macrocode}
 % Creates a new markdown parser, where `writer` is a writer and where `options`
