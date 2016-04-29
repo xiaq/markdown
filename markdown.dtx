@@ -1034,13 +1034,13 @@ function M.reader.new(writer, options)
                      + Ct(LooseListItem(bullet)^1)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
-  local function ordered_list(s,tight,startNumber)
+  local function orderedlist(items,tight,startNumber)
     if options.startNumber then
-      startNumber = tonumber(listtype) or 1  -- fallback for '#'
+      startNumber = tonumber(startNumber) or 1  -- fallback for '#'
     else
       startNumber = nil
     end
-    return writer.orderedlist(s,tight,startNumber)
+    return writer.orderedlist(items,tight,startNumber)
   end
 
   local OrderedList = Cg(enumerator, "listtype") *
@@ -1048,7 +1048,7 @@ function M.reader.new(writer, options)
                         * Cc(true) * skipblanklines * -enumerator
                       + Ct(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
-                      ) * Cb("listtype") / ordered_list
+                      ) * Cb("listtype") / orderedlist
 
   local defstartchar = S("~:")
   local defstart     = ( defstartchar * #spacing * (tab + space^-3)
