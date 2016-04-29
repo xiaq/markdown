@@ -819,13 +819,6 @@ function M.reader.new(writer, options)
   local define_reference_parser =
     leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
 
-  local referenceparser =
-    -- need the Ct or we get a stack overflow
-    Ct(( NoteBlock / register_note
-       + define_reference_parser / register_link
-       + nonemptyline^1
-       + blankline^1)^0)
-
   -- lookup link reference and return either
   -- the link or nil and fallback text.
   local function lookup_reference(label,sps,tag)
