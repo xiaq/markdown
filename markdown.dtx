@@ -294,7 +294,7 @@ end
 M.writer = {}
 function M.writer.new(options)
   local self = {}
-  local options = options or {}
+  options = options or {}
 %    \end{macrocode}
 % A space character.
 %  \begin{macrocode}
@@ -540,7 +540,7 @@ end
 %  \begin{macrocode}
 M.reader = {}
 function M.reader.new(writer, options)
-  local options = options or {}
+  options = options or {}
 
   local expandtabs
   if options.preserveTabs then
