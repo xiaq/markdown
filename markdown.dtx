@@ -1312,7 +1312,9 @@ return M
 % \blindtext
 %
 % \subsection{User Interface}
-% \blindtext
+% The user interface macros are intended for redefinition by the user. By
+% default, they point to the prototype macros that contain the implicit
+% definition.
 %
 %  \begin{macrocode}
 \def\markdownEllipsis{\markdownEllipsisPrototype}
@@ -1353,7 +1355,8 @@ return M
 %    \end{macrocode}
 %
 % \subsection{Package Interface}
-% \blindtext
+% The package interface macros are intended for redefinition by packages. They
+% come into effect, when the user does not redefine the user interface macros.
 % 
 %  \begin{macrocode}
 \def\markdownEllipsisPrototype{...}
