@@ -98,12 +98,13 @@ local unicode = require("unicode")
 % \blindtext
 %
 % \subsubsection{Options}
+% \label{sec:luaoptions}
 % \blindtext
 %
 % \begin{marglist}
 %
 %   \item[cacheDir]
-%     The directory in which temporary files are stored. If no value is
+%     The path to the directory containing the cache files. If no value is
 %     specified, the temporary files will be stored directly in the current
 %     directory.
 %
@@ -192,8 +193,8 @@ local unicode = require("unicode")
 %
 %   \item[verbatim]
 %      When set to \t`true`, this option will store the contents of code blocks
-%      in temporary files inside \t`cacheDir`. The filename containing the contents
-%      of a corresponding code block will be passed to the
+%      in temporary files inside the cache directory. The filename containing
+%      the contents of a corresponding code block will be passed to the
 %      \m{markdownInputVerbatim} \TeX{} macro.
 %
 %      When set to \t`false`, this option will cause code blocks to be surrounded
@@ -219,7 +220,7 @@ local lpegmatch = lpeg.match
 local M = {}
 %    \end{macrocode}
 % 
-% \subsubsection{Utility functions}
+% \subsubsection{Utility Functions}
 % \blindtext
 % 
 % Prints an error message and exits.
@@ -228,6 +229,31 @@ local util = {}
 function util.err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
   os.exit(exit_code or 1)
+end
+%    \end{macrocode}
+% Computes the digest of \t`string` and \t`salt`, adds the \t`suffix` and looks
+% into the directory \t`dir`, whether a file with such name exists. If it does
+% not, it gets created with `transform(string)` as its content. After that, the
+% name of the file is returned.
+%  \begin{macrocode}
+function util.cache(dir, cache, string, salt, transform, suffix)
+  local digest = md5.sumhexa(string)
+  if salt ~= nil then
+    digest = md5.sumhexa(digest .. salt)
+  end
+  local name = util.pathname(dir, digest .. suffix)
+  local file = io.open(name, "r")
+  if file == nil then -- If no cache entry exists, then create a new one.
+    local file = assert(io.open(name, "w"))
+    local result = string
+    if transform ~= nil then
+      result = transform(result)
+    end
+    assert(file:write(result))
+    assert(file:close())
+  end
+  cache[name] = true
+  return name
 end
 %    \end{macrocode}
 % Creates a shallow copy of a table including metatables.
@@ -256,26 +282,26 @@ end
 % proceeding.
 %  \begin{macrocode}
 function util.walk(t, f)
-    local typ = type(t)
-    if typ == "string" then
-      f(t)
-    elseif typ == "table" then
-      local i = 1
-      local n
+  local typ = type(t)
+  if typ == "string" then
+    f(t)
+  elseif typ == "table" then
+    local i = 1
+    local n
+    n = t[i]
+    while n do
+      util.walk(n, f)
+      i = i + 1
       n = t[i]
-      while n do
-        util.walk(n, f)
-        i = i + 1
-        n = t[i]
-      end
-    elseif typ == "function" then
-      local ok, val = pcall(t)
-      if ok then
-        util.walk(val,f)
-      end
-    else
-      f(tostring(t))
     end
+  elseif typ == "function" then
+    local ok, val = pcall(t)
+    if ok then
+      util.walk(val,f)
+    end
+  else
+    f(tostring(t))
+  end
 end
 %    \end{macrocode}
 % Flattens an array.
@@ -367,6 +393,16 @@ function util.escaper(char_escapes, string_escapes)
   end
 end
 %    \end{macrocode}
+% Produces a path name out of a directory path and a file name.
+%  \begin{macrocode}
+function util.pathname(dir, file)
+  if #dir == 0 then
+    return file
+  else
+    return dir .. "/" .. file
+  end
+end
+%    \end{macrocode}
 % \subsubsection{The \TeX{} writer}
 % \blindtext
 %
@@ -376,6 +412,14 @@ M.writer = {}
 function M.writer.new(options)
   local self = {}
   options = options or {}
+%    \end{macrocode}
+% A list of cached files.
+%  \begin{macrocode}
+  self.cache = {}
+%    \end{macrocode}
+% The suffix of the cached files.
+%  \begin{macrocode}
+  self.suffix = ".tex"
 %    \end{macrocode}
 % A space character.
 %  \begin{macrocode}
@@ -548,24 +592,9 @@ function M.writer.new(options)
 %    \end{macrocode}
 % The block verbatim code formatter.
 %  \begin{macrocode}
-  local function pathname(file)
-    if #options.cacheDir == 0 then
-      return file
-    else
-      return options.cacheDir .. "/" .. file
-    end
-  end
-
   function self.verbatim(s)
     if options.verbatim then
-      local name = pathname(md5.sumhexa(s) .. ".verbatim")
-      local file = io.open(name, "r")
-      if file == nil then -- If no cache entry exists, then create a new one.
-        -- TODO: Cache autocleaning.
-        local file = assert(io.open(name, "w"))
-        assert(file:write(s))
-        assert(file:close())
-      end
+      local name = util.cache(options.cacheDir, self.cache, s, nil, nil, ".verbatim")
       return {"\\markdownInputVerbatim{",name,"}"}
     else
       return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
@@ -622,8 +651,16 @@ end
 %  \begin{macrocode}
 M.reader = {}
 function M.reader.new(writer, options)
+  local self = {}
   options = options or {}
-
+%    \end{macrocode}
+% A list of cached files.
+%  \begin{macrocode}
+  self.cache = {}
+%    \end{macrocode}
+% This function expands into spaces, unless it is prohibited by the options
+% (see section \ref{sec:luaoptions}).
+%  \begin{macrocode}
   local expandtabs
   if options.preserveTabs then
     expandtabs = function(s) return s end
@@ -636,14 +673,14 @@ function M.reader.new(writer, options)
                    end
                  end
   end
-
-  ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% These are the top level parsing functions.
+%  \begin{macrocode}
   local syntax
   local blocks
   local inlines
 
-  parse_blocks =
+  local parse_blocks =
     function(str)
       local res = lpegmatch(blocks, str)
       if res == nil
@@ -652,7 +689,7 @@ function M.reader.new(writer, options)
         end
     end
 
-  parse_inlines =
+  local parse_inlines =
     function(str)
       local res = lpegmatch(inlines, str)
       if res == nil
@@ -661,7 +698,7 @@ function M.reader.new(writer, options)
         end
     end
 
-  parse_inlines_no_link =
+  local parse_inlines_no_link =
     function(str)
       local res = lpegmatch(inlines_no_link, str)
       if res == nil
@@ -801,25 +838,29 @@ function M.reader.new(writer, options)
 
   local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
 %    \end{macrocode}
-% \paragraph{Tags and Links Parsers}
+% \paragraph{Tag and Link Parsers}
 %  \begin{macrocode}
   local leader        = space^-3
 
   -- in balanced brackets, parentheses, quotes:
   local bracketed     = P{ lbracket
-                         * ((anyescaped - (lbracket + rbracket + blankline^2)) + V(1))^0
+                         * ((anyescaped - (lbracket + rbracket
+                             + blankline^2)) + V(1))^0
                          * rbracket }
 
   local inparens      = P{ lparent
-                         * ((anyescaped - (lparent + rparent + blankline^2)) + V(1))^0
+                         * ((anyescaped - (lparent + rparent
+                             + blankline^2)) + V(1))^0
                          * rparent }
 
   local squoted       = P{ squote * alphanumeric
-                         * ((anyescaped - (squote + blankline^2)) + V(1))^0
+                         * ((anyescaped - (squote + blankline^2))
+                             + V(1))^0
                          * squote }
 
   local dquoted       = P{ dquote * alphanumeric
-                         * ((anyescaped - (dquote + blankline^2)) + V(1))^0
+                         * ((anyescaped - (dquote + blankline^2))
+                             + V(1))^0
                          * dquote }
 
   -- bracketed 'tag' for markdown links, allowing nested brackets:
@@ -1013,7 +1054,8 @@ function M.reader.new(writer, options)
   local AutoLinkEmail = less
                       * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
                       * more
-                      / function(email) return writer.link(writer.string(email),"mailto:"..email) end
+                      / function(email)
+                        return writer.link(writer.string(email),"mailto:"..email) end
 
   local DirectLink    = (tag / parse_inlines_no_link)  -- no links inside links
                       * spnl
@@ -1200,7 +1242,8 @@ function M.reader.new(writer, options)
 
       Blocks                = Blank^0 *
                               Block^-1 *
-                              (Blank^0 / function() return writer.interblocksep end * Block)^0 *
+                              (Blank^0 / function()
+                                return writer.interblocksep end * Block)^0 *
                               Blank^0 *
                               eof,
 
@@ -1287,12 +1330,22 @@ function M.reader.new(writer, options)
 %    \end{macrocode}
 % \paragraph{Exported Conversion Function}
 %  \begin{macrocode}
-  -- inp is a string; line endings are assumed to be LF (unix-style)
-  -- and tabs are assumed to be expanded.
-  return function(inp)
-      references = {}
-      return util.rope_to_string(parse_blocks(inp))
+  function self.convert(input)
+    references = {} -- TODO: Add caching and a reference persistence option.
+    local opt_string = {}
+    for k,v in pairs(options) do -- Create salt out of boolean options.
+      if type(v) == "boolean" then
+        opt_string[#opt_string+1] = k .. "=" .. tostring(v)
+      end
+    end
+    table.sort(opt_string)
+    local name = util.cache(options.cacheDir, self.cache, input,
+      table.concat(opt_string, ","), function(input)
+        return util.rope_to_string(parse_blocks(input))
+      end, ".md" .. writer.suffix)
+    return name
   end
+  return self
 end
 
 return M
