@@ -1,11 +1,14 @@
 % \iffalse
 %<*driver>
 \documentclass{ltxdockit}
+\usepackage{btxdockit}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[american]{babel}
 \usepackage{microtype}
 \usepackage{blindtext}
+\let\blindtext\relax % TODO: Remove these.
+\let\Blindtext\relax
 \usepackage{hologo}
 \usepackage{xcolor}
 \usepackage{doc}
@@ -83,12 +86,13 @@
 % \subsection{Prerequisites}
 % \blindtext
 %
-%  \begin{macrocode}
+% \iffalse
 %<*lua>
+% \fi
+%  \begin{macrocode}
 local lpeg = require("lpeg")
 local md5 = require("md5")
 local unicode = require("unicode")
-%</lua>
 %    \end{macrocode}
 %
 % \section{User Guide}
@@ -101,17 +105,42 @@ local unicode = require("unicode")
 % \label{sec:luaoptions}
 % \blindtext
 %
-% \begin{marglist}
+%  \begin{macrocode}
+local defaultOptions = {}
+%    \end{macrocode}
+% \begin{optionlist}
+%   \optitem[false]{blankBeforeBlockquote}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Require a blank line between a paragraph and the following
+%         blockquote.
+%       \item[false] Do not require a blank line between a paragraph and the
+%         following blockquote.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.blankBeforeBlockquote = false
+%    \end{macrocode}
 %
-%   \item[cacheDir]
-%     The path to the directory containing the cache files. If no value is
-%     specified, the temporary files will be stored directly in the current
-%     directory.
+%   \optitem[false]{blankBeforeHeader}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Require a blank line between a paragraph and the following
+%         header.
+%       \item[false] Do not require a blank line between a paragraph and the
+%         following header.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.blankBeforeHeader = false
+%    \end{macrocode}
 %
-%   \item[definitionLists]
-%     When set to \t`true`, this option will enable the pandoc definition list
-%     syntax extension:
-%     \begin{verbatim}
+%   \valitem[.]{cacheDir}{directory}
+%     The path to the directory containing auxiliary cache files.
+%  \begin{macrocode}
+defaultOptions.cacheDir = "."
+%    \end{macrocode}
+%
+%   \optitem[false]{definitionLists}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the pandoc definition list syntax extension:
+%         \begin{verbatim}
 % Term 1
 % 
 % :   Definition 1
@@ -123,29 +152,46 @@ local unicode = require("unicode")
 %         { some code, part of Definition 2 }
 % 
 %     Third paragraph of definition 2.
-%     \end{verbatim}
+%         \end{verbatim}
+%       \item[false] Disable the pandoc definition list syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.definitionLists = false
+%    \end{macrocode}
+% 
+%   \optitem[false]{hashEnumerator}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the use of hash symbols (\t`\#`) as ordered item
+%         list markers.
+%       \item[false] Disable the use of hash symbols (\t`\#`) as ordered item
+%         list markers.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.hashEnumerator = false
+%    \end{macrocode}
 %
-%   \item[hashEnumerator]
-%     When set to \t`true`, this option will enable the usage of hash (\t`\#`)
-%     symbols as ordered list item markers.
+%   \optitem[false]{hybrid}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Disable the escaping of special \TeX{} characters, which
+%         makes it possible to intersperse your markdown markup with \TeX{}
+%         code.  The intended usage is in documents prepared manually by a
+%         human author.  In such documents, it can often be desirable to mix
+%         \TeX{} and markdown markup freely.
 %
-%   \item[hybrid]
-%      When set to \t`true`, this option events the escaping of special \TeX{}
-%      characters, which makes it possible to intersperse your markdown markup
-%      with TeX code. The intended usage is in documents prepared manually by a
-%      human author with the package in mind. In such documents, it can often
-%      be desirable to mix \TeX{} and markdown markup freely.
+%       \item[false] Enable the escaping of special \TeX{} characters outside
+%         verbatim environments, so that they are not interpretted by \TeX{}.
+%         This is encouraged when typesetting automatically generated content
+%         or markdown documents that were not prepared with this package in
+%         mind.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.hybrid = false
+%    \end{macrocode}
 %
-%      When set to \t`false`, this option escapes special \TeX{} characters
-%      outside verbatim environments, so that they are not interpretted by
-%      \TeX{}. This is encouraged when typesetting automatically generated
-%      content or markdown documents that were not prepared with this package
-%      in mind.
-%
-%   \item[notes]
-%     When set to \t`true`, this option will enable the pandoc footnote syntax
-%     extension:
-%     \begin{verbatim}
+%   \optitem[false]{notes}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the pandoc footnote syntax extension:
+%         \begin{verbatim}
 % Here is a footnote reference,[^1] and another.[^longnote]
 % 
 % [^1]: Here is the footnote.
@@ -163,50 +209,61 @@ local unicode = require("unicode")
 % 
 % This paragraph won't be part of the note, because it
 % isn't indented.
-%     \end{verbatim}
+%       \end{verbatim}
+%       \item[false] Disable the pandoc footnote syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.notes = false
+%    \end{macrocode}
 %
-%   \item[preserveTabs]
-%     When set to \t`true`, this option will not cause the preservation of tabs.
-%     When set to \t`false`, this option will cause the conversion of tabs to
-%     spaces.
+%   \optitem[false]{preserveTabs}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Preserve all tabs in the input.
+%       \item[false] Convert any tabs in the input to spaces.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.preserveTabs = false
+%    \end{macrocode}
 %
-%   \item[blankBeforeBlockquote]
-%     When set to \t`true`, this option will cause a blank line to be required
-%     between a paragraph and a following block quote.
+%   \optitem[false]{smartEllipses}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Convert any ellipses in the input to the
+%         \m{markdownEllipsis} \TeX{} macro.
+%       \item[false] Preserve all ellipses in the input.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.smartEllipses = false
+%    \end{macrocode}
 %
-%   \item[blankBeforeHeader]
-%     When set to \t`true`, this option will cause a blank line to be required
-%     between a paragraph and a following header.
+%   \optitem[true]{startNumber}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Make the number in the first item in ordered lists
+%         significant. The number of each item will be passed to the
+%         \m{markdownOlItemWithNumber} \TeX{} macro.
+%       \item[false] Ignore the number in the items of ordered lists. Each
+%         item will only produce a \m{markdownOlItem} \TeX{} macro.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.startNumber = true
+%    \end{macrocode}
 %
-%   \item[smartEllipses]
-%     When set to \t`true`, this option will cause the conversion of ellipses to
-%     the \m{markdownEllipsis} \TeX{} macro.
-%
-%   \item[startNumber]
-%     When set to \t`true`, this option will make the number in the first item in
-%     an ordered list significant. The number for each item will then be passed
-%     to the \m{markdownOlItemWithNumber} \TeX{} macro.
-%
-%     When set to \t`false`, this option will ignore the number in the items of
-%     an ordered list. Each item will just generate a
-%     \m{markdownOlItem} \TeX{} macro.
-%
-%   \item[verbatim]
-%      When set to \t`true`, this option will store the contents of code blocks
-%      in temporary files inside the cache directory. The filename containing
-%      the contents of a corresponding code block will be passed to the
-%      \m{markdownInputVerbatim} \TeX{} macro.
-%
-%      When set to \t`false`, this option will cause code blocks to be surrounded
-%      by the \m{markdownCodeBlockBegin} and \m{markdownCodeBlockEnd} \TeX{}
-%      macros and have special TeX characters escaped in their contents.
-%
-% \end{marglist}
+%   \optitem[true]{verbatim}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Store the contents of all code blocks in temporary files
+%         inside the cache directory. The filename containing the contents of a
+%         corresponding code block will be passed to the
+%         \m{markdownInputVerbatim} \TeX{} macro.
+%       \item[false] Surround all code blocks with the \m{markdownCodeBlockBegin}
+%         and \m{markdownCodeBlockEnd} \TeX{} macros and escape any special
+%         \TeX{} characters inside their contents.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.verbatim = true
+%    \end{macrocode}
+% \end{optionlist}
 % 
 % \section{Implementation}
-% \iffalse
-%<*lua>
-% \fi\subsection{Lua interface}
+% \subsection{Lua interface}
 % \blindtext
 %
 %  \begin{macrocode}
@@ -233,14 +290,11 @@ end
 %    \end{macrocode}
 % Computes the digest of \t`string` and \t`salt`, adds the \t`suffix` and looks
 % into the directory \t`dir`, whether a file with such name exists. If it does
-% not, it gets created with `transform(string)` as its content. After that, the
-% name of the file is returned.
+% not, it gets created with \t`transform(string)` as its content. After that,
+% the name of the file is returned.
 %  \begin{macrocode}
-function util.cache(dir, cache, string, salt, transform, suffix)
-  local digest = md5.sumhexa(string)
-  if salt ~= nil then
-    digest = md5.sumhexa(digest .. salt)
-  end
+function util.cache(dir, string, salt, transform, suffix)
+  local digest = md5.sumhexa(string .. (salt or ""))
   local name = util.pathname(dir, digest .. suffix)
   local file = io.open(name, "r")
   if file == nil then -- If no cache entry exists, then create a new one.
@@ -252,7 +306,6 @@ function util.cache(dir, cache, string, salt, transform, suffix)
     assert(file:write(result))
     assert(file:close())
   end
-  cache[name] = true
   return name
 end
 %    \end{macrocode}
@@ -403,7 +456,7 @@ function util.pathname(dir, file)
   end
 end
 %    \end{macrocode}
-% \subsubsection{The \TeX{} writer}
+% \subsubsection{\TeX{} writer}
 % \blindtext
 %
 % Creates a new \TeX{} writer, where \t`options` is a table with options.
@@ -413,9 +466,10 @@ function M.writer.new(options)
   local self = {}
   options = options or {}
 %    \end{macrocode}
-% A list of cached files.
+% Inherit options from the \t`defaultOptions` table.
 %  \begin{macrocode}
-  self.cache = {}
+  setmetatable(options, { __index = function (_, key)
+    return defaultOptions[key] end })
 %    \end{macrocode}
 % The suffix of the cached files.
 %  \begin{macrocode}
@@ -594,7 +648,7 @@ function M.writer.new(options)
 %  \begin{macrocode}
   function self.verbatim(s)
     if options.verbatim then
-      local name = util.cache(options.cacheDir, self.cache, s, nil, nil, ".verbatim")
+      local name = util.cache(options.cacheDir, s, nil, nil, ".verbatim")
       return {"\\markdownInputVerbatim{",name,"}"}
     else
       return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
@@ -654,9 +708,10 @@ function M.reader.new(writer, options)
   local self = {}
   options = options or {}
 %    \end{macrocode}
-% A list of cached files.
+% Inherit options from the \t`defaultOptions` table.
 %  \begin{macrocode}
-  self.cache = {}
+  setmetatable(options, { __index = function (_, key)
+    return defaultOptions[key] end })
 %    \end{macrocode}
 % This function expands into spaces, unless it is prohibited by the options
 % (see section \ref{sec:luaoptions}).
@@ -1333,13 +1388,14 @@ function M.reader.new(writer, options)
   function self.convert(input)
     references = {} -- TODO: Add caching and a reference persistence option.
     local opt_string = {}
-    for k,v in pairs(options) do -- Create salt out of boolean options.
+    for k,_ in pairs(defaultOptions) do -- Create salt out of boolean options.
+      local v = options[k]
       if type(v) == "boolean" then
         opt_string[#opt_string+1] = k .. "=" .. tostring(v)
       end
     end
     table.sort(opt_string)
-    local name = util.cache(options.cacheDir, self.cache, input,
+    local name = util.cache(options.cacheDir, input,
       table.concat(opt_string, ","), function(input)
         return util.rope_to_string(parse_blocks(input))
       end, ".md" .. writer.suffix)
