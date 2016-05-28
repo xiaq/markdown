@@ -28,13 +28,26 @@
 \let\oldCodelineNo\theCodelineNo
 \def\theCodelineNo{\textcolor{gray}{\oldCodelineNo}}
 
-% Define some user markup.
-\let\pkg\relax
-\def\m#1{% A TeX macro
-  %\expandafter\DescribeMacro\csname#1\endcsname
-  \textcolor{spot}{\cs{#1}}}
+% Define some markup.
+\let\pkg\relax % A package name
+\newcommand\mdef[1]{% A TeX macro definition
+  \phantomsection\label{macro:#1}\textcolor{spot}{\cs{#1}}}
+\newcommand\m[1]{% A TeX macro reference
+  \hyperref[macro:#1]{\textcolor{spot}{\cs{#1}}}}
+\newcommand\luamdef[1]{% A Lua object / method definition
+  \phantomsection\label{lua:#1}\textcolor{spot}{\t`#1`}}
+\newcommand\luam[1]{% A Lua object / method reference
+  \hyperref[lua:#1]{\t`#1`}}
 \def\t`#1`{% Inline code
 	\textcolor{spot}{\texttt{#1}}}
+\newcommand\Optitem[2][]{% An option item definition
+  \phantomsection\label{opt:#2}\optitem[#1]{#2}}
+\newcommand\Valitem[2][]{% A value item definition
+  \phantomsection\label{opt:#2}\valitem[#1]{#2}}
+\newcommand\Opt[1]{% An option / value item reference
+  \hyperref[opt:#1]{\t`#1`}}
+\newcommand\acro[1]{% An acronym
+  \textsc{#1}}
 
 % Set up the title page.
 \titlepage{%
@@ -78,7 +91,7 @@
 if not modules then modules = { } end modules ['markdown-lunamark'] = {
     version   = "0.4.0",
     comment   = "A module for the conversion from markdown to TeX",
-    author    = "John MacFarlane, Hand Hagen, Vít Novotný",
+    author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
     license   = "MIT sublicensed as LPPL 1.3"
 }
@@ -108,7 +121,7 @@ local unicode = require("unicode")
 % This part of the manual describes the interfaces exposed by the package
 % and is aimed at the user of the package.
 %
-% \subsection{Lua Interface}
+% \subsection{Lua Interface}\label{sec:luainterface}
 % The Lua interface provides the conversion from markdown to \TeX{}.  This
 % interface is used by the \TeX{} interface (see Section
 % \ref{sec:texinterface}) and will be of interest to the developers of other
@@ -119,26 +132,27 @@ local M = {}
 %    \end{macrocode}
 %
 % \subsubsection{Classes}\label{sec:luaclasses}
-% The Lua interface exposes the \t`writer` and \t`reader` classes.
+% The Lua interface exposes the \luamdef{writer} and \luamdef{reader} classes.
 %  \begin{macrocode}
 M.writer = {}
 M.reader = {}
 %    \end{macrocode}
 %
-% The \t`writer` class can be instantiated via the \t`writer.new(options)`
+% The \luam{writer} class can be instantiated via the \t`new(options)` class
 % method, where \t`options` is a table of options (see Section
-% \ref{sec:luaoptions}). The \t`options` parameter is optional; when unspecified,
-% the behaviour is the same as if \t`options` were an empty table.
+% \ref{sec:luaoptions}). The \t`options` parameter is optional; when
+% unspecified, the behaviour is the same as if \t`options` were an empty table.
 %
-% The \t`reader` class can be instantiated via the method \t`reader.new(writer,
-% options)`, where \t`writer` is an instance of the \t`writer` class and
-% \t`options` is a table of options. The \t`options` parameter is optional;
-% when unspecified, the behaviour is the same as if \t`options` were an empty
-% table.The \t`reader` class exposes the \t`convert(string)` instance method,
-% which accepts a markdown \t`string` and returns a \TeX{} output.
+% The \luam{reader} class can be instantiated via the \t`new(w, opts)` class
+% method, where \t`w` is an instance of the \luam{writer} class and \t`opts` is
+% a table of options. The \t`options` parameter is optional; when unspecified,
+% the behaviour is the same as if \t`options` were an empty table. The
+% \luam{reader} class exposes the \luamdef{convert}\t`(string)` instance
+% method, which accepts a markdown \t`string` and returns a \TeX{} output.
 %
-% The following example converts the markdown string \t`"\_Hello world!\_"` to
-% a \TeX{} output using the default options and prints it:
+% The following example Lua code converts the markdown string \t`"\_Hello
+% world!\_"` to a \TeX{} output using the default options and prints the \TeX{}
+% output:
 % \begin{verbatim}
 % local md = require("markdown")
 % local writer = md.writer.new()
@@ -153,7 +167,7 @@ M.reader = {}
 local defaultOptions = {}
 %    \end{macrocode}
 % \begin{optionlist}
-%   \optitem[false]{blankBeforeBlockquote}{\opt{true}, \opt{false}}
+%   \Optitem[false]{blankBeforeBlockquote}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Require a blank line between a paragraph and the following
 %         blockquote.
@@ -164,7 +178,7 @@ local defaultOptions = {}
 defaultOptions.blankBeforeBlockquote = false
 %    \end{macrocode}
 %
-%   \optitem[false]{blankBeforeHeader}{\opt{true}, \opt{false}}
+%   \Optitem[false]{blankBeforeHeading}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Require a blank line between a paragraph and the following
 %         header.
@@ -172,16 +186,16 @@ defaultOptions.blankBeforeBlockquote = false
 %         following header.
 %     \end{valuelist}
 %  \begin{macrocode}
-defaultOptions.blankBeforeHeader = false
+defaultOptions.blankBeforeHeading = false
 %    \end{macrocode}
 %
-%   \valitem[.]{cacheDir}{directory}
+%   \Valitem[.]{cacheDir}{directory}
 %     The path to the directory containing auxiliary cache files.
 %  \begin{macrocode}
 defaultOptions.cacheDir = "."
 %    \end{macrocode}
 %
-%   \optitem[false]{definitionLists}{\opt{true}, \opt{false}}
+%   \Optitem[false]{definitionLists}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the pandoc definition list syntax extension:
 %         \begin{verbatim}
@@ -203,7 +217,7 @@ defaultOptions.cacheDir = "."
 defaultOptions.definitionLists = false
 %    \end{macrocode}
 % 
-%   \optitem[false]{hashEnumerator}{\opt{true}, \opt{false}}
+%   \Optitem[false]{hashEnumerator}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the use of hash symbols (\t`\#`) as ordered item
 %         list markers.
@@ -214,7 +228,7 @@ defaultOptions.definitionLists = false
 defaultOptions.hashEnumerator = false
 %    \end{macrocode}
 %
-%   \optitem[false]{hybrid}{\opt{true}, \opt{false}}
+%   \Optitem[false]{hybrid}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Disable the escaping of special \TeX{} characters, which
 %         makes it possible to intersperse your markdown markup with \TeX{}
@@ -232,7 +246,7 @@ defaultOptions.hashEnumerator = false
 defaultOptions.hybrid = false
 %    \end{macrocode}
 %
-%   \optitem[false]{notes}{\opt{true}, \opt{false}}
+%   \Optitem[false]{notes}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the pandoc footnote syntax extension:
 %         \begin{verbatim}
@@ -260,7 +274,7 @@ defaultOptions.hybrid = false
 defaultOptions.notes = false
 %    \end{macrocode}
 %
-%   \optitem[false]{preserveTabs}{\opt{true}, \opt{false}}
+%   \Optitem[false]{preserveTabs}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Preserve all tabs in the input.
 %       \item[false] Convert any tabs in the input to spaces.
@@ -269,36 +283,37 @@ defaultOptions.notes = false
 defaultOptions.preserveTabs = false
 %    \end{macrocode}
 %
-%   \optitem[false]{smartEllipses}{\opt{true}, \opt{false}}
+%   \Optitem[false]{smartEllipses}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Convert any ellipses in the input to the
-%         \m{markdownEllipsis} \TeX{} macro.
+%         \m{markdownRendererEllipsis} \TeX{} macro.
 %       \item[false] Preserve all ellipses in the input.
 %     \end{valuelist}
 %  \begin{macrocode}
 defaultOptions.smartEllipses = false
 %    \end{macrocode}
 %
-%   \optitem[true]{startNumber}{\opt{true}, \opt{false}}
+%   \Optitem[true]{startNumber}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Make the number in the first item in ordered lists
 %         significant. The number of each item will be passed to the
-%         \m{markdownOlItemWithNumber} \TeX{} macro.
+%         \m{markdownRendererOlItemWithNumber} \TeX{} macro.
 %       \item[false] Ignore the number in the items of ordered lists. Each
-%         item will only produce a \m{markdownOlItem} \TeX{} macro.
+%         item will only produce a \m{markdownRendererOlItem} \TeX{} macro.
 %     \end{valuelist}
 %  \begin{macrocode}
 defaultOptions.startNumber = true
 %    \end{macrocode}
 %
-%   \optitem[true]{verbatim}{\opt{true}, \opt{false}}
+%   \Optitem[true]{verbatim}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Store the contents of all code blocks in temporary files
 %         inside the cache directory. The filename containing the contents of a
 %         corresponding code block will be passed to the
-%         \m{markdownInputVerbatim} \TeX{} macro.
-%       \item[false] Surround all code blocks with the \m{markdownCodeBlockBegin}
-%         and \m{markdownCodeBlockEnd} \TeX{} macros and escape any special
+%         \m{markdownRendererInputVerbatim} \TeX{} macro.
+%       \item[false] Surround all code blocks with the
+%         \m{markdownRendererCodeBlockBegin} and
+%         \m{markdownRendererCodeBlockEnd} \TeX{} macros and escape any special
 %         \TeX{} characters inside their contents.
 %     \end{valuelist}
 %  \begin{macrocode}
@@ -312,20 +327,324 @@ defaultOptions.verbatim = true
 % \fi\subsection{\TeX{} Interface}\label{sec:texinterface}
 % \blindtext
 %
-% \subsubsection{Markdown environments}
+% \subsubsection{Markdown Environments}
 % \blindtext
 %
-% \subsubsection{Token renderers}
-% \blindtext
+% \subsubsection{Token Renderers}\label{sec:texrenderersuser}
+% The following \TeX{} macros may occur inside the output of the \luam{convert}
+% method exposed by the Lua interface (see Section \ref{sec:luaclasses})
+% and represent markdown tokens. These macros are intended to be redefined by
+% the user who is typesetting a document. By default, they point to the
+% corresponding prototypes (see Section \ref{sec:texrenderersprototypes}).
+%
+% \paragraph{Ellipsis Renderer}
+% The \mdef{markdownRendererEllipsis} macro replaces any occurance of ASCII
+% ellipses in the input text. This macro will only be produced, when the
+% \Opt{smartEllipses} option is \t`true`.  The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererEllipsis{%
+  \markdownRendererEllipsisPrototype}
+%    \end{macrocode}
+% \paragraph{Code Span Renderer}
+% The \mdef{markdownRendererCodeSpan} macro represents inlined code in the
+% input text. It receives a single argument that corresponds to the inlined
+% code.
+%  \begin{macrocode}
+\def\markdownRendererCodeSpan{%
+  \markdownRendererCodeSpanPrototype}
+%    \end{macrocode}
+% \paragraph{Link Renderer}
+% The \mdef{markdownRendererLink} macro represents a hyperlink. It receives
+% three arguments: the label, the \acro{url}, and the title of the link.
+%  \begin{macrocode}
+\def\markdownRendererLink{%
+  \markdownRendererLinkPrototype}
+%    \end{macrocode}
+% \paragraph{Image Renderer}
+% The \mdef{markdownRendererImage} macro represents an image. It receives three
+% arguments: the label, the \acro{url}, and the title of the image.
+%  \begin{macrocode}
+\def\markdownRendererImage{%
+  \markdownRendererImagePrototype}
+%    \end{macrocode}
+% \paragraph{Bullet List Renderers}
+% The \mdef{markdownRendererUlBegin} macro represents the beginning of a bullet
+% list that contains an item with several paragraphs of text (the list is not
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlBegin{%
+  \markdownRendererUlBeginPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererUlBeginTight} macro represents the beginning of a
+% bullet list that contains no item with several paragraphs of text (the list
+% is tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlBeginTight{%
+  \markdownRendererUlBeginTightPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererUlItem} macro represents an item in a bullet list.
+% The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlItem{%
+  \markdownRendererUlItemPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererUlEnd} macro represents the end of a bullet list
+% that contains an item with several paragraphs of text (the list is not
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlEnd{%
+  \markdownRendererUlEndPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererUlEndTight} macro represents the end of a bullet
+% list that contains no item with several paragraphs of text (the list is
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlEndTight{%
+  \markdownRendererUlEndTightPrototype}
+%    \end{macrocode}
+% \paragraph{Ordered ListRenderers}
+% The \mdef{markdownRendererOlBegin} macro represents the beginning of an
+% ordered list that contains an item with several paragraphs of text (the
+% list is not tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlBegin{%
+  \markdownRendererOlBeginPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererOlBeginTight} macro represents the beginning of an
+% ordered list that contains no item with several paragraphs of text (the
+% list is tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlBeginTight{%
+  \markdownRendererOlBeginTightPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererOlItem} macro represents an item in an ordered list.
+% This macro will only be produced, when the \Opt{startNumber} option is
+% \t`false`.  The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlItem{%
+  \markdownRendererOlItemPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererOlItemWithNumber} macro represents an item in an
+% ordered list.  This macro will only be produced, when the \Opt{startNumber}
+% option is \t`true`.  The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlItemWithNumber{%
+  \markdownRendererOlItemWithNumberPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererOlEnd} macro represents the end of an ordered list
+% that contains an item with several paragraphs of text (the list is not
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlEnd{%
+  \markdownRendererOlEndPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererOlEndTight} macro represents the end of an ordered
+% list that contains no item with several paragraphs of text (the list is
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlEndTight{%
+  \markdownRendererOlEndTightPrototype}
+%    \end{macrocode}
+% \paragraph{Definition List Renderers}
+% The following macros are only produces, when the \Opt{definitionLists} option
+% is \t`true`.
+%
+% The \mdef{markdownRendererDlBegin} macro represents the beginning of a
+% definition list that contains an item with several paragraphs of text (the
+% list is not tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererDlBegin{%
+  \markdownRendererDlBeginPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererDlBeginTight} macro represents the beginning of a
+% definition list that contains an item with several paragraphs of text (the
+% list is not tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererDlBeginTight{%
+  \markdownRendererDlBeginTightPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererDlItem} macro represents an item in a definition
+% list. The macro receives one argument that corresponds to the term being
+% defined.
+%  \begin{macrocode}
+\def\markdownRendererDlItem{%
+  \markdownRendererDlItemPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererDlEnd} macro represents the end of a definition
+% list that contains an item with several paragraphs of text (the list is not
+% tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererDlEnd{%
+  \markdownRendererDlEndPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererDlEndTight} macro represents the end of a
+% definition list that contains no item with several paragraphs of text (the
+% list is tight). The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererDlEndTight{%
+  \markdownRendererDlEndTightPrototype}
+%    \end{macrocode}
+% \paragraph{Emphasis Renderers}
+% The \mdef{markdownRendererEmphasis} macro represents an emphasized span of
+% text. The macro receives one argument that corresponds to the emphasized
+% span of text.
+%  \begin{macrocode}
+\def\markdownRendererEmphasis{%
+  \markdownRendererEmphasisPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererStrongEmphasis} macro represents a strongly
+% emphasized span of text. The macro receives one argument that corresponds to
+% the emphasized span of text.
+%  \begin{macrocode}
+\def\markdownRendererStrongEmphasis{%
+  \markdownRendererStrongEmphasisPrototype}
+%    \end{macrocode}
+% \paragraph{Block Quote Renderers}
+% The \mdef{markdownRendererBlockQuoteBegin} macro represents the beginning of
+% a block quote. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererBlockQuoteBegin{%
+  \markdownRendererBlockQuoteBeginPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererBlockQuoteEnd} macro represents the end of a block
+% quote. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererBlockQuoteEnd{%
+  \markdownRendererBlockQuoteEndPrototype}
+%    \end{macrocode}
+% \paragraph{Code Block Renderers}
+% The \mdef{markdownRendererCodeBlockBegin} macro represents the beginning of a
+% code block. This macro will only be produced, when the \Opt{verbatim} option
+% is \t`false`. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererCodeBlockBegin{%
+  \markdownRendererCodeBlockBeginPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererCodeBlockEnd} macro represents the end of a code
+% block. This macro will only be produced, when the \Opt{verbatim} option is
+% \t`false`. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererCodeBlockEnd{%
+  \markdownRendererCodeBlockEndPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererInputVerbatim} macro represents a code
+% block. This macro will only be produced, when the \Opt{verbatim} option is
+% \t`true`. The macro receives one argument that corresponds to the filename of
+% a file contaning the code block to input.
+%  \begin{macrocode}
+\def\markdownRendererInputVerbatim{%
+  \markdownRendererInputVerbatimPrototype}
+%    \end{macrocode}
+% \paragraph{Heading Renderers}
+% The \mdef{markdownRendererHeadingOne} macro represents a first level heading.
+% The macro receives one argument that corresponds to the heading text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingOne{%
+  \markdownRendererHeadingOnePrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererHeadingTwo} macro represents a second level
+% heading. The macro receives one argument that corresponds to the heading
+% text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingTwo{%
+  \markdownRendererHeadingTwoPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererHeadingThree} macro represents a third level
+% heading. The macro receives one argument that corresponds to the heading
+% text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingThree{%
+  \markdownRendererHeadingThreePrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererHeadingFour} macro represents a fourth level
+% heading. The macro receives one argument that corresponds to the heading
+% text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingFour{%
+  \markdownRendererHeadingFourPrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererHeadingFive} macro represents a fifth level
+% heading. The macro receives one argument that corresponds to the heading
+% text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingFive{%
+  \markdownRendererHeadingFivePrototype}
+%    \end{macrocode}
+% The \mdef{markdownRendererHeadingSix} macro represents a sixth level
+% heading. The macro receives one argument that corresponds to the heading
+% text.
+%  \begin{macrocode}
+\def\markdownRendererHeadingSix{%
+  \markdownRendererHeadingSixPrototype}
+%    \end{macrocode}
+% \paragraph{Horizontal Rule Renderer}
+% The \mdef{markdownRendererHorizontalRule} macro represents a horizontal rule.
+% The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererHorizontalRule{%
+  \markdownRendererHorizontalRulePrototype}
+%    \end{macrocode}
+% \paragraph{Footnote Renderer}
+% The \mdef{markdownRendererFootnote} macro represents a footnote. This macro
+% will only be produced, when the \Opt{notes} option is \t`true`.  The macro
+% receives one argument that corresponds to the footnote text.
+%  \begin{macrocode}
+\def\markdownRendererFootnote{%
+  \markdownRendererFootnotePrototype}
+%    \end{macrocode}
+%
+% \subsubsection{Token Renderer Prototypes}\label{sec:texrenderersprototypes}
+% The following \TeX{} macros provide definitions for the token renderers (see
+% Section \ref{sec:texrenderersuser}) that have not been redefined by the
+% user. These macros are intended to be redefined by macro package authors
+% who wish to provide sensible default token renderers.
+%
+%  \begin{macrocode}
+\def\markdownRendererEllipsisPrototype{...}
+\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}
+\def\markdownRendererLinkPrototype#1#2#3{#1}
+\def\markdownRendererImagePrototype#1#2#3{#1}
+\def\markdownRendererUlBeginPrototype{}
+\def\markdownRendererUlBeginTightPrototype{}
+\def\markdownRendererUlItemPrototype{}
+\def\markdownRendererUlEndPrototype{}
+\def\markdownRendererUlEndTightPrototype{}
+\def\markdownRendererOlBeginPrototype{}
+\def\markdownRendererOlBeginTightPrototype{}
+\def\markdownRendererOlItemPrototype{}
+\def\markdownRendererOlItemWithNumberPrototype#1{}
+\def\markdownRendererOlEndPrototype{}
+\def\markdownRendererOlEndTightPrototype{}
+\def\markdownRendererDlBeginPrototype{}
+\def\markdownRendererDlBeginTightPrototype{}
+\def\markdownRendererDlItemPrototype#1{#1}
+\def\markdownRendererDlEndPrototype{}
+\def\markdownRendererDlEndTightPrototype{}
+\def\markdownRendererEmphasisPrototype#1{{\it#1}}
+\def\markdownRendererStrongEmphasisPrototype#1{{\it\bf#1}}
+\def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}
+\def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}
+\def\markdownRendererCodeBlockBeginPrototype{\par\begingroup\tt}
+\def\markdownRendererCodeBlockEndPrototype{\endgroup\par}
+\def\markdownRendererInputVerbatimPrototype#1{\par{\tt\input#1\relax}\par}
+\def\markdownRendererHeadingOnePrototype#1{#1}
+\def\markdownRendererHeadingTwoPrototype#1{#1}
+\def\markdownRendererHeadingThreePrototype#1{#1}
+\def\markdownRendererHeadingFourPrototype#1{#1}
+\def\markdownRendererHeadingFivePrototype#1{#1}
+\def\markdownRendererHeadingSixPrototype#1{#1}
+\def\markdownRendererHorizontalRulePrototype{}
+\def\markdownRendererFootnotePrototype#1{#1}
+%    \end{macrocode}
 %
 % \subsubsection{Options}\label{sec:texoptions}
 % The \TeX{} options are represented by \TeX{} macros that map directly to the
 % options recognized by the Lua interface (see Section \ref{sec:luaoptions}).
 % They are undefined by default, which makes them fall back to the defaults
-% provided by the Lua interface.
+% provided by the Lua interface (see Section \ref{sec:luainterface}).
 %  \begin{macrocode}
 \let\markdownOptionBlankBeforeBlockquote\undefined
-\let\markdownOptionBlankBeforeHeader\undefined
+\let\markdownOptionBlankBeforeHeading\undefined
 \let\markdownOptionCacheDir\undefined
 \let\markdownOptionDefinitionLists\undefined
 \let\markdownOptionHashEnumerator\undefined
@@ -354,7 +673,6 @@ local concat = table.concat
 local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
   lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
-local lpegmatch = lpeg.match
 %    \end{macrocode}
 % 
 % \subsubsection{Utility Functions}
@@ -522,7 +840,7 @@ function util.escaper(char_escapes, string_escapes)
   end
   local escape_string = Cs((escapable + any)^0)
   return function(s)
-    return lpegmatch(escape_string, s)
+    return lpeg.match(escape_string, s)
   end
 end
 %    \end{macrocode}
@@ -580,11 +898,11 @@ function M.writer.new(options)
 %    \end{macrocode}
 % An ellipsis.
 %  \begin{macrocode}
-  self.ellipsis = "\\markdownEllipsis "
+  self.ellipsis = "\\markdownRendererEllipsis "
 %    \end{macrocode}
 % The horizontal rule.
 %  \begin{macrocode}
-  self.hrule = "\\markdownHorizontalRule "
+  self.hrule = "\\markdownRendererHorizontalRule "
 %    \end{macrocode}
 % A special character escaping function.
 %  \begin{macrocode}
@@ -611,14 +929,14 @@ function M.writer.new(options)
 % The inline verbatim code formatter.
 %  \begin{macrocode}
   function self.code(s)
-    return {"\\markdownCodeSpan{",escape(s),"}"}
+    return {"\\markdownRendererCodeSpan{",escape(s),"}"}
   end
 %    \end{macrocode}
 % A formatter for a link with the text \t`label`, the URI \t`uri`, and the
 % title \t`title`.
 %  \begin{macrocode}
   function self.link(lab,src,tit)
-    return {"\\markdownLink{",self.string(lab[1]),"}",
+    return {"\\markdownRendererLink{",self.string(lab[1]),"}",
                           "{",self.string(src),"}",
                           "{",self.string(tit),"}"}
   end
@@ -627,7 +945,7 @@ function M.writer.new(options)
 % \t`src`, and the title \t`title`.
 %  \begin{macrocode}
   function self.image(lab,src,tit)
-    return {"\\markdownImage{",self.string(lab[1]),"}",
+    return {"\\markdownRendererImage{",self.string(lab[1]),"}",
                            "{",self.string(src),"}",
                            "{",self.string(tit),"}"}
   end
@@ -636,7 +954,7 @@ function M.writer.new(options)
 % \t`tight` is true, the list should have minimal spacing between items.
 %  \begin{macrocode}
   local function ulitem(s)
-    return {"\\markdownUlItem ",s}
+    return {"\\markdownRendererUlItem ",s}
   end
 
   function self.bulletlist(items,tight)
@@ -646,9 +964,11 @@ function M.writer.new(options)
     end
     local contents = util.intersperse(buffer,"\n")
     if tight then
-      return {"\\markdownUlBeginTight\n",contents,"\n\\markdownUlEndTight "}
+      return {"\\markdownRendererUlBeginTight\n",contents,
+        "\n\\markdownRendererUlEndTight "}
     else
-      return {"\\markdownUlBegin\n",contents,"\n\\markdownUlEnd "}
+      return {"\\markdownRendererUlBegin\n",contents,
+        "\n\\markdownRendererUlEnd "}
     end
   end
 %    \end{macrocode}
@@ -659,9 +979,9 @@ function M.writer.new(options)
 %  \begin{macrocode}
   local function olitem(s,num)
     if num ~= nil then
-      return {"\\markdownOlItemWithNumber{",num,"} ",s}
+      return {"\\markdownRendererOlItemWithNumber{",num,"} ",s}
     else
-      return {"\\markdownOlItem ",s}
+      return {"\\markdownRendererOlItem ",s}
     end
   end
 
@@ -676,9 +996,11 @@ function M.writer.new(options)
     end
     local contents = util.intersperse(buffer,"\n")
     if tight then
-      return {"\\markdownOlBeginTight\n",contents,"\n\\markdownOlEndTight "}
+      return {"\\markdownRendererOlBeginTight\n",contents,
+        "\n\\markdownRendererOlEndTight "}
     else
-      return {"\\markdownOlBegin\n",contents,"\n\\markdownOlEnd "}
+      return {"\\markdownRendererOlBegin\n",contents,
+        "\n\\markdownRendererOlEnd "}
     end
   end
 %    \end{macrocode}
@@ -688,7 +1010,7 @@ function M.writer.new(options)
 % should have minimal spacing between items.
 %  \begin{macrocode}
   local function dlitem(term,defs)
-      return {"\\markdownDlItem{",term,"}\n",defs}
+      return {"\\markdownRendererDlItem{",term,"}\n",defs}
   end
 
   function self.definitionlist(items,tight)
@@ -699,28 +1021,31 @@ function M.writer.new(options)
     end
     local contents = util.intersperse(buffer, self.containersep)
     if tight then
-      return {"\\markdownDlBeginTight\n",contents,"\n\\markdownDlEndTight "}
+      return {"\\markdownRendererDlBeginTight\n",contents,
+        "\n\\markdownRendererDlEndTight "}
     else
-      return {"\\markdownDlBegin\n",contents,"\n\\markdownDlEnd "}
+      return {"\\markdownRendererDlBegin\n",contents,
+        "\n\\markdownRendererDlEnd "}
     end
   end
 %    \end{macrocode}
 % The emphasized text formatter.
 %  \begin{macrocode}
   function self.emphasis(s)
-    return {"\\markdownEmphasis{",s,"}"}
+    return {"\\markdownRendererEmphasis{",s,"}"}
   end
 %    \end{macrocode}
 % The strongly emphasized text formatter.
 %  \begin{macrocode}
   function self.strong(s)
-    return {"\\markdownStrongEmphasis{",s,"}"}
+    return {"\\markdownRendererStrongEmphasis{",s,"}"}
   end
 %    \end{macrocode}
 % The block quotation formatter.
 %  \begin{macrocode}
   function self.blockquote(s)
-    return {"\\markdownBlockQuoteBegin\n",s,"\n\\markdownBlockQuoteEnd "}
+    return {"\\markdownRendererBlockQuoteBegin\n",s,
+      "\n\\markdownRendererBlockQuoteEnd "}
   end
 %    \end{macrocode}
 % The block verbatim code formatter.
@@ -728,9 +1053,10 @@ function M.writer.new(options)
   function self.verbatim(s)
     if options.verbatim then
       local name = util.cache(options.cacheDir, s, nil, nil, ".verbatim")
-      return {"\\markdownInputVerbatim{",name,"}"}
+      return {"\\markdownRendererInputVerbatim{",name,"}"}
     else
-      return {"\\markdownCodeBlockBegin\n",escape(s),"\\markdownCodeBlockEnd "}
+      return {"\\markdownRendererCodeBlockBegin\n",escape(s),
+        "\\markdownRendererCodeBlockEnd "}
     end
   end
 %    \end{macrocode}
@@ -739,17 +1065,17 @@ function M.writer.new(options)
   function self.header(s,level)
     local cmd
     if level == 1 then
-      cmd = "\\markdownHeaderOne"
+      cmd = "\\markdownRendererHeadingOne"
     elseif level == 2 then
-      cmd = "\\markdownHeaderTwo"
+      cmd = "\\markdownRendererHeadingTwo"
     elseif level == 3 then
-      cmd = "\\markdownHeaderThree"
+      cmd = "\\markdownRendererHeadingThree"
     elseif level == 4 then
-      cmd = "\\markdownHeaderFour"
+      cmd = "\\markdownRendererHeadingFour"
     elseif level == 5 then
-      cmd = "\\markdownHeaderFive"
+      cmd = "\\markdownRendererHeadingFive"
     elseif level == 6 then
-      cmd = "\\markdownHeaderSix"
+      cmd = "\\markdownRendererHeadingSix"
     else
       cmd = ""
     end
@@ -759,7 +1085,7 @@ function M.writer.new(options)
 % The footnote formatter.
 %  \begin{macrocode}
   function self.note(contents)
-    return {"\\markdownFootnote{",contents,"}"}
+    return {"\\markdownRendererFootnote{",contents,"}"}
   end
 
   return self
@@ -815,7 +1141,7 @@ function M.reader.new(writer, options)
 
   local parse_blocks =
     function(str)
-      local res = lpegmatch(blocks, str)
+      local res = lpeg.match(blocks, str)
       if res == nil
         then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
         else return res
@@ -824,7 +1150,7 @@ function M.reader.new(writer, options)
 
   local parse_inlines =
     function(str)
-      local res = lpegmatch(inlines, str)
+      local res = lpeg.match(inlines, str)
       if res == nil
         then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
         else return res
@@ -833,7 +1159,7 @@ function M.reader.new(writer, options)
 
   local parse_inlines_no_link =
     function(str)
-      local res = lpegmatch(inlines_no_link, str)
+      local res = lpeg.match(inlines_no_link, str)
       if res == nil
         then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
         else return res
@@ -1147,7 +1473,7 @@ function M.reader.new(writer, options)
     bqstart = fail
   end
 
-  if options.blankBeforeHeader then
+  if options.blankBeforeHeading then
     headerstart = fail
   end
 
@@ -1342,7 +1668,7 @@ function M.reader.new(writer, options)
                        + Reference
                        + (tightblocksep / "\n")
 %    \end{macrocode}
-% \paragraph{Headers}
+% \paragraph{Headings}
 %  \begin{macrocode}
   -- parse Atx heading start and return level
   local HeadingStart = #hash * C(hash^-6) * -hash / length
@@ -1355,14 +1681,14 @@ function M.reader.new(writer, options)
   end
 
   -- parse atx header
-  local AtxHeader = Cg(HeadingStart,"level")
+  local AtxHeading = Cg(HeadingStart,"level")
                      * optionalspace
                      * (C(line) / strip_atx_end / parse_inlines)
                      * Cb("level")
                      / writer.header
 
   -- parse setext header
-  local SetextHeader = #(line * S("=-"))
+  local SetextHeading = #(line * S("=-"))
                      * Ct(line / parse_inlines)
                      * HeadingLevel
                      * optionalspace * newline
@@ -1387,7 +1713,7 @@ function M.reader.new(writer, options)
                             + V("HorizontalRule")
                             + V("BulletList")
                             + V("OrderedList")
-                            + V("Header")
+                            + V("Heading")
                             + V("DefinitionList")
                             + V("Paragraph")
                             + V("Plain"),
@@ -1397,7 +1723,7 @@ function M.reader.new(writer, options)
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
-      Header                = AtxHeader + SetextHeader,
+      Heading               = AtxHeading + SetextHeading,
       DefinitionList        = DefinitionList,
       DisplayHtml           = DisplayHtml,
       Paragraph             = Paragraph,
@@ -1486,7 +1812,7 @@ return M
 %    \end{macrocode}
 % \blindtext
 %
-% \subsubsection{The shell wrapper}
+% \subsubsection{Shell Wrapper}
 % \blindtext
 %
 % \iffalse
@@ -1498,90 +1824,6 @@ return M
 % \fi\subsection{\TeX{} Implementation}
 % \blindtext
 %
-% \subsubsection{User Interface}
-% The user interface macros are intended for redefinition by the user. By
-% default, they point to the corresponding prototype \TeX{} macros that contain
-% the implicit definition.
-%
-%  \begin{macrocode}
-\def\markdownEllipsis{\markdownEllipsisPrototype}
-\def\markdownCodeSpan{\markdownCodeSpanPrototype}
-\def\markdownLink{\markdownLinkPrototype}
-\def\markdownImage{\markdownImagePrototype}
-\def\markdownUlBegin{\markdownUlBeginPrototype}
-\def\markdownUlBeginTight{\markdownUlBeginTightPrototype}
-\def\markdownUlItem{\markdownUlItemPrototype}
-\def\markdownUlEnd{\markdownUlEndPrototype}
-\def\markdownUlEndTight{\markdownUlEndTightPrototype}
-\def\markdownOlBegin{\markdownOlBeginPrototype}
-\def\markdownOlBeginTight{\markdownOlBeginTightPrototype}
-\def\markdownOlItem{\markdownOlItemPrototype}
-\def\markdownOlItemWithNumber{\markdownOlItemWithNumberPrototype}
-\def\markdownOlEnd{\markdownOlEndPrototype}
-\def\markdownOlEndTight{\markdownOlEndTightPrototype}
-\def\markdownDlBegin{\markdownDlBeginPrototype}
-\def\markdownDlBeginTight{\markdownDlBeginTightPrototype}
-\def\markdownDlItem{\markdownDlItemPrototype}
-\def\markdownDlEnd{\markdownDlEndPrototype}
-\def\markdownDlEndTight{\markdownDlEndTightPrototype}
-\def\markdownEmphasis{\markdownEmphasisPrototype}
-\def\markdownStrongEmphasis{\markdownStrongEmphasisPrototype}
-\def\markdownBlockQuoteBegin{\markdownBlockQuoteBeginPrototype}
-\def\markdownBlockQuoteEnd{\markdownBlockQuoteEndPrototype}
-\def\markdownCodeBlockBegin{\markdownCodeBlockBeginPrototype}
-\def\markdownCodeBlockEnd{\markdownCodeBlockEndPrototype}
-\def\markdownInputVerbatim{\markdownInputVerbatimPrototype}
-\def\markdownHeaderOne{\markdownHeaderOnePrototype}
-\def\markdownHeaderTwo{\markdownHeaderTwoPrototype}
-\def\markdownHeaderThree{\markdownHeaderThreePrototype}
-\def\markdownHeaderFour{\markdownHeaderFourPrototype}
-\def\markdownHeaderFive{\markdownHeaderFivePrototype}
-\def\markdownHeaderSix{\markdownHeaderSixPrototype}
-\def\markdownHorizontalRule{\markdownHorizontalRulePrototype}
-\def\markdownFootnote{\markdownFootnotePrototype}
-%    \end{macrocode}
-%
-% \subsubsection{Package Interface}
-% The package interface macros are intended for redefinition by packages. They
-% come into effect, when the user does not redefine the user interface macros.
-% 
-%  \begin{macrocode}
-\def\markdownEllipsisPrototype{...}
-\def\markdownCodeSpanPrototype#1{#1}
-\def\markdownLinkPrototype#1#2#3{#1}  % #1 = Label, #2 = Src, #3 = Title
-\def\markdownImagePrototype#1#2#3{#1} % #1 = Label, #2 = Src, #3 = Title
-\def\markdownUlBeginPrototype{}
-\def\markdownUlBeginTightPrototype{}
-\def\markdownUlItemPrototype{}
-\def\markdownUlEndPrototype{}
-\def\markdownUlEndTightPrototype{}
-\def\markdownOlBeginPrototype{}
-\def\markdownOlBeginTightPrototype{}
-\def\markdownOlItemPrototype{}
-\def\markdownOlItemWithNumberPrototype#1{}
-\def\markdownOlEndPrototype{}
-\def\markdownOlEndTightPrototype{}
-\def\markdownDlBeginPrototype{}
-\def\markdownDlBeginTightPrototype{}
-\def\markdownDlItemPrototype#1{#1}
-\def\markdownDlEndPrototype{}
-\def\markdownDlEndTightPrototype{}
-\def\markdownEmphasisPrototype#1{#1}
-\def\markdownStrongEmphasisPrototype#1{#1}
-\def\markdownBlockQuoteBeginPrototype{}
-\def\markdownBlockQuoteEndPrototype{}
-\def\markdownCodeBlockBeginPrototype{}
-\def\markdownCodeBlockEndPrototype{}
-\def\markdownInputVerbatimPrototype#1{\input#1\relax}
-\def\markdownHeaderOnePrototype#1{#1}
-\def\markdownHeaderTwoPrototype#1{#1}
-\def\markdownHeaderThreePrototype#1{#1}
-\def\markdownHeaderFourPrototype#1{#1}
-\def\markdownHeaderFivePrototype#1{#1}
-\def\markdownHeaderSixPrototype#1{#1}
-\def\markdownHorizontalRulePrototype{}
-\def\markdownFootnotePrototype#1{#1}
-%    \end{macrocode}
 % \iffalse
 %</tex>
 % \fi
