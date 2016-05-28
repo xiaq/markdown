@@ -98,23 +98,55 @@ if not modules then modules = { } end modules ['markdown-lunamark'] = {
 % \subsection{Prerequisites}
 % \blindtext
 %
-% \iffalse
-%<*lua>
-% \fi
 %  \begin{macrocode}
 local lpeg = require("lpeg")
 local md5 = require("md5")
 local unicode = require("unicode")
 %    \end{macrocode}
 %
-% \section{User Guide}
-% \blindtext
+% \section{User Guide}\label{sec:interfaces}
+% This part of the manual describes the interfaces exposed by the package
+% and is aimed at the user of the package.
 %
 % \subsection{Lua Interface}
-% \blindtext
+% The Lua interface provides the conversion from markdown to \TeX{}.  This
+% interface is used by the \TeX{} interface (see Section
+% \ref{sec:texinterface}) and will be of interest to the developers of other
+% packages and Lua modules.
 %
-% \subsubsection{Options}
-% \label{sec:luaoptions}
+%  \begin{macrocode}
+local M = {}
+%    \end{macrocode}
+%
+% \subsubsection{Classes}\label{sec:luaclasses}
+% The Lua interface exposes the \t`writer` and \t`reader` classes.
+%  \begin{macrocode}
+M.writer = {}
+M.reader = {}
+%    \end{macrocode}
+%
+% The \t`writer` class can be instantiated via the \t`writer.new(options)`
+% method, where \t`options` is a table of options (see Section
+% \ref{sec:luaoptions}). The \t`options` parameter is optional; when unspecified,
+% the behaviour is the same as if \t`options` were an empty table.
+%
+% The \t`reader` class can be instantiated via the method \t`reader.new(writer,
+% options)`, where \t`writer` is an instance of the \t`writer` class and
+% \t`options` is a table of options. The \t`options` parameter is optional;
+% when unspecified, the behaviour is the same as if \t`options` were an empty
+% table.The \t`reader` class exposes the \t`convert(string)` instance method,
+% which accepts a markdown \t`string` and returns a \TeX{} output.
+%
+% The following example converts the markdown string \t`"\_Hello world!\_"` to
+% a \TeX{} output using the default options and prints it:
+% \begin{verbatim}
+% local md = require("markdown")
+% local writer = md.writer.new()
+% local reader = md.reader.new(writer)
+% print(reader.convert("_Hello world!_"))
+% \end{verbatim}
+%
+% \subsubsection{Options}\label{sec:luaoptions}
 % \blindtext
 %
 %  \begin{macrocode}
@@ -286,7 +318,6 @@ local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
   lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.P(1)
 local lpegmatch = lpeg.match
-local M = {}
 %    \end{macrocode}
 % 
 % \subsubsection{Utility Functions}
@@ -301,9 +332,9 @@ function util.err(msg, exit_code)
 end
 %    \end{macrocode}
 % Computes the digest of \t`string` and \t`salt`, adds the \t`suffix` and looks
-% into the directory \t`dir`, whether a file with such name exists. If it does
-% not, it gets created with \t`transform(string)` as its content. After that,
-% the name of the file is returned.
+% into the directory \t`dir`, whether a file with such a name exists. If it
+% does not, it gets created with \t`transform(string)` as its content. After
+% that, the name of the file is returned.
 %  \begin{macrocode}
 function util.cache(dir, string, salt, transform, suffix)
   local digest = md5.sumhexa(string .. (salt or ""))
@@ -473,7 +504,6 @@ end
 %
 % Creates a new \TeX{} writer, where \t`options` is a table with options.
 %  \begin{macrocode}
-M.writer = {}
 function M.writer.new(options)
   local self = {}
   options = options or {}
@@ -715,7 +745,6 @@ end
 % document.  The converter assumes that the input has unix line endings
 % (newline).
 %  \begin{macrocode}
-M.reader = {}
 function M.reader.new(writer, options)
   local self = {}
   options = options or {}
@@ -1411,7 +1440,7 @@ function M.reader.new(writer, options)
       table.concat(opt_string, ","), function(input)
         return util.rope_to_string(parse_blocks(input))
       end, ".md" .. writer.suffix)
-    return name
+    return string.format("\\input{%s}", name)
   end
   return self
 end
@@ -1429,13 +1458,13 @@ return M
 % 
 % \iffalse
 %<*tex>
-% \fi\section{\TeX{} interface}
+% \fi\subsection{\TeX{} Implementation}
 % \blindtext
 %
-% \subsection{User Interface}
+% \subsubsection{User Interface}
 % The user interface macros are intended for redefinition by the user. By
-% default, they point to the prototype macros that contain the implicit
-% definition.
+% default, they point to the corresponding prototype \TeX{} macros that contain
+% the implicit definition.
 %
 %  \begin{macrocode}
 \def\markdownEllipsis{\markdownEllipsisPrototype}
@@ -1475,7 +1504,7 @@ return M
 \def\markdownFootnote{\markdownFootnotePrototype}
 %    \end{macrocode}
 %
-% \subsection{Package Interface}
+% \subsubsection{Package Interface}
 % The package interface macros are intended for redefinition by packages. They
 % come into effect, when the user does not redefine the user interface macros.
 % 
@@ -1522,7 +1551,7 @@ return M
 %
 % \iffalse
 %<*latex>
-% \fi\section{\LaTeX{} interface}
+% \fi\subsection{\LaTeX{} Implementation}
 % \blindtext
 %
 % \iffalse
@@ -1531,7 +1560,7 @@ return M
 %
 % \iffalse
 %<*context>
-% \fi\section{\Hologo{ConTeXt} interface}
+% \fi\subsection{\Hologo{ConTeXt} Implementation}
 % \blindtext
 %
 % \iffalse
