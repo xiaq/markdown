@@ -14,10 +14,7 @@
 \usepackage{doc}
 
 % Make paragraphs numbered.
-\makeatletter
-\makeatother
 \setcounter{secnumdepth}{4}
-\setcounter{tocdepth}{4}
 
 % Set up the style.
 \addtokomafont{title}{\sffamily}
@@ -33,14 +30,15 @@
 
 % Define some user markup.
 \let\pkg\relax
-\def\m#1{%
+\def\m#1{% A TeX macro
   %\expandafter\DescribeMacro\csname#1\endcsname
   \textcolor{spot}{\cs{#1}}}
-\def\t`#1`{\textcolor{spot}{\texttt{#1}}}
+\def\t`#1`{% Inline code
+	\textcolor{spot}{\texttt{#1}}}
 
 % Set up the title page.
 \titlepage{%
-  title={A Markdown interpreter for \TeX{}},
+  title={A Markdown Interpreter for \TeX{}},
   subtitle={},
   url={https://github.com/witiko/markdown},
   author={Vít Novotný (based on the work of John MacFarlane and Hans Hagen)},
@@ -64,13 +62,27 @@
 % \blindtext
 %
 % \subsection{About \pkg{Markdown}}
-% \pkg{Markdown} consists of the \pkg{lunamark} Lua library v0.4.0 by John
-% MacFarlane, which was slimmed down and heavily modified for the purposes of
-% this package. This library provides quick markdown parsing for the rest of the
-% package. On top of \pkg{lunamark} sits a shell wrapper, which enables the
-% usage of the library from within \t`\cs{write}18`-capable \TeX{} engines
-% without direct support of Lua. The user interacts with the package through
-% the \TeX{} and \LaTeX{} interfaces.
+% The \pkg{Markdown} package consists of the \pkg{lunamark} Lua library
+% by John MacFarlane, which was slimmed down and heavily modified for the
+% purposes of the package. The \pkg{lunamark} library provides quick markdown
+% parsing for the rest of the package. On top of \pkg{lunamark} sits a shell
+% wrapper, which enables the usage of the library from within
+% \t`\cs{write}18`-capable \TeX{} engines without direct support of Lua. The
+% user interacts with the package through the Lua, \TeX{}, \LaTeX{}, and
+% \Hologo{ConTeXt} interfaces.
+%
+% \iffalse
+%<*lua>
+% \fi
+%  \begin{macrocode}
+if not modules then modules = { } end modules ['markdown-lunamark'] = {
+    version   = "0.4.0",
+    comment   = "A module for the conversion from markdown to TeX",
+    author    = "John MacFarlane, Hand Hagen, Vít Novotný",
+    copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
+    license   = "MIT sublicensed as LPPL 1.3"
+}
+%    \end{macrocode}
 %
 % \blindtext
 %
