@@ -306,8 +306,45 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 % \end{optionlist}
 % 
-% \section{Implementation}
-% \subsection{Lua interface}
+% \iffalse
+%</lua>
+%<*tex>
+% \fi\subsection{\TeX{} Interface}\label{sec:texinterface}
+% \blindtext
+%
+% \subsubsection{Markdown environments}
+% \blindtext
+%
+% \subsubsection{Token renderers}
+% \blindtext
+%
+% \subsubsection{Options}\label{sec:texoptions}
+% The \TeX{} options are represented by \TeX{} macros that map directly to the
+% options recognized by the Lua interface (see Section \ref{sec:luaoptions}).
+% They are undefined by default, which makes them fall back to the defaults
+% provided by the Lua interface.
+%  \begin{macrocode}
+\let\markdownOptionBlankBeforeBlockquote\undefined
+\let\markdownOptionBlankBeforeHeader\undefined
+\let\markdownOptionCacheDir\undefined
+\let\markdownOptionDefinitionLists\undefined
+\let\markdownOptionHashEnumerator\undefined
+\let\markdownOptionHybrid\undefined
+\let\markdownOptionNotes\undefined
+\let\markdownOptionPreserveTabs\undefined
+\let\markdownOptionSmartEllipses\undefined
+\let\markdownOptionStartNumber\undefined
+\let\markdownOptionVerbatim\undefined
+%    \end{macrocode}
+% 
+% \section{Implementation}\label{sec:implementation}
+% This part of the manual describes the implementation of the interfaces
+% exposed by the package (see Section \ref{sec:interfaces}) and is aimed at the
+% developer of the package, as well as the curious user.
+% \iffalse
+%</tex>
+%<*lua>
+% \fi\subsection{Lua Implementation}\label{sec:luaimplementation}
 % \blindtext
 %
 %  \begin{macrocode}
