@@ -1,7 +1,4 @@
 .PHONY: all clean implode
-AUXFILES=markdown.aux markdown.log markdown.toc markdown.ind \
-	markdown.idx markdown.out markdown.ilg markdown.gls \
-	markdown.glo markdown.hd markdown.lot markdown.pyg
 AUXDIRS=_minted-markdown
 DTXARCHIVE=markdown.dtx
 INSTALLER=markdown.ins
@@ -19,8 +16,7 @@ $(TEXFILE) $(LUAFILE): $(INSTALLER) $(DTXARCHIVE)
 
 # This target typesets the technical documentation.
 %.pdf: %.dtx
-	pdflatex -shell-escape $<
-	pdflatex -shell-escape $<
+	latexmk -pdf $<
 	#pdflatex $<
 	#makeindex -s gind.ist                       $(basename $@)
 	#makeindex -s gglo.ist -o $(basename $@).gls $(basename $@).glo
@@ -29,7 +25,7 @@ $(TEXFILE) $(LUAFILE): $(INSTALLER) $(DTXARCHIVE)
 
 # This pseudo-target removes any existing auxiliary files.
 clean:
-	rm -f $(AUXFILES)
+	latexmk -c
 	rm -rf ${AUXDIRS}
 
 # This pseudo-target removes any makeable files.
