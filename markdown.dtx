@@ -163,8 +163,15 @@ local md5 = require("md5")
 %     \cite[Section~3.2]{luatex16}). This method is not present in the base
 %     library.
 % \end{description}
-% The \pkg{Lua File System} module is statically linked into the Lua\TeX{} engine
-% (see \cite[Section~3.3]{luatex16}).
+% The \pkg{Lua File System} module is statically linked into the Lua\TeX{}
+% engine (see \cite[Section~3.3]{luatex16}).
+%
+% The \TeX{} part of the package also requires that either the Lua\TeX{}
+% \m{luaescapestring} primitive or the \Hologo{eTeX} \m{detokenize} primitive
+% is available for the definition of the \m{markdownLuaEscape} macro, and that
+% either the Lua\TeX{} \m{directlua} primitive or the \hologo{pdfTeX}
+% \m{input}\t`|"\dots"` shell access primitive is available for the definition
+% of the \m{markdownLuaExecute} macro.
 %
 % \subsubsection{\LaTeX{} prerequisites}
 % \blindtext
@@ -392,7 +399,7 @@ defaultOptions.verbatim = true
 %
 % \subsubsection{Markdown Conversion}
 % The \TeX{} interface exposes the \mdef{markdownBegin}, \mdef{markdownEnd},
-% \mdef{markdownInline}, and \mdef{markdownInput} macros.
+% and \mdef{markdownInput} macros.
 %
 % The \m{markdownBegin} macro marks the beginning of a markdown document
 % fragment. The corresponding \m{markdownEnd} macro must be visible directly
@@ -405,13 +412,6 @@ defaultOptions.verbatim = true
 \let\markdownEnd\relax
 %    \end{macrocode}
 %
-% The \m{markdownInline} macro accepts a single parameter containing a markdown
-% string and expands to the result of the conversion of the input markdown
-% string to \TeX{}.
-%  \begin{macrocode}
-\let\markdownInline\relax
-%    \end{macrocode}
-%
 % The \m{markdownInput} macro accepts a single parameter containing the
 % filename of a markdown document and expands to the result of the conversion
 % of the input markdown document to \TeX{}.
@@ -420,14 +420,14 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The following example \TeX{} code produces a document containing the result
-% of the conversion of the markdown string \t`\_Hello world!\_` three times,
-% supposing that the \t`hello.md` file contains the \t`\_Hello world!\_` string.
+% of the conversion of the markdown string \t`\_Hello world!\_` two times,
+% supposing that the \t`hello.md` file contains the \t`\_Hello world!\_`
+% string.
 % \begin{verbatim}
 % \input markdown
 % \markdownBegin
 %   _Hello world!_
 % \markdownEnd
-% \markdownInline{_Hello world!_}
 % \markdownInput{hello.md}\end{verbatim}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
@@ -444,7 +444,7 @@ defaultOptions.verbatim = true
 % \Opt{smartEllipses} option is \t`true`.  The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererEllipsis{%
-  \markdownRendererEllipsisPrototype}
+  \markdownRendererEllipsisPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Code Span Renderer}
@@ -453,7 +453,7 @@ defaultOptions.verbatim = true
 % code.
 %  \begin{macrocode}
 \def\markdownRendererCodeSpan{%
-  \markdownRendererCodeSpanPrototype}
+  \markdownRendererCodeSpanPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Link Renderer}
@@ -461,7 +461,7 @@ defaultOptions.verbatim = true
 % three arguments: the label, the \acro{url}, and the title of the link.
 %  \begin{macrocode}
 \def\markdownRendererLink{%
-  \markdownRendererLinkPrototype}
+  \markdownRendererLinkPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Image Renderer}
@@ -469,7 +469,7 @@ defaultOptions.verbatim = true
 % arguments: the label, the \acro{url}, and the title of the image.
 %  \begin{macrocode}
 \def\markdownRendererImage{%
-  \markdownRendererImagePrototype}
+  \markdownRendererImagePrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Bullet List Renderers}
@@ -478,7 +478,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlBegin{%
-  \markdownRendererUlBeginPrototype}
+  \markdownRendererUlBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlBeginTight} macro represents the beginning of a
@@ -486,14 +486,14 @@ defaultOptions.verbatim = true
 % is tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlBeginTight{%
-  \markdownRendererUlBeginTightPrototype}
+  \markdownRendererUlBeginTightPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlItem} macro represents an item in a bullet list.
 % The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlItem{%
-  \markdownRendererUlItemPrototype}
+  \markdownRendererUlItemPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlEnd} macro represents the end of a bullet list
@@ -501,7 +501,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlEnd{%
-  \markdownRendererUlEndPrototype}
+  \markdownRendererUlEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlEndTight} macro represents the end of a bullet
@@ -509,7 +509,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlEndTight{%
-  \markdownRendererUlEndTightPrototype}
+  \markdownRendererUlEndTightPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Ordered ListRenderers}
@@ -518,7 +518,7 @@ defaultOptions.verbatim = true
 % list is not tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlBegin{%
-  \markdownRendererOlBeginPrototype}
+  \markdownRendererOlBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlBeginTight} macro represents the beginning of an
@@ -526,7 +526,7 @@ defaultOptions.verbatim = true
 % list is tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlBeginTight{%
-  \markdownRendererOlBeginTightPrototype}
+  \markdownRendererOlBeginTightPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlItem} macro represents an item in an ordered list.
@@ -534,7 +534,7 @@ defaultOptions.verbatim = true
 % \t`false`.  The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlItem{%
-  \markdownRendererOlItemPrototype}
+  \markdownRendererOlItemPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlItemWithNumber} macro represents an item in an
@@ -542,7 +542,7 @@ defaultOptions.verbatim = true
 % option is \t`true`.  The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlItemWithNumber{%
-  \markdownRendererOlItemWithNumberPrototype}
+  \markdownRendererOlItemWithNumberPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlEnd} macro represents the end of an ordered list
@@ -550,7 +550,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlEnd{%
-  \markdownRendererOlEndPrototype}
+  \markdownRendererOlEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlEndTight} macro represents the end of an ordered
@@ -558,7 +558,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlEndTight{%
-  \markdownRendererOlEndTightPrototype}
+  \markdownRendererOlEndTightPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Definition List Renderers}
@@ -570,7 +570,7 @@ defaultOptions.verbatim = true
 % list is not tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlBegin{%
-  \markdownRendererDlBeginPrototype}
+  \markdownRendererDlBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlBeginTight} macro represents the beginning of a
@@ -578,7 +578,7 @@ defaultOptions.verbatim = true
 % list is not tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlBeginTight{%
-  \markdownRendererDlBeginTightPrototype}
+  \markdownRendererDlBeginTightPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlItem} macro represents an item in a definition
@@ -586,7 +586,7 @@ defaultOptions.verbatim = true
 % defined.
 %  \begin{macrocode}
 \def\markdownRendererDlItem{%
-  \markdownRendererDlItemPrototype}
+  \markdownRendererDlItemPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlEnd} macro represents the end of a definition
@@ -594,7 +594,7 @@ defaultOptions.verbatim = true
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlEnd{%
-  \markdownRendererDlEndPrototype}
+  \markdownRendererDlEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlEndTight} macro represents the end of a
@@ -602,7 +602,7 @@ defaultOptions.verbatim = true
 % list is tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlEndTight{%
-  \markdownRendererDlEndTightPrototype}
+  \markdownRendererDlEndTightPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Emphasis Renderers}
@@ -611,7 +611,7 @@ defaultOptions.verbatim = true
 % span of text.
 %  \begin{macrocode}
 \def\markdownRendererEmphasis{%
-  \markdownRendererEmphasisPrototype}
+  \markdownRendererEmphasisPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererStrongEmphasis} macro represents a strongly
@@ -619,7 +619,7 @@ defaultOptions.verbatim = true
 % the emphasized span of text.
 %  \begin{macrocode}
 \def\markdownRendererStrongEmphasis{%
-  \markdownRendererStrongEmphasisPrototype}
+  \markdownRendererStrongEmphasisPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Block Quote Renderers}
@@ -627,14 +627,14 @@ defaultOptions.verbatim = true
 % a block quote. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererBlockQuoteBegin{%
-  \markdownRendererBlockQuoteBeginPrototype}
+  \markdownRendererBlockQuoteBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererBlockQuoteEnd} macro represents the end of a block
 % quote. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererBlockQuoteEnd{%
-  \markdownRendererBlockQuoteEndPrototype}
+  \markdownRendererBlockQuoteEndPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Code Block Renderers}
@@ -643,7 +643,7 @@ defaultOptions.verbatim = true
 % is \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererCodeBlockBegin{%
-  \markdownRendererCodeBlockBeginPrototype}
+  \markdownRendererCodeBlockBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererCodeBlockEnd} macro represents the end of a code
@@ -651,7 +651,7 @@ defaultOptions.verbatim = true
 % \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererCodeBlockEnd{%
-  \markdownRendererCodeBlockEndPrototype}
+  \markdownRendererCodeBlockEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererInputVerbatim} macro represents a code
@@ -660,7 +660,7 @@ defaultOptions.verbatim = true
 % a file contaning the code block to input.
 %  \begin{macrocode}
 \def\markdownRendererInputVerbatim{%
-  \markdownRendererInputVerbatimPrototype}
+  \markdownRendererInputVerbatimPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Heading Renderers}
@@ -668,7 +668,7 @@ defaultOptions.verbatim = true
 % The macro receives one argument that corresponds to the heading text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingOne{%
-  \markdownRendererHeadingOnePrototype}
+  \markdownRendererHeadingOnePrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingTwo} macro represents a second level
@@ -676,7 +676,7 @@ defaultOptions.verbatim = true
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingTwo{%
-  \markdownRendererHeadingTwoPrototype}
+  \markdownRendererHeadingTwoPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingThree} macro represents a third level
@@ -684,7 +684,7 @@ defaultOptions.verbatim = true
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingThree{%
-  \markdownRendererHeadingThreePrototype}
+  \markdownRendererHeadingThreePrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingFour} macro represents a fourth level
@@ -692,7 +692,7 @@ defaultOptions.verbatim = true
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingFour{%
-  \markdownRendererHeadingFourPrototype}
+  \markdownRendererHeadingFourPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingFive} macro represents a fifth level
@@ -700,7 +700,7 @@ defaultOptions.verbatim = true
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingFive{%
-  \markdownRendererHeadingFivePrototype}
+  \markdownRendererHeadingFivePrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingSix} macro represents a sixth level
@@ -708,7 +708,7 @@ defaultOptions.verbatim = true
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingSix{%
-  \markdownRendererHeadingSixPrototype}
+  \markdownRendererHeadingSixPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Horizontal Rule Renderer}
@@ -716,7 +716,7 @@ defaultOptions.verbatim = true
 % The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererHorizontalRule{%
-  \markdownRendererHorizontalRulePrototype}
+  \markdownRendererHorizontalRulePrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Footnote Renderer}
@@ -725,7 +725,7 @@ defaultOptions.verbatim = true
 % receives one argument that corresponds to the footnote text.
 %  \begin{macrocode}
 \def\markdownRendererFootnote{%
-  \markdownRendererFootnotePrototype}
+  \markdownRendererFootnotePrototype}%
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderer Prototypes}\label{sec:texrenderersprototypes}
@@ -737,41 +737,41 @@ defaultOptions.verbatim = true
 % \ref{sec:lateximplementation} and \ref{sec:contextimplementation}).
 %
 %  \begin{macrocode}
-\def\markdownRendererEllipsisPrototype{...}
-\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}
-\def\markdownRendererLinkPrototype#1#2#3{#1}
-\def\markdownRendererImagePrototype#1#2#3{#1}
-\def\markdownRendererUlBeginPrototype{}
-\def\markdownRendererUlBeginTightPrototype{}
-\def\markdownRendererUlItemPrototype{}
-\def\markdownRendererUlEndPrototype{}
-\def\markdownRendererUlEndTightPrototype{}
-\def\markdownRendererOlBeginPrototype{}
-\def\markdownRendererOlBeginTightPrototype{}
-\def\markdownRendererOlItemPrototype{}
-\def\markdownRendererOlItemWithNumberPrototype#1{}
-\def\markdownRendererOlEndPrototype{}
-\def\markdownRendererOlEndTightPrototype{}
-\def\markdownRendererDlBeginPrototype{}
-\def\markdownRendererDlBeginTightPrototype{}
-\def\markdownRendererDlItemPrototype#1{#1}
-\def\markdownRendererDlEndPrototype{}
-\def\markdownRendererDlEndTightPrototype{}
-\def\markdownRendererEmphasisPrototype#1{{\it#1}}
-\def\markdownRendererStrongEmphasisPrototype#1{{\it#1}}
-\def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}
-\def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}
-\def\markdownRendererCodeBlockBeginPrototype{\par\begingroup\tt}
-\def\markdownRendererCodeBlockEndPrototype{\endgroup\par}
-\def\markdownRendererInputVerbatimPrototype#1{\par{\tt\input{#1}}\par}
-\def\markdownRendererHeadingOnePrototype#1{#1}
-\def\markdownRendererHeadingTwoPrototype#1{#1}
-\def\markdownRendererHeadingThreePrototype#1{#1}
-\def\markdownRendererHeadingFourPrototype#1{#1}
-\def\markdownRendererHeadingFivePrototype#1{#1}
-\def\markdownRendererHeadingSixPrototype#1{#1}
-\def\markdownRendererHorizontalRulePrototype{}
-\def\markdownRendererFootnotePrototype#1{#1}
+\def\markdownRendererEllipsisPrototype{...}%
+\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
+\def\markdownRendererLinkPrototype#1#2#3{#1}%
+\def\markdownRendererImagePrototype#1#2#3{#1}%
+\def\markdownRendererUlBeginPrototype{}%
+\def\markdownRendererUlBeginTightPrototype{}%
+\def\markdownRendererUlItemPrototype{}%
+\def\markdownRendererUlEndPrototype{}%
+\def\markdownRendererUlEndTightPrototype{}%
+\def\markdownRendererOlBeginPrototype{}%
+\def\markdownRendererOlBeginTightPrototype{}%
+\def\markdownRendererOlItemPrototype{}%
+\def\markdownRendererOlItemWithNumberPrototype#1{}%
+\def\markdownRendererOlEndPrototype{}%
+\def\markdownRendererOlEndTightPrototype{}%
+\def\markdownRendererDlBeginPrototype{}%
+\def\markdownRendererDlBeginTightPrototype{}%
+\def\markdownRendererDlItemPrototype#1{#1}%
+\def\markdownRendererDlEndPrototype{}%
+\def\markdownRendererDlEndTightPrototype{}%
+\def\markdownRendererEmphasisPrototype#1{{\it#1}}%
+\def\markdownRendererStrongEmphasisPrototype#1{{\it#1}}%
+\def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}%
+\def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}%
+\def\markdownRendererCodeBlockBeginPrototype{\par\begingroup\tt}%
+\def\markdownRendererCodeBlockEndPrototype{\endgroup\par}%
+\def\markdownRendererInputVerbatimPrototype#1{\par{\tt\input{#1}}\par}%
+\def\markdownRendererHeadingOnePrototype#1{#1}%
+\def\markdownRendererHeadingTwoPrototype#1{#1}%
+\def\markdownRendererHeadingThreePrototype#1{#1}%
+\def\markdownRendererHeadingFourPrototype#1{#1}%
+\def\markdownRendererHeadingFivePrototype#1{#1}%
+\def\markdownRendererHeadingSixPrototype#1{#1}%
+\def\markdownRendererHorizontalRulePrototype{}%
+\def\markdownRendererFootnotePrototype#1{#1}%
 %    \end{macrocode}
 %
 % \subsubsection{Options}\label{sec:texoptions}
@@ -782,8 +782,12 @@ defaultOptions.verbatim = true
 % option recognized by the Lua interface. By default, it is set to store the
 % cache files in the \t`markdown-`\m{jobname} directory, where \m{jobname}
 % is the base name of the document being typeset.
+%
+% Since the hyphen symbol (\t`-`) may be active, we take the precaution of
+% making it an ordinary symbol for the purpose of the definition.
 %  \begin{macrocode}
-\def\markdownOptionCacheDir{markdown-\jobname}
+{\catcode`\-=12%
+ \gdef\markdownOptionCacheDir{markdown-\jobname}}%
 %    \end{macrocode}
 %
 % The rest of the macros are undefined, which makes them fall back to the
@@ -1012,7 +1016,7 @@ function util.pathname(dir, file)
   end
 end
 %    \end{macrocode}
-% \subsubsection{\TeX{} writer}
+% \subsubsection{\TeX{} Writer}
 % \blindtext
 %
 % Creates a new \TeX{} writer, where \t`options` is a table with options.
@@ -1961,7 +1965,7 @@ function M.reader.new(writer, options)
       table.concat(opt_string, ","), function(input)
         return util.rope_to_string(parse_blocks(input))
       end, ".md" .. writer.suffix)
-    return string.format("\\input{%s}", name)
+    return string.format("\\input %s", name)
   end
   return self
 end
@@ -1980,7 +1984,7 @@ return M
 % options are not sanitized and expect the \TeX{} option macros to expand to
 % either \t`true` or \t`false`.
 %  \begin{macrocode}
-\gdef\markdownSerializedOptions{{%
+\def\markdownSerializedOptions{{%
   \ifx\markdownOptionBlankBeforeBlockquote\undefined\else
     blankBeforeBlockquote = \markdownOptionBlankBeforeBlockquote,
   \fi
@@ -1988,15 +1992,7 @@ return M
     blankBeforeHeading = \markdownOptionBlankBeforeHeading,
   \fi
   \ifx\markdownOptionCacheDir\undefined\else
-    \directlua{% Ensure the creation of the cache directory.
-			% TODO: Move this elsewhere and replace \luaescapestring
-			% with a macro that does not require LuaTeX.
-      local lfs = require("lfs")
-      local cacheDir = "\luaescapestring{\markdownOptionCacheDir}"
-      if lfs.isdir(cacheDir) == true then else
-        assert(lfs.mkdir(cacheDir))
-      end}%
-    cacheDir = "\luaescapestring{\markdownOptionCacheDir}",
+    cacheDir = "\markdownLuaEscape{\markdownOptionCacheDir}",
   \fi
   \ifx\markdownOptionDefinitionLists\undefined\else
     definitionLists = \markdownOptionDefinitionLists,
@@ -2021,31 +2017,89 @@ return M
   \fi
   \ifx\markdownVerbatim\undefined\else
     verbatim = \markdownVerbatim,
-  \fi}}
-\ifx\directlua\undefined
-%    \end{macrocode}
-% \blindtext
-%  \begin{macrocode}
+  \fi}
+}%
+\def\markdownPrepare{%
+  local lfs = require("lfs")
+  local cacheDir = "\markdownLuaEscape{\markdownOptionCacheDir}"
+  if lfs.isdir(cacheDir) == true then else
+    assert(lfs.mkdir(cacheDir))
+  end
+  local md = require("markdown")
+  local options = \markdownSerializedOptions
+  local writer = md.writer.new(options)
+  local reader = md.reader.new(writer, options)
+}%
+\ifx\luaescapestring\undefined
+  \def\markdownLuaEscape#1{%
+    \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
+    \expandafter\markdownLuaEscapeNext\expandafter\expandafter\expandafter
+    \markdownLuaEscapeGobble\expandafter\detokenize\expandafter{%
+    \csname#1\endcsname}\relax}%
+  \def\markdownLuaEscapeGobble#1{}%
+  \begingroup
+    \catcode`\"=12%
+    \catcode`\|=0%
+    \catcode`\\=12%
+    |gdef|markdownLuaEscapeNext#1{%
+      |if#1|relax|else
+        |if#1"%
+          \"|expandafter|expandafter|expandafter
+            |markdownLuaEscapeNext
+        |else
+          |if#1\%
+            \\|expandafter|expandafter|expandafter|expandafter
+              |expandafter|expandafter|expandafter|markdownLuaEscapeNext
+          |else
+            #1|expandafter|expandafter|expandafter|expandafter
+              |expandafter|expandafter|expandafter|markdownLuaEscapeNext
+          |fi
+        |fi
+      |fi}%
+  |endgroup
 \else
+  \let\markdownLuaEscape\luaescapestring
+\fi
+\ifx\directlua\undefined
+  \csname newwrite\endcsname\markdownLuaExecuteScript
+  \begingroup
+    \catcode`\"=12%
+    \gdef\markdownLuaExecute#1{%
+      \ifnum\pdfshellescape=1%
+        \immediate\openout\markdownLuaExecuteScript=\jobname.markdown.lua%
+        \immediate\write\markdownLuaExecuteScript{%
+          local kpse = require('kpse')
+          kpse.set_program_name('luatex') #1}%
+        \immediate\closeout\markdownLuaExecuteScript
+        \input|"texlua \jobname.markdown.lua"
+      \else
+        \errmessage{Markdown: I can not access the shell. Run the TeX
+          compiler with the --shell-escape or the --enable-write18 flag}%
+      \fi}%
+  \endgroup
+  % TODO: define markdownReadAndConvert
+\else
+  \def\markdownLuaExecute#1{\directlua{%
+    local print = tex.print #1}}%
 %    \end{macrocode}
-% Let us now suppose that we are using Lua\TeX{}. In that case, we may use Lua
-% directly without relying on shell access through the file stream 18.
-%
+% In the definition of the \m{markdownReadAndConvert} macro, we will be using
+% the hash symbol (\t`\#`), the underscore symbol (\t`\_`), the caret symbol
+% (\t`\^`), the backslash symbol (\t`\textbackslash`), the percent sign
+% (\t`\%`), and the braces (\t`\{\}`) as a part of the Lua syntax.
 %  \begin{macrocode}
-	\begingroup
+  \begingroup
 %    \end{macrocode}
 %
-% In the definition of the \m{markdownBufferBegin} macro, we will be using the
-% hash symbol (\t`\#`), the underscore symbol (\t`\_`), the caret (\t`\^`)
-% symbol, the backslash symbol (\t`\textbackslash`), the percent sign (\t`\%`),
-% and the braces (\t`\{\}`) as a part of the Lua syntax.
-%
-% To this end, we will make the hash, underscore, and caret symbols ordinary
+% To this end, we will make the underscore, and caret symbols ordinary
 % characters,
 %  \begin{macrocode}
-    \catcode`\#=12%
     \catcode`\_=12%
     \catcode`\^=12%
+%    \end{macrocode}
+% swap the category codes of the hash symbol and the slash symbol (\t`/`).
+%  \begin{macrocode}
+    \catcode`\/=6%
+    \catcode`\#=12%
 %    \end{macrocode}
 % swap the category codes of the backslash symbol and the pipe symbol (\t`|`),
 %  \begin{macrocode}
@@ -2057,50 +2111,31 @@ return M
     |catcode`|@=14%
     |catcode`|%=12@
 %    \end{macrocode}
-% Braces are a part of \TeX{} syntax, but they are not removed during
-% expansion, so we do not need to bother with them.
+% Braces are a part of the plain \TeX{} syntax, but they are not removed during
+% expansion, so we do not need to bother with changing their category codes.
 %  \begin{macrocode}
-    |gdef|markdownBegin{|directlua{
-      local md = require("markdown")
-      local options = |markdownSerializedOptions
-      local writer = md.writer.new(options)
-      local reader = md.reader.new(writer, options)
+    |gdef|markdownReadAndConvert/1{|markdownLuaExecute{@
+      |markdownPrepare
       local buffer = {}
       callback.register("process_input_buffer", function (line)
-        if line:match[[^%s*\markdownEnd]] then
+        if line:match[[^%s*\/1]] then
           callback.register("process_input_buffer", nil)
           local input = table.concat(buffer, "\n")
           return reader.convert(input) ..
-            line:gsub([[^%s*\markdownEnd]], "")
+            line:gsub([[^%s*\/1]], "")
         else
           buffer[#buffer+1] = line
           return ""
         end
       end)}}@
   |endgroup
-%    \end{macrocode}
-% Note that we did not redefine the \m{markdownEnd} macro, which still expands
-% to \m{relax}. The macro is only meaningful while scanning for the end of the
-% input.
-%
-% With direct Lua access, the definition of the \m{markdownInline} and
-% \m{markdownInput} macros is straightforward:
-%  \begin{macrocode}
-  \gdef\markdownInline#1{\directlua{
-    local md = require("markdown")
-    local options = \markdownSerializedOptions
-    local writer = md.writer.new(options)
-    local reader = md.reader.new(writer, options)
-    local input = "\luaescapestring{#1}"
-    tex.print(reader.convert(input))}}
-  \gdef\markdownInput#1{\directlua{
-    local md = require("markdown")
-    local options = \markdownSerializedOptions
-    local writer = md.writer.new(options)
-    local reader = md.reader.new(writer, options)
-    local input = assert(io.open("\luaescapestring{#1}", "r")):read("*a")
-    tex.print(reader.convert(input))}}
 \fi
+\def\markdownBegin{\markdownReadAndConvert{markdownEnd}}%
+\def\markdownInput#1{%
+  \markdownLuaExecute{%
+    \markdownPrepare
+    local input = assert(io.open("\markdownLuaEscape{#1}","r")):read("*a")
+    print(reader.convert(input))}}%
 %    \end{macrocode}
 %
 % \iffalse
