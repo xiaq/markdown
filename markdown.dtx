@@ -170,8 +170,8 @@ local md5 = require("md5")
 % \m{luaescapestring} primitive or the \Hologo{eTeX} \m{detokenize} primitive
 % is available for the definition of the \m{markdownLuaEscape} macro, and that
 % either the Lua\TeX{} \m{directlua} primitive or the \hologo{pdfTeX}
-% \m{input}\t`|"\dots"` shell access primitive is available for the definition
-% of the \m{markdownLuaExecute} macro.
+% shell access file stream 18 is available for the definition of the
+% \m{markdownLuaExecute} macro.
 %
 % \subsubsection{\LaTeX{} prerequisites}
 % \blindtext
@@ -404,9 +404,8 @@ defaultOptions.verbatim = true
 % The \m{markdownBegin} macro marks the beginning of a markdown document
 % fragment. The corresponding \m{markdownEnd} macro must be visible directly
 % from the input line buffer (it may not be produced as a result of input
-% expansion) and it may be preceded by nothing but whitespace characters on the
-% line at which it occurs. If these conditions are not met, the \m{markdownEnd}
-% macro will not be recognized as the end of the markdown string.
+% expansion); it will otherwise not be recognized as the end of the markdown
+% string.
 %  \begin{macrocode}
 \let\markdownBegin\relax
 \let\markdownEnd\relax
@@ -782,12 +781,8 @@ defaultOptions.verbatim = true
 % option recognized by the Lua interface. By default, it is set to store the
 % cache files in the \t`markdown-`\m{jobname} directory, where \m{jobname}
 % is the base name of the document being typeset.
-%
-% Since the hyphen symbol (\t`-`) may be active, we take the precaution of
-% making it an ordinary symbol for the purpose of the definition.
 %  \begin{macrocode}
-{\catcode`\-=12%
- \gdef\markdownOptionCacheDir{markdown-\jobname}}%
+\def\markdownOptionCacheDir{markdown-\jobname}
 %    \end{macrocode}
 %
 % The rest of the macros are undefined, which makes them fall back to the
@@ -1965,7 +1960,7 @@ function M.reader.new(writer, options)
       table.concat(opt_string, ","), function(input)
         return util.rope_to_string(parse_blocks(input))
       end, ".md" .. writer.suffix)
-    return string.format("\\input %s", name)
+    return string.format([[\input %s\relax]], name)
   end
   return self
 end
@@ -2062,21 +2057,22 @@ return M
 \fi
 \ifx\directlua\undefined
   \csname newwrite\endcsname\markdownLuaExecuteScript
-  \begingroup
-    \catcode`\"=12%
-    \gdef\markdownLuaExecute#1{%
-      \ifnum\pdfshellescape=1%
-        \immediate\openout\markdownLuaExecuteScript=\jobname.markdown.lua%
-        \immediate\write\markdownLuaExecuteScript{%
-          local kpse = require('kpse')
-          kpse.set_program_name('luatex') #1}%
-        \immediate\closeout\markdownLuaExecuteScript
-        \input|"texlua \jobname.markdown.lua"
-      \else
-        \errmessage{Markdown: I can not access the shell. Run the TeX
-          compiler with the --shell-escape or the --enable-write18 flag}%
-      \fi}%
-  \endgroup
+  \def\markdownLuaExecute#1{%
+    \ifnum\pdfshellescape=1%
+      \immediate\openout\markdownLuaExecuteScript=\jobname.markdown.lua%
+      \markdownInfoMessage{Writing a helper Lua script to the file
+        "\jobname.markdown.lua"}%
+      \immediate\write\markdownLuaExecuteScript{%
+        local kpse = require('kpse')
+        kpse.set_program_name('luatex') #1}%
+      \immediate\closeout\markdownLuaExecuteScript
+      \markdownInfoMessage{Executing a helper Lua script from the file
+        "\jobname.markdown.lua"}%
+      \input|"texlua \jobname.markdown.lua"
+    \else
+      \markdownErrorMessage{I can not access the shell. Run the TeX
+        compiler with the --shell-escape or the --enable-write18 flag}%
+    \fi}%
   % TODO: define markdownReadAndConvert
 \else
   \def\markdownLuaExecute#1{\directlua{%
@@ -2101,37 +2097,47 @@ return M
     \catcode`\/=6%
     \catcode`\#=12%
 %    \end{macrocode}
+% swap the category codes of the percent sign and the at symbol (\t`@`).
+%  \begin{macrocode}
+    \catcode`\@=14%
+    \catcode`\%=12%
+%    \end{macrocode}
 % swap the category codes of the backslash symbol and the pipe symbol (\t`|`),
 %  \begin{macrocode}
-    \catcode`|=0%
-    \catcode`\\=12%
-%    \end{macrocode}
-% and swap the character codes of the percent sign and the at symbol (\t`@`).
-%  \begin{macrocode}
-    |catcode`|@=14%
-    |catcode`|%=12@
+    \catcode`|=0@
+    \catcode`\\=12@
 %    \end{macrocode}
 % Braces are a part of the plain \TeX{} syntax, but they are not removed during
 % expansion, so we do not need to bother with changing their category codes.
 %  \begin{macrocode}
-    |gdef|markdownReadAndConvert/1{|markdownLuaExecute{@
-      |markdownPrepare
-      local buffer = {}
-      callback.register("process_input_buffer", function (line)
-        if line:match[[^%s*\/1]] then
-          callback.register("process_input_buffer", nil)
-          local input = table.concat(buffer, "\n")
-          return reader.convert(input) ..
-            line:gsub([[^%s*\/1]], "")
-        else
-          buffer[#buffer+1] = line
-          return ""
-        end
-      end)}}@
+    |gdef|markdownReadAndConvert/1{@
+      |markdownInfoMessage{Buffering markdown input and scanning for the
+        closing \/1 command}@
+      |markdownLuaExecute{@
+        |markdownPrepare
+        local buffer = {}
+        callback.register("process_input_buffer", function (line)
+          if line:match[[^.-\/1]] then
+            buffer[#buffer+1] = line:gsub([[\/1.*]], "")
+            callback.register("process_input_buffer", nil)
+            local input = table.concat(buffer, "\n"):
+              gsub("^%s*", ""):gsub("%s*$", "")
+            return [[\markdownInfoMessage{Done buffering markdown input}]] ..
+              reader.convert(input) .. line:gsub([[^.-\/1]], "")
+          else
+            buffer[#buffer+1] = line
+            return ""
+          end
+        end)}}@
   |endgroup
 \fi
+\def\markdownInfoMessage#1{%
+  \message{(l.\the\inputlineno) markdown.tex: #1.}}%
+\def\markdownErrorMessage#1{%
+  \errmessage{(l.\the\inputlineno) markdown.tex: #1}}%
 \def\markdownBegin{\markdownReadAndConvert{markdownEnd}}%
 \def\markdownInput#1{%
+  \markdownInfoMessage{Including markdown document "#1"}%
   \markdownLuaExecute{%
     \markdownPrepare
     local input = assert(io.open("\markdownLuaEscape{#1}","r")):read("*a")
