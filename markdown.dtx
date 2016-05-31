@@ -6,6 +6,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[american]{babel}
 \usepackage{microtype}
+\usepackage{amsmath}
 \usepackage{blindtext}
 \let\blindtext\relax % TODO: Remove these.
 \let\Blindtext\relax
@@ -38,7 +39,7 @@
 \newcommand\luam[1]{% A Lua object / method reference
   \hyperref[lua:#1]{\t`#1`}}
 \def\t`#1`{% Inline code
-	\textcolor{spot}{\texttt{#1}}}
+  \textcolor{spot}{\text{\texttt{#1}}}}
 \newcommand\Optitem[2][]{% An option item definition
   \phantomsection\label{opt:#2}\optitem[#1]{#2}}
 \newcommand\Valitem[2][]{% A value item definition
@@ -47,6 +48,9 @@
   \hyperref[opt:#1]{\t`#1`}}
 \newcommand\acro[1]{% An acronym
   \textsc{#1}}
+
+% Set up the catcodes.
+\catcode`\_=12 % We won't be typesetting math and Lua contains lots of `_`.
 
 % Set up the title page.
 \titlepage{%
@@ -67,6 +71,15 @@
     title   = {Lua\TeX{} reference manual (0.95.0)},
     url     = {http://www.luatex.org/svn/trunk/manual/luatex.pdf},
     urldate = {2016-05-12}}
+  @book{ierusalimschy13,
+    author    = {Ierusalimschy, Roberto},
+    year      = {2013},
+    title     = {Programming in Lua},
+    edition   = {3},
+    isbn      = {978-85-903798-5-0},
+    pagetotal = {xviii, 347},
+    location  = {Rio de Janeiro},
+    publisher = {PUC-Rio}}
 \end{filecontents}
 \usepackage[
   backend=biber,
@@ -86,18 +99,27 @@
 % \fi
 %
 % \section{Introduction}
-% This document is a reference manual for the \pkg{Markdown} package.
-% \blindtext
+% This document is a reference manual for the \pkg{Markdown} package. It is
+% split into three sections. This section explains the purpose and the
+% background of the package and outlines its prerequisites. Section
+% \ref{sec:interfaces} describes the interfaces exposed by the package along
+% with usage notes and examples. It is aimed at the user of the package.
+% Section \ref{sec:implementation} then describes the implementation of the
+% package and is aimed at the developer of the package, as well as the curious
+% users.
 %
 % \subsection{About \pkg{Markdown}}
-% \blindtext
+% The \pkg{Markdown} package provides facilities the conversion of markdown
+% markup to \TeX{}. These are provided both in form of a Lua module and in form
+% of a plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that enable
+% the direct inclusion of markdown documents inside \TeX{} documents.
 %
-% The \pkg{Markdown} package consists of the \pkg{Lunamark} Lua library by John
-% MacFarlane, which was slimmed down and rewritten for the needs of the package.
-% \pkg{Lunamark} provides speedy markdown parsing for the rest of the package.
-% On top of \pkg{Lunamark} sits \TeX{} code, as well as code for the \LaTeX{}
-% and \Hologo{ConTeXt} formats. The user interacts with the package through
-% either the Lua, \TeX{}, \LaTeX{}, or \Hologo{ConTeXt} interface.
+% Architecturally, the package consists of the \pkg{Lunamark} Lua module by
+% John MacFarlane, which was slimmed down and rewritten for the needs of the
+% package. \pkg{Lunamark} provides speedy markdown parsing for the rest of the
+% package and is stored inside the \t`markdown.lua` file. On top of
+% \pkg{Lunamark} sits code for the plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt}
+% formats by Vít Novotný.
 %
 % \iffalse
 %<*lua>
@@ -112,18 +134,30 @@ if not modules then modules = { } end modules ['markdown-lunamark'] = {
 }
 %    \end{macrocode}
 %
-% \blindtext
-%
-% \subsection{License}
-% \blindtext
-%
 % \subsection{Feedback}
-% \blindtext
+% Please use the \pkg{markdown} project page on
+% GitHub\footnote{\url{https://github.com/witiko/markdown/issues}} to report
+% bugs and submit feature requests. Before making a feature request, please
+% ensure that you have thoroughly studied this manual. If you do not want to
+% report a bug or request a feature but are simply in need of assistance, you
+% might want to consider posting your question on the \TeX-\LaTeX{} Stack
+% Exchange\footnote{\url{http://tex.stackexchange.com}}.
 %
 % \subsection{Acknowledgements}
-% \blindtext
+% I would like to thank the Faculty of Informatics at the Masaryk University in
+% Brno for providing me with the opportunity to work on this package alongside
+% my studies. I would also like to thank the creator of the Lunamark Lua
+% module, John Macfarlane, for releasing Lunamark under a permissive license
+% that enabled its inclusion into the package.
+%
+% The plain \TeX, \LaTeX, and \Hologo{ConTeXt} code draws inspiration from
+% several sources including the source code of \Hologo{LaTeX2e}, the
+% \pkg{minted} package by Geoffrey M. Poore -- which likewise tackles the issue
+% of interfacing with an external interpreter from \TeX, and others.
 %
 % \subsection{Prerequisites}
+% This section gives an overview of all resources required by the package.
+%
 % \subsubsection{Lua prerequisites}
 % The Lua part of the package requires the following Lua modules:
 % \begin{description}
@@ -149,17 +183,17 @@ local md5 = require("md5")
 % All the abovelisted modules are statically linked into the Lua\TeX{} engine
 % (see \cite[Section~3.3]{luatex16}).
 %
-% \subsubsection{\TeX{} prerequisites}
-% The \TeX{} part of the package requires the following Lua module:
+% \subsubsection{Plain \TeX{} prerequisites}
+% The plain \TeX{} part of the package requires the following Lua module:
 % \begin{description}
 %   \item[\pkg{Lua File System}] A library that provides access to the
-%     filesystem via \acro{os}-specific syscalls. It is used by the \TeX{} code
-%     to create the cache directory specified by the
+%     filesystem via \acro{os}-specific syscalls. It is used by the plain
+%     \TeX{} code to create the cache directory specified by the
 %     \m{markdownOptionCacheDir} macro before interfacing with the
 %     \pkg{Lunamark} library.
 %
-%     The \TeX{} code makes use of the \luam{isDir} method that was added to
-%     the module by the Lua\TeX{} engine developers (see
+%     The plain \TeX{} code makes use of the \luam{isDir} method that was added
+%     to the module by the Lua\TeX{} engine developers (see
 %     \cite[Section~3.2]{luatex16}). This method is not present in the base
 %     library.
 % \end{description}
@@ -179,53 +213,43 @@ local md5 = require("md5")
 %
 % \section{User Guide}\label{sec:interfaces}
 % This part of the manual describes the interfaces exposed by the package
-% and is aimed at the user of the package.
+% along with usage notes and examples. It is aimed at the user of the package.
 %
 % \subsection{Lua Interface}\label{sec:luainterface}
 % The Lua interface provides the conversion from markdown to \TeX{}.  This
-% interface is used by the \TeX{} implementation (see Section
+% interface is used by the plain \TeX{} implementation (see Section
 % \ref{sec:teximplementation}) and will be of interest to the developers of
 % other packages and Lua modules.
 %
-% The Lua interface is implemented by the \t`markdown.lua` Lua module.
+% The Lua interface is implemented by the \t`markdown` Lua module.
 %
 %  \begin{macrocode}
 local M = {}
 %    \end{macrocode}
 %
-% \subsubsection{Classes}\label{sec:luaclasses}
-% The Lua interface exposes the \luamdef{writer} and \luamdef{reader} classes.
+% \subsubsection{Conversion from Markdown to \TeX{}}\label{sec:luaconversion}
+% The Lua interface exposes the \luamdef{converter} object. This object creates
+% converter functions that perform the conversion from markdown to \TeX{}.
 %
-% The \luam{writer} class can be instantiated via the \t`new(options)` class
-% method, where \t`options` is a table of options (see Section
+% A converter function can be created via the \luam{converter}\t`.new(options)`
+% factory method, where \t`options` is a table of Lua options (see Section
 % \ref{sec:luaoptions}). The \t`options` parameter is optional; when
-% unspecified, the behaviour will be the same as if \t`options` were an empty table.
+% unspecified, the behaviour will be the same as if \t`options` were an empty
+% table.
 %  \begin{macrocode}
-M.writer = {}
+M.converter = {}
 %    \end{macrocode}
 %
-% The \luam{reader} class can be instantiated via the \t`new(w, opts)` class
-% method, where \t`w` is an instance of the \luam{writer} class and \t`opts` is
-% a table of options. The \t`options` parameter is optional; when unspecified,
-% the behaviour will be the same as if \t`options` were an empty table. The
-% \luam{reader} class exposes the \luamdef{convert}\t`(string)` instance
-% method, which accepts a markdown \t`string` and returns a \TeX{} output.
-%  \begin{macrocode}
-M.reader = {}
-%    \end{macrocode}
-%
-% The following example Lua code converts the markdown string \t`\_Hello
-% world!\_` to a \TeX{} output using the default options and prints the \TeX{}
+% The following example Lua code converts the markdown string \t`_Hello
+% world!_` to a \TeX{} output using the default options and prints the \TeX{}
 % output:
 % \begin{verbatim}
 % local md = require("markdown")
-% local writer = md.writer.new()
-% local reader = md.reader.new(writer)
-% print(reader.convert("_Hello world!_"))\end{verbatim}
+% local convert = md.converter.new()
+% print(convert("_Hello world!_"))\end{verbatim}
 %
 % \subsubsection{Options}\label{sec:luaoptions}
-% \blindtext
-%
+% The Lua interface recognizes the following options:
 %  \begin{macrocode}
 local defaultOptions = {}
 %    \end{macrocode}
@@ -292,17 +316,17 @@ defaultOptions.hashEnumerator = false
 %
 %   \Optitem[false]{hybrid}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
-%       \item[true] Disable the escaping of special \TeX{} characters, which
-%         makes it possible to intersperse your markdown markup with \TeX{}
-%         code.  The intended usage is in documents prepared manually by a
-%         human author.  In such documents, it can often be desirable to mix
+%       \item[true] Disable the escaping of special plain \TeX{} characters,
+%         which makes it possible to intersperse your markdown markup with
+%         \TeX{} code. The intended usage is in documents prepared manually by
+%         a human author.  In such documents, it can often be desirable to mix
 %         \TeX{} and markdown markup freely.
 %
-%       \item[false] Enable the escaping of special \TeX{} characters outside
-%         verbatim environments, so that they are not interpretted by \TeX{}.
-%         This is encouraged when typesetting automatically generated content
-%         or markdown documents that were not prepared with this package in
-%         mind.
+%       \item[false] Enable the escaping of special plain \TeX{} characters
+%         outside verbatim environments, so that they are not interpretted by
+%         \TeX{}. This is encouraged when typesetting automatically generated
+%         content or markdown documents that were not prepared with this
+%         package in mind.
 %     \end{valuelist}
 %  \begin{macrocode}
 defaultOptions.hybrid = false
@@ -385,19 +409,20 @@ defaultOptions.verbatim = true
 % \iffalse
 %</lua>
 %<*tex>
-% \fi\subsection{\TeX{} Interface}\label{sec:texinterface}
-% The \TeX{} interface provides the conversion from markdown to \TeX{} from
-% within \TeX{} with the Lua options (see Section \ref{sec:luaoptions}) and
-% the way markdown tokens are rendered exposed as \TeX{} macros.
+% \fi\subsection{Plain \TeX{} Interface}\label{sec:texinterface}
+% The plain \TeX{} interface provides macros for the conversion from markdown
+% to \TeX{} from within \TeX{} with the Lua options (see Section
+% \ref{sec:luaoptions}) and the way markdown tokens are rendered exposed as
+% \TeX{} macros.
 %
-% The \TeX{} interface is implemented by the \t`markdown.tex` file. It is
+% The plain \TeX{} interface is implemented by the \t`markdown.tex` file. It is
 % expected that at least some of the basic characters that make up the syntax
 % of plain \TeX{} (\t`\textbackslash\{\}\#\%\textvisiblespace`) have the
 % expected category codes, when \m{input}ting the file.
 %
-% \subsubsection{Markdown Conversion}
-% The \TeX{} interface exposes the \mdef{markdownBegin}, \mdef{markdownEnd},
-% and \mdef{markdownInput} macros.
+% \subsubsection{Conversion from Markdown to \TeX{}}
+% The interface exposes the \mdef{markdownBegin}, \mdef{markdownEnd}, and
+% \mdef{markdownInput} macros.
 %
 % The \m{markdownBegin} macro marks the beginning of a markdown document
 % fragment. The corresponding \m{markdownEnd} macro must be visible directly
@@ -409,8 +434,8 @@ defaultOptions.verbatim = true
 \let\markdownEnd\relax
 %    \end{macrocode}
 % Note that the macros will consume the rest of the lines at which they appear.
-% In the following example \TeX{} code, the characters \t`c` and \t`f` will not
-% appear in the output.
+% In the following example plain \TeX{} code, the characters \t`c` and \t`f`
+% will not appear in the output.
 % \begin{verbatim}
 % \input markdown
 % a
@@ -428,8 +453,8 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The following example \TeX{} code produces a document containing the result
-% of the conversion of the markdown string \t`\_Hello world!\_` two times,
-% supposing that the \t`hello.md` file contains the \t`\_Hello world!\_`
+% of the conversion of the markdown string \t`_Hello world!_` two times,
+% supposing that the \t`hello.md` file contains the \t`_Hello world!_`
 % string.
 % \begin{verbatim}
 % \input markdown
@@ -440,9 +465,9 @@ defaultOptions.verbatim = true
 % \bye\end{verbatim}
 %
 % \subsubsection{Options}\label{sec:texoptions}
-% The \TeX{} options are represented by \TeX{} macros. Some of them map
+% The plain \TeX{} options are represented by \TeX{} macros. Some of them map
 % directly to the options recognized by the Lua interface (see Section
-% \ref{sec:luaoptions}), while some of them are specific to the \TeX{}
+% \ref{sec:luaoptions}), while some of them are specific to the plain \TeX{}
 % interface.
 %
 % \paragraph{File and directory names}
@@ -479,17 +504,18 @@ defaultOptions.verbatim = true
 %
 % The \mdef{markdownOptionCacheDir} macro corresponds to the Lua interface
 % \Opt{cacheDir} option that sets the name of the directory that will contain
-% the produced cache files. The option defaults to \t`markdown-`\m{jobname}.
-% The same limitations as in the case of the
+% the produced cache files. The option defaults to \t`_markdown-`\m{jobname},
+% which is a similar naming scheme to the one used by the \pkg{minted} \LaTeX{}
+% package. The same limitations as in the case of the
 % \m{markdownOptionHelperScriptFileName} macro apply here.
 %  \begin{macrocode}
-\def\markdownOptionCacheDir{markdown-\jobname}%
+\def\markdownOptionCacheDir{_markdown-\jobname}%
 %    \end{macrocode}
 %
 % \paragraph{Lua Wrappers}
 % The following macros map directly to the options recognized by the Lua
 % interface (see Section \ref{sec:luaoptions}) and are not processed by the
-% \TeX{} implementation, only passed along to Lua. They are undefined, which
+% plain \TeX{} implementation, only passed along to Lua. They are undefined, which
 % makes them fall back to the default values provided by the Lua interface.
 %  \begin{macrocode}
 \let\markdownOptionBlankBeforeBlockquote\undefined
@@ -506,10 +532,11 @@ defaultOptions.verbatim = true
 %
 % \paragraph{Miscellaneous}
 % The \m{markdownOptionFileStream} macro may contain the file stream number the
-% \TeX{} implementation should use when accessing temporary files during the
-% conversion from markdown to \TeX{} in \TeX{} engines without the \m{directLua}
-% primitive. This macro must be defined prior to \m{input}ting the
-% \t`markdown.tex` file. Otherwise a new file stream number will be allocated.
+% plain \TeX{} implementation should use when accessing temporary files during
+% the conversion from markdown to \TeX{} in \TeX{} engines without the
+% \m{directLua} primitive. This macro must be defined prior to \m{input}ting
+% the \t`markdown.tex` file. Otherwise a new file stream number will be
+% allocated.
 %  \begin{macrocode}
 \ifx\markdownOptionFileStream\undefined
   \newwrite\markdownOptionFileStream
@@ -517,11 +544,11 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
-% The following \TeX{} macros may occur inside the output of the \luam{convert}
-% method exposed by the Lua interface (see Section \ref{sec:luaclasses})
-% and represent the parsed markdown tokens. These macros are intended to be
-% redefined by the user who is typesetting a document. By default, they point
-% to the corresponding prototypes (see Section
+% The following \TeX{} macros may occur inside the output of the
+% converter functions exposed by the Lua interface (see Section
+% \ref{sec:luaconversion}) and represent the parsed markdown tokens. These
+% macros are intended to be redefined by the user who is typesetting a
+% document. By default, they point to the corresponding prototypes (see Section
 % \ref{sec:texrenderersprototypes}).
 %
 % \paragraph{Ellipsis Renderer}
@@ -875,13 +902,20 @@ defaultOptions.verbatim = true
 % \section{Technical Documentation}\label{sec:implementation}
 % This part of the manual describes the implementation of the interfaces
 % exposed by the package (see Section \ref{sec:interfaces}) and is aimed at the
-% developer of the package, as well as the curious user.
+% developers of the package, as well as the curious users.
 %
 % \iffalse
 %</context>
 %<*lua>
 % \fi\subsection{Lua Implementation}\label{sec:luaimplementation}
-% \blindtext
+% The Lua implementation implements \luamdef{writer} and \luamdef{reader}
+% objects that provide the conversion from markdown to \TeX{}.
+%
+% The Lunamark Lua module implements writers for the conversion to various
+% other formats, such as DocBook, Groff, or \acro{HTML}. These were stripped
+% from the module and the remaining markdown reader and \TeX{} writer were
+% hidden behind the \luam{converter} object exposed by the Lua interface (see
+% Section \ref{sec:luainterface}).
 %
 %  \begin{macrocode}
 local upper, gsub, format, length =
@@ -893,20 +927,26 @@ local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
 %    \end{macrocode}
 % 
 % \subsubsection{Utility Functions}
-% \blindtext
-% 
-% Prints an error message and exits.
+% This section documents the utility functions used by the Lua code. These were
+% originally located in the \t`lunamark/util.lua` file in the Lunamark library.
 %  \begin{macrocode}
 local util = {}
+%    \end{macrocode}
+% 
+% The \luamdef{util.err} method prints an error message \t`msg` and exits.
+% If \t`exit_code` is provided, it specifies the exit code.  Otherwise, the
+% exit code will be 1.
+%  \begin{macrocode}
 function util.err(msg, exit_code)
-  io.stderr:write("Lunamark: " .. msg .. "\n")
+  io.stderr:write("markdown.lua: " .. msg .. "\n")
   os.exit(exit_code or 1)
 end
 %    \end{macrocode}
-% Computes the digest of \t`string` and \t`salt`, adds the \t`suffix` and looks
-% into the directory \t`dir`, whether a file with such a name exists. If it
-% does not, it gets created with \t`transform(string)` as its content. After
-% that, the name of the file is returned.
+%
+% The \luamdef{util.cache} method computes the digest of \t`string` and
+% \t`salt`, adds the \t`suffix` and looks into the directory \t`dir`, whether a
+% file with such a name exists. If it does not, it gets created with
+% \t`transform(string)` as its content. The filename is then returned.
 %  \begin{macrocode}
 function util.cache(dir, string, salt, transform, suffix)
   local digest = md5.sumhexa(string .. (salt or ""))
@@ -924,7 +964,9 @@ function util.cache(dir, string, salt, transform, suffix)
   return name
 end
 %    \end{macrocode}
-% Creates a shallow copy of a table including metatables.
+%
+% The \luamdef{util.table_copy} method creates a shallow copy of a table \t`t`
+% and its metatable.
 %  \begin{macrocode}
 function util.table_copy(t)
   local u = { }
@@ -932,7 +974,11 @@ function util.table_copy(t)
   return setmetatable(u, getmetatable(t))
 end
 %    \end{macrocode}
-% Expands tabs in a single line of text.
+%
+% The \luamdef{util.expand_tabs_in_line} expands tabs in string \t`s`. If
+% \t`tabstop` is specified, it is used as the tab stop width. Otherwise,
+% the tab stop width of 4 characters is used. The method is a copy of the tab
+% expansion algorithm from \cite[Chapter~21]{ierusalimschy13}.
 %  \begin{macrocode}
 function util.expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
@@ -944,10 +990,11 @@ function util.expand_tabs_in_line(s, tabstop)
           end))
 end
 %    \end{macrocode}
-% Walks a rope \t`t`, applying a function \t`f` to each leaf element in order. A
-% rope is an array whose elements may be ropes, strings, numbers, or functions.
-% If a leaf element is a function, call it and get the return value before
-% proceeding.
+%
+% The \luamdef{util.walk} method walks a rope \t`t`, applying a function \t`f`
+% to each leaf element in order. A rope is an array whose elements may be
+% ropes, strings, numbers, or functions.  If a leaf element is a function, call
+% it and get the return value before proceeding.
 %  \begin{macrocode}
 function util.walk(t, f)
   local typ = type(t)
@@ -972,7 +1019,9 @@ function util.walk(t, f)
   end
 end
 %    \end{macrocode}
-% Flattens an array.
+%
+% The \luamdef{util.flatten} method flattens an array \t`ary` that does not
+% contain cycles and returns the result.
 %  \begin{macrocode}
 function util.flatten(ary)
   local new = {}
@@ -988,7 +1037,10 @@ function util.flatten(ary)
   return new
 end
 %    \end{macrocode}
-% Converts a rope to a string.
+%
+% The \luamdef{util.rope_to_string} method converts a rope \t`rope` to a
+% string and returns it. For the definition of a rope, see the definition of
+% the \luam{util.walk} method.
 %  \begin{macrocode}
 function util.rope_to_string(rope)
   local buffer = {}
@@ -996,7 +1048,9 @@ function util.rope_to_string(rope)
   return table.concat(buffer)
 end
 %    \end{macrocode}
-% Retrieves the last item in a rope.
+%
+% The \luamdef{util.rope_last} method retrieves the last item in a rope. For
+% the definition of a rope, see the definition of the \luam{util.walk} method.
 %  \begin{macrocode}
 function util.rope_last(rope)
   if #rope == 0 then
@@ -1011,8 +1065,10 @@ function util.rope_last(rope)
   end
 end
 %    \end{macrocode}
-% Given an array \t`ary`, returns a new array with \t`x` interspersed between
-% elements of \t`ary`.
+%
+% Given an array \t`ary` and a string \t`x`, the \luamdef{util.intersperse}
+% method returns an array \t`new`, such that \t`ary[i] == new[2*(i-1)+1]` and
+% \t`new[2*i] == x` for all $1\leq\t`i`\leq\t`\#ary`$.
 %  \begin{macrocode}
 function util.intersperse(ary, x)
   local new = {}
@@ -1027,8 +1083,10 @@ function util.intersperse(ary, x)
   return new
 end
 %    \end{macrocode}
-% Given an array \t`ary`, returns a new array with each element \t`x` of
-% \t`ary` replaced by \t`f(x)`.
+% 
+% Given an array \t`ary` and a function \t`f`, the \luamdef{util.map} method
+% returns an array \t`new`, such that \t`new[i] == f(ary[i])` for all
+% $1\leq\t`i`\leq\t`\#ary`$.
 %  \begin{macrocode}
 function util.map(ary, f)
   local new = {}
@@ -1038,30 +1096,61 @@ function util.map(ary, f)
   return new
 end
 %    \end{macrocode}
-% Given a table \t`char\_escapes` mapping escapable characters onto their
-% escaped versions and optionally \t`string\_escapes` mapping escapable strings
-% (or multibyte UTF-8 characters) onto their escaped versions, returns a
-% function that escapes a string. This function uses \pkg{lpeg} and is faster
-% than \t`gsub`.
+%
+% Given a table \t`char_escapes` mapping escapable characters to escaped
+% strings and optionally a table \t`string_escapes` mapping escapable strings
+% to escaped strings, the \luamdef{util.escaper} method returns a function that
+% escapes all occurances of escapable strings and characters (in this order).
+% 
+% The method uses \pkg{LPeg}, which is faster than the Lua \t`string.gsub`
+% built-in method.
 %  \begin{macrocode}
 function util.escaper(char_escapes, string_escapes)
+%    \end{macrocode}
+% Build a string of escapable characters.
+%  \begin{macrocode}
   local char_escapes_list = ""
   for i,_ in pairs(char_escapes) do
     char_escapes_list = char_escapes_list .. i
   end
+%    \end{macrocode}
+% Create an \pkg{LPeg} capture \t`escapable` that produces the escaped string
+% corresponding to the matched escapable character.
+%  \begin{macrocode}
   local escapable = S(char_escapes_list) / char_escapes
+%    \end{macrocode}
+% If \t`string_escapes` is provided, turn \t`escapable` into the
+% {\catcode`\_=8\[
+%   \sum_{(\t`k`,\t`v`)\in\t`string\_escapes`}\t`P(k) / v` + \t`escapable`
+% \]}^^A
+% capture that replaces any occurance of the string \t`k` with the string
+% \t`v` for each $(\t`k`, \t`v`)\in\t`string\_escapes`$. Note that the pattern
+% summation is not commutative and the summation operands are inspected in the
+% summation order during the matching. As a corrolary, the strings always take
+% precedence over the characters.
+%  \begin{macrocode}
   if string_escapes then
     for k,v in pairs(string_escapes) do
       escapable = P(k) / v + escapable
     end
   end
+%    \end{macrocode}
+% Create an \pkg{LPeg} capture \t`escape_string` that captures anything
+% \t`escapable` does and matches any other unmatched characters.
+%  \begin{macrocode}
   local escape_string = Cs((escapable + any)^0)
+%    \end{macrocode}
+% Return a function that matches the input string \t`s` against the
+% \t`escape_string` capture.
+%  \begin{macrocode}
   return function(s)
     return lpeg.match(escape_string, s)
   end
 end
 %    \end{macrocode}
-% Produces a path name out of a directory path and a file name.
+%
+% The \luamdef{util.pathname} method produces a pathname out of a directory
+% name \t`dir` and a filename \t`file` and returns it.
 %  \begin{macrocode}
 function util.pathname(dir, file)
   if #dir == 0 then
@@ -1071,11 +1160,12 @@ function util.pathname(dir, file)
   end
 end
 %    \end{macrocode}
-% \subsubsection{\TeX{} Writer}
+% \subsubsection{\TeX{} Writer}\label{sec:texwriter}
 % \blindtext
 %
 % Creates a new \TeX{} writer, where \t`options` is a table with options.
 %  \begin{macrocode}
+M.writer = {}
 function M.writer.new(options)
   local self = {}
   options = options or {}
@@ -1309,7 +1399,7 @@ function M.writer.new(options)
 end
 %    \end{macrocode}
 % 
-% \subsubsection{Markdown Reader}
+% \subsubsection{Markdown Reader}\label{sec:markdownreader}
 % \blindtext
 % 
 % Normalizes a markdown reference tag. (Turns it lowercase, and collapses any
@@ -1325,6 +1415,7 @@ end
 % document.  The converter assumes that the input has unix line endings
 % (newline).
 %  \begin{macrocode}
+M.reader = {}
 function M.reader.new(writer, options)
   local self = {}
   options = options or {}
@@ -2025,6 +2116,16 @@ function M.reader.new(writer, options)
   return self
 end
 
+%    \end{macrocode}
+% \subsubsection{Conversion from Markdown to \TeX{}}
+% \blindtext
+%  \begin{macrocode}
+function M.converter.new(options)
+  local writer = M.writer.new(options)
+  local reader = M.reader.new(writer, options)
+  return reader.convert
+end
+
 return M
 %    \end{macrocode}
 % \blindtext
@@ -2032,8 +2133,11 @@ return M
 % \iffalse
 %</lua>
 %<*tex>
-% \fi\subsection{\TeX{} Implementation}
-% \blindtext
+% \fi\subsection{Plain \TeX{} Implementation}\label{sec:teximplementation}
+% The plain \TeX{} implementation provides macros for the interfacing between
+% \TeX{} and Lua and for the buffering of input text. These macros are then
+% used to implement the macros for the conversion from markdown to \TeX{}
+% exposed by the plain \TeX{} interface (see Section \ref{sec:texinterface}).
 %
 % \subsubsection{Logging Facilities}
 % The \mdef{markdownInfo}, \mdef{markdownWarning}, and
@@ -2050,10 +2154,10 @@ return M
 %
 % \subsubsection{Lua Snippets}
 % The \mdef{markdownLuaOptions} macro expands to a Lua table that
-% contains the \TeX{} options (see Section \ref{sec:texoptions}) in a format
-% recognized by Lua (see Section \ref{sec:luaoptions}). Note that the boolean
-% options are not sanitized and expect the \TeX{} option macros to expand to
-% either \t`true` or \t`false`.
+% contains the plain \TeX{} options (see Section \ref{sec:texoptions}) in a
+% format recognized by Lua (see Section \ref{sec:luaoptions}). Note that the
+% boolean options are not sanitized and expect the plain \TeX{} option macros
+% to expand to either \t`true` or \t`false`.
 %  \begin{macrocode}
 \def\markdownLuaOptions{{%
   \ifx\markdownOptionBlankBeforeBlockquote\undefined\else
@@ -2093,7 +2197,8 @@ return M
 %    \end{macrocode}
 %
 % The \mdef{markdownPrepare} macro contains the Lua code that is executed prior
-% to any conversion from markdown to \TeX{}.
+% to any conversion from markdown to \TeX{}. It exposes the \luam{convert}
+% function for the use by any further Lua code.
 %  \begin{macrocode}
 \def\markdownPrepare{%
 %    \end{macrocode}
@@ -2105,14 +2210,12 @@ return M
     assert(lfs.mkdir(cacheDir))
   end
 %    \end{macrocode}
-% Next, load the \t`markdown.lua` module and instantiate its \t`writer` and
-% \t`reader` classes using the \TeX{} options, which were serialized to a Lua
-% table via the \m{markdownLuaOptions} macro.
+% Next, load the \t`markdown` module and create a \t`converter` function using
+% the plain \TeX{} options, which were serialized to a Lua table via the
+% \m{markdownLuaOptions} macro.
 %  \begin{macrocode}
   local md = require("markdown")
-  local options = \markdownLuaOptions
-  local writer = md.writer.new(options)
-  local reader = md.reader.new(writer, options)
+  local convert = md.converter.new(\markdownLuaOptions)
 }%
 %    \end{macrocode}
 %
@@ -2303,7 +2406,7 @@ return M
 %    \end{macrocode}
 % In the definition of the direct Lua access version of the
 % \m{markdownReadAndConvert} macro, we will be using the hash symbol (\t`\#`),
-% the underscore symbol (\t`\_`), the caret symbol (\t`\^`), the backslash
+% the underscore symbol (\t`_`), the caret symbol (\t`\^`), the backslash
 % symbol (\t`\textbackslash`), the percent sign (\t`\%`), and the braces
 % (\t`\{\}`) as a part of the Lua syntax.
 %  \begin{macrocode}
@@ -2349,14 +2452,14 @@ return M
         callback.register("process_input_buffer", function (line)
 %    \end{macrocode}
 % When the ending control sequence appears on a line, unregister the callback,
-% convert the contents of out buffer from markdown to \TeX{}, and insert the
+% convert the contents of our buffer from markdown to \TeX{}, and insert the
 % result into the input line buffer of \TeX{}.
 %  \begin{macrocode}
           if line:match[[^.-\/1]] then
             buffer[#buffer+1] = line:gsub([[\/1.*]], "")
             callback.register("process_input_buffer", nil)
             local input = table.concat(buffer, "\n")
-            local output = reader.convert(input)
+            local output = convert(input)
             return [[\markdownInfo{The \/1 command was found}]] .. output
 %    \end{macrocode}
 % When the ending control sequence does not appear on a line, store the line in
@@ -2380,7 +2483,7 @@ return M
 \fi
 %    \end{macrocode}
 %
-% \subsubsection{Markdown Conversion}
+% \subsubsection{Conversion from Markdown to \TeX{}}
 % The \m{markdownBegin} macro is a special instance of the
 % \m{markdownReadAndConvert} macro that recognizes the 
 % \m{markdownEnd} ending control sequence.
@@ -2397,7 +2500,7 @@ return M
   \markdownLuaExecute{%
     \markdownPrepare
     local input = assert(io.open("#1","r")):read("*a")
-    print(reader.convert(input))}}%
+    print(convert(input))}}%
 %    \end{macrocode}
 %
 % \iffalse
