@@ -80,6 +80,14 @@
     pagetotal = {xviii, 347},
     location  = {Rio de Janeiro},
     publisher = {PUC-Rio}}
+  @book{knuth86,
+    author    = {Knuth, Donald Ervin},
+    year      = {1986},
+    title     = {The \TeX{}book},
+    edition   = {3},
+    isbn      = {ISBN 0-201-13447-0},
+    pagetotal = {ix, 479},
+    publisher = {Addison-Westley}}
 \end{filecontents}
 \usepackage[
   backend=biber,
@@ -110,9 +118,9 @@
 %
 % \subsection{About \pkg{Markdown}}
 % The \pkg{Markdown} package provides facilities the conversion of markdown
-% markup to \TeX{}. These are provided both in form of a Lua module and in form
-% of a plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that enable
-% the direct inclusion of markdown documents inside \TeX{} documents.
+% markup to plain \TeX{}. These are provided both in form of a Lua module and
+% in form of a plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that
+% enable the direct inclusion of markdown documents inside \TeX{} documents.
 %
 % Architecturally, the package consists of the \pkg{Lunamark} Lua module by
 % John MacFarlane, which was slimmed down and rewritten for the needs of the
@@ -127,7 +135,7 @@
 %  \begin{macrocode}
 if not modules then modules = { } end modules ['markdown-lunamark'] = {
     version   = "0.4.0",
-    comment   = "A module for the conversion from markdown to TeX",
+    comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
     license   = "MIT sublicensed as LPPL 1.3"
@@ -215,9 +223,15 @@ local md5 = require("md5")
 % This part of the manual describes the interfaces exposed by the package
 % along with usage notes and examples. It is aimed at the user of the package.
 %
+% Since neither \TeX{} nor Lua provide interfaces as a language construct, the
+% separation to interfaces and implementations is purely abstract. It serves as
+% a means of structuring this manual and as a promise to the user that if they
+% only access the package through the interfaces, the future versions of the
+% package should remain backwards compatible.
+%
 % \subsection{Lua Interface}\label{sec:luainterface}
-% The Lua interface provides the conversion from markdown to \TeX{}.  This
-% interface is used by the plain \TeX{} implementation (see Section
+% The Lua interface provides the conversion from markdown to plain \TeX{}.
+% This interface is used by the plain \TeX{} implementation (see Section
 % \ref{sec:teximplementation}) and will be of interest to the developers of
 % other packages and Lua modules.
 %
@@ -227,17 +241,16 @@ local md5 = require("md5")
 local M = {}
 %    \end{macrocode}
 %
-% \subsubsection{Conversion from Markdown to \TeX{}}\label{sec:luaconversion}
-% The Lua interface exposes the \luamdef{converter} object. This object creates
-% converter functions that perform the conversion from markdown to \TeX{}.
-%
-% A converter function can be created via the \luam{converter}\t`.new(options)`
-% factory method, where \t`options` is a table of Lua options (see Section
-% \ref{sec:luaoptions}). The \t`options` parameter is optional; when
+% \subsubsection{Conversion from Markdown to Plain \TeX{}}
+% \label{sec:luaconversion}
+% The Lua interface exposes the \luamdef{new}\t`(options)` method.
+% This method creates converter functions that perform the conversion from
+% markdown to plain \TeX{} according to the Lua options \t`options` (see
+% Section \ref{sec:luaoptions}). The \t`options` parameter is optional; when
 % unspecified, the behaviour will be the same as if \t`options` were an empty
 % table.
 %  \begin{macrocode}
-M.converter = {}
+M.new = {}
 %    \end{macrocode}
 %
 % The following example Lua code converts the markdown string \t`_Hello
@@ -245,11 +258,12 @@ M.converter = {}
 % output:
 % \begin{verbatim}
 % local md = require("markdown")
-% local convert = md.converter.new()
+% local convert = md.new()
 % print(convert("_Hello world!_"))\end{verbatim}
 %
 % \subsubsection{Options}\label{sec:luaoptions}
-% The Lua interface recognizes the following options:
+% The Lua interface recognizes the following options. When unspecified, the
+% options are taken from the \luamdef{defaultOptions} table.
 %  \begin{macrocode}
 local defaultOptions = {}
 %    \end{macrocode}
@@ -411,7 +425,7 @@ defaultOptions.verbatim = true
 %<*tex>
 % \fi\subsection{Plain \TeX{} Interface}\label{sec:texinterface}
 % The plain \TeX{} interface provides macros for the conversion from markdown
-% to \TeX{} from within \TeX{} with the Lua options (see Section
+% to plain \TeX{} from within \TeX{} with the Lua options (see Section
 % \ref{sec:luaoptions}) and the way markdown tokens are rendered exposed as
 % \TeX{} macros.
 %
@@ -420,22 +434,32 @@ defaultOptions.verbatim = true
 % of plain \TeX{} (\t`\textbackslash\{\}\#\%\textvisiblespace`) have the
 % expected category codes, when \m{input}ting the file.
 %
-% \subsubsection{Conversion from Markdown to \TeX{}}
+% \subsubsection{Conversion from Markdown to Plain \TeX{}}
 % The interface exposes the \mdef{markdownBegin}, \mdef{markdownEnd}, and
 % \mdef{markdownInput} macros.
 %
 % The \m{markdownBegin} macro marks the beginning of a markdown document
-% fragment. The corresponding \m{markdownEnd} macro must be visible directly
-% from the input line buffer (it may not be produced as a result of input
-% expansion); it will otherwise not be recognized as the end of the markdown
-% string.
+% fragment and the \m{markdownEnd} macro marks its end.
 %  \begin{macrocode}
 \let\markdownBegin\relax
 \let\markdownEnd\relax
 %    \end{macrocode}
-% Note that the macros will consume the rest of the lines at which they appear.
-% In the following example plain \TeX{} code, the characters \t`c` and \t`f`
-% will not appear in the output.
+% There are several limitations to the macros you need to be aware of.
+% The first limitation concerns the \m{markdownEnd} macro, which must be
+% visible directly from the input line buffer (it may not be produced as a
+% result of input expansion). Otherwise, it will not be recognized as the end
+% of the markdown string otherwise. As a corrolary, the \m{markdownEnd} string
+% may not appear anywhere inside the markdown input.
+%
+% Another limitation concerns spaces at the right end of an input line. In
+% markdown, these are used to produce a forced line break. However, any such
+% spaces are removed before the lines enter the input buffer of \TeX{} (see
+% \cite[p.~46]{knuth86}). As a corrolary, the \m{markdownBegin} macro also
+% ignores them.
+%
+% The \m{markdownBegin} and \m{markdownEnd} macros will also consume the rest
+% of the lines at which they appear.  In the following example plain \TeX{}
+% code, the characters \t`c` and \t`f` will not appear in the output.
 % \begin{verbatim}
 % \input markdown
 % a
@@ -447,10 +471,12 @@ defaultOptions.verbatim = true
 %
 % The \m{markdownInput} macro accepts a single parameter containing the
 % filename of a markdown document and expands to the result of the conversion
-% of the input markdown document to \TeX{}.
+% of the input markdown document to plain \TeX{}.
 %  \begin{macrocode}
 \let\markdownInput\relax
 %    \end{macrocode}
+% This macro is not subject to the abovelisted limitations of the
+% \m{markdownBegin} and \m{markdownEnd} macros.
 %
 % The following example \TeX{} code produces a document containing the result
 % of the conversion of the markdown string \t`_Hello world!_` two times,
@@ -473,9 +499,9 @@ defaultOptions.verbatim = true
 % \paragraph{File and directory names}
 % The \mdef{markdownOptionHelperScriptFileName} macro sets the filename of the
 % helper Lua script file that is created during the conversion from markdown to
-% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
-% \m{jobname}\t`.markdown.lua`, where \m{jobname} is the base name of the
-% document being typeset.
+% plain \TeX{} in \TeX{} engines without the \m{directLua} primitive. It
+% defaults to \m{jobname}\t`.markdown.lua`, where \m{jobname} is the base name
+% of the document being typeset.
 %
 % The expansion of this macro must not contain quotation marks (\t`"`) or
 % backslash symbols (\t`\textbackslash`). Mind that \TeX{} engines tend to
@@ -486,18 +512,18 @@ defaultOptions.verbatim = true
 %
 % The \mdef{markdownOptionInputTempFileName} macro sets the filename of the
 % temporary input file that is created during the conversion from markdown to
-% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
-% \m{jobname}\t`.markdown.out`. The same limitations as in the case of the
-% \m{markdownOptionHelperScriptFileName} macro apply here.
+% plain \TeX{} in \TeX{} engines without the \m{directLua} primitive. It
+% defaults to \m{jobname}\t`.markdown.out`. The same limitations as in the case
+% of the \m{markdownOptionHelperScriptFileName} macro apply here.
 %  \begin{macrocode}
 \def\markdownOptionInputTempFileName{\jobname.markdown.in}%
 %    \end{macrocode}
 %
 % The \mdef{markdownOptionOutputTempFileName} macro sets the filename of the
 % temporary output file that is created during the conversion from markdown to
-% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
-% \m{jobname}\t`.markdown.out`. The same limitations as in the case of the
-% \m{markdownOptionHelperScriptFileName} macro apply here.
+% plain \TeX{} in \TeX{} engines without the \m{directLua} primitive. It
+% defaults to \m{jobname}\t`.markdown.out`. The same limitations as in the case
+% of the \m{markdownOptionHelperScriptFileName} macro apply here.
 %  \begin{macrocode}
 \def\markdownOptionOutputTempFileName{\jobname.markdown.out}%
 %    \end{macrocode}
@@ -533,7 +559,7 @@ defaultOptions.verbatim = true
 % \paragraph{Miscellaneous}
 % The \m{markdownOptionFileStream} macro may contain the file stream number the
 % plain \TeX{} implementation should use when accessing temporary files during
-% the conversion from markdown to \TeX{} in \TeX{} engines without the
+% the conversion from markdown to plain \TeX{} in \TeX{} engines without the
 % \m{directLua} primitive. This macro must be defined prior to \m{input}ting
 % the \t`markdown.tex` file. Otherwise a new file stream number will be
 % allocated.
@@ -551,6 +577,14 @@ defaultOptions.verbatim = true
 % document. By default, they point to the corresponding prototypes (see Section
 % \ref{sec:texrenderersprototypes}).
 %
+% \paragraph{Line Break Renderer}
+% The \mdef{markdownRendererLineBreak} macro represents a forced line break.
+% The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererLineBreak{%
+  \markdownRendererLineBreakPrototype}%
+%    \end{macrocode}
+%
 % \paragraph{Ellipsis Renderer}
 % The \mdef{markdownRendererEllipsis} macro replaces any occurance of ASCII
 % ellipses in the input text. This macro will only be produced, when the
@@ -561,9 +595,9 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % \paragraph{Code Span Renderer}
-% The \mdef{markdownRendererCodeSpan} macro represents inlined code in the
+% The \mdef{markdownRendererCodeSpan} macro represents inlined code span in the
 % input text. It receives a single argument that corresponds to the inlined
-% code.
+% code span.
 %  \begin{macrocode}
 \def\markdownRendererCodeSpan{%
   \markdownRendererCodeSpanPrototype}%
@@ -571,7 +605,7 @@ defaultOptions.verbatim = true
 %
 % \paragraph{Link Renderer}
 % The \mdef{markdownRendererLink} macro represents a hyperlink. It receives
-% three arguments: the label, the \acro{url}, and the title of the link.
+% three arguments: the label, the \acro{uri}, and the title of the link.
 %  \begin{macrocode}
 \def\markdownRendererLink{%
   \markdownRendererLinkPrototype}%
@@ -625,7 +659,7 @@ defaultOptions.verbatim = true
   \markdownRendererUlEndTightPrototype}%
 %    \end{macrocode}
 %
-% \paragraph{Ordered ListRenderers}
+% \paragraph{Ordered List Renderers}
 % The \mdef{markdownRendererOlBegin} macro represents the beginning of an
 % ordered list that contains an item with several paragraphs of text (the
 % list is not tight). The macro receives no arguments.
@@ -850,6 +884,7 @@ defaultOptions.verbatim = true
 % \ref{sec:lateximplementation} and \ref{sec:contextimplementation}).
 %
 %  \begin{macrocode}
+\def\markdownRendererLineBreakPrototype{\hfil\break}%
 \def\markdownRendererEllipsisPrototype{...}%
 \def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
 \def\markdownRendererLinkPrototype#1#2#3{#1}%
@@ -909,12 +944,12 @@ defaultOptions.verbatim = true
 %<*lua>
 % \fi\subsection{Lua Implementation}\label{sec:luaimplementation}
 % The Lua implementation implements \luamdef{writer} and \luamdef{reader}
-% objects that provide the conversion from markdown to \TeX{}.
+% objects that provide the conversion from markdown to plain \TeX{}.
 %
 % The Lunamark Lua module implements writers for the conversion to various
 % other formats, such as DocBook, Groff, or \acro{HTML}. These were stripped
-% from the module and the remaining markdown reader and \TeX{} writer were
-% hidden behind the \luam{converter} object exposed by the Lua interface (see
+% from the module and the remaining markdown reader and plain \TeX{} writer
+% were hidden behind the converter functions exposed by the Lua interface (see
 % Section \ref{sec:luainterface}).
 %
 %  \begin{macrocode}
@@ -927,8 +962,10 @@ local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, any =
 %    \end{macrocode}
 % 
 % \subsubsection{Utility Functions}
-% This section documents the utility functions used by the Lua code. These were
-% originally located in the \t`lunamark/util.lua` file in the Lunamark library.
+% This section documents the utility functions used by the Lua code. These
+% functions are encapsulated in the \t`util` object. The functions were
+% originally located in the \t`lunamark/util.lua` file in the Lunamark Lua
+% module.
 %  \begin{macrocode}
 local util = {}
 %    \end{macrocode}
@@ -1099,8 +1136,9 @@ end
 %
 % Given a table \t`char_escapes` mapping escapable characters to escaped
 % strings and optionally a table \t`string_escapes` mapping escapable strings
-% to escaped strings, the \luamdef{util.escaper} method returns a function that
-% escapes all occurances of escapable strings and characters (in this order).
+% to escaped strings, the \luamdef{util.escaper} method returns an escaper
+% function that escapes all occurances of escapable strings and characters (in
+% this order).
 % 
 % The method uses \pkg{LPeg}, which is faster than the Lua \t`string.gsub`
 % built-in method.
@@ -1125,9 +1163,9 @@ function util.escaper(char_escapes, string_escapes)
 % \]}^^A
 % capture that replaces any occurance of the string \t`k` with the string
 % \t`v` for each $(\t`k`, \t`v`)\in\t`string\_escapes`$. Note that the pattern
-% summation is not commutative and the summation operands are inspected in the
-% summation order during the matching. As a corrolary, the strings always take
-% precedence over the characters.
+% summation is not commutative and the its operands are inspected in the
+% summation order during the matching. As a corrolary, the strings always
+% take precedence over the characters.
 %  \begin{macrocode}
   if string_escapes then
     for k,v in pairs(string_escapes) do
@@ -1160,60 +1198,92 @@ function util.pathname(dir, file)
   end
 end
 %    \end{macrocode}
-% \subsubsection{\TeX{} Writer}\label{sec:texwriter}
-% \blindtext
+% \subsubsection{Plain \TeX{} Writer}\label{sec:texwriter}
+% This section documents the \luam{writer} object, which produces implements
+% the routines for producing the \TeX{} output. The object is an amalgamate
+% of the abstract writer, the \TeX{} writer, and the \LaTeX{} writer that were
+% located in the \t`lunamark/writer.lua`, \t`lunamark/writer/tex.lua`, and
+% \t`lunamark/writer/latex.lua` files in the Lunamark Lua module.
 %
-% Creates a new \TeX{} writer, where \t`options` is a table with options.
+% Although not specified in the Lua interface (see Section
+% \ref{sec:luainterface}), the \luam{writer} object is exported, so that the
+% curious user could easily tinker with the methods of the objects produced by
+% the \luam{writer.new} method described below. The user should be aware,
+% however, that the implementation may change in a future revision.
 %  \begin{macrocode}
 M.writer = {}
+%    \end{macrocode}
+%
+% The \luamdef{writer.new} method creates and returns a new \TeX{} writer
+% object with the Lua options (see Section \ref{sec:luaoptions}) \t`options`.
+% When \t`options` are unspecified, it is assumed that an empty table was
+% passed to the method.
+%
+% The objects produced by the \luam{writer.new} method expose instance methods
+% and variables of their own. As a convention, I will refer to these
+% \meta{member}s as \t`writer->`\meta{member}.
+%  \begin{macrocode}
 function M.writer.new(options)
   local self = {}
   options = options or {}
 %    \end{macrocode}
-% Inherit options from the \t`defaultOptions` table.
+%
+% Make the \t`options` table inherit from the \luam{defaultOptions} table.
 %  \begin{macrocode}
   setmetatable(options, { __index = function (_, key)
     return defaultOptions[key] end })
 %    \end{macrocode}
-% The suffix of the cached files.
+%
+% Define \luamdef{writer->suffix} as the suffix of the produced cache files.
 %  \begin{macrocode}
   self.suffix = ".tex"
 %    \end{macrocode}
-% A space character.
+%
+% Define \luamdef{writer->space} as the output format of a space character.
 %  \begin{macrocode}
   self.space = " "
 %    \end{macrocode}
-% The plain text block formatter.
+%
+% Define \luamdef{writer->plain} as a function that will transform an input
+% plain text block \t`s` to the output format.
 %  \begin{macrocode}
   function self.plain(s)
     return s
   end
 %    \end{macrocode}
-% The paragraph formatter.
+%
+% Define \luamdef{writer->paragraph} as a function that will transform an
+% input paragraph \t`s` to the output format.
 %  \begin{macrocode}
   function self.paragraph(s)
     return s
   end
 %    \end{macrocode}
-% Line breaks for use between block elements.
+%
+% Define \luamdef{writer->interblocksep} as the separator of block elements.
 %  \begin{macrocode}
   self.interblocksep = "\n\n"
 %    \end{macrocode}
-% A line break.
+%
+% Define \luamdef{writer->linebreak} as the output format of a forced line break.
 %  \begin{macrocode}
-  self.linebreak = "\\\\"
+  self.linebreak = "\\markdownRendererLineBreak "
 %    \end{macrocode}
-% An ellipsis.
+%
+% Define \luamdef{writer->ellipsis} as the output format of an ellipsis.
 %  \begin{macrocode}
   self.ellipsis = "\\markdownRendererEllipsis "
 %    \end{macrocode}
-% The horizontal rule.
+%
+% Define \luamdef{writer->hrule} as the output format of a horizontal rule.
 %  \begin{macrocode}
   self.hrule = "\\markdownRendererHorizontalRule "
 %    \end{macrocode}
-% A special character escaping function.
+%
+% Define a table \luamdef{escaped} containing the mapping from special plain
+% \TeX{} characters to their escaped variants.
 %  \begin{macrocode}
-  self.escaped = {
+  local escaped = {
      ["{"] = "\\{",
      ["}"] = "\\}",
      ["$"] = "\\$",
@@ -1224,41 +1294,58 @@ function M.writer.new(options)
      ["^"] = "\\^{}",
      ["\\"] = "\\char92{}",
      ["~"] = "\\char126{}",
-     ["|"] = "\\char124{}",
-  }
-  local escape = util.escaper(self.escaped)
+     ["|"] = "\\char124{}", }
+%    \end{macrocode}
+% Use the \luam{escaped} table to create an escaper function \luamdef{escape}.
+%  \begin{macrocode}
+  local escape = util.escaper(escaped)
+%    \end{macrocode}
+%
+% Define \luamdef{writer->string} as a function that will transform an input
+% plain text span \t`s` to the output format. If the \Opt{hybrid} option is
+% \t`true`, use an identity function. Otherwise, use the \luam{escape}
+% function.
+%  \begin{macrocode}
   if options.hybrid then
     self.string = function(s) return s end
   else
     self.string = escape
   end
 %    \end{macrocode}
-% The inline verbatim code formatter.
+%
+% Define \luamdef{writer->code} as a function that will transform an input
+% inlined code span \t`s` to the output format.
 %  \begin{macrocode}
   function self.code(s)
     return {"\\markdownRendererCodeSpan{",escape(s),"}"}
   end
 %    \end{macrocode}
-% A formatter for a link with the text \t`label`, the URI \t`uri`, and the
-% title \t`title`.
+%
+% Define \luamdef{writer->link} as a function that will transform an input
+% hyperlink to the output format, where \t`lab` corresponds to thelabel,
+% \t`src` to \acro{uri}, and \t`tit` to the title of the link.
 %  \begin{macrocode}
   function self.link(lab,src,tit)
-    return {"\\markdownRendererLink{",self.string(lab[1]),"}",
+    return {"\\markdownRendererLink{",lab,"}",
                           "{",self.string(src),"}",
                           "{",self.string(tit),"}"}
   end
 %    \end{macrocode}
-% A formatter for an image with the alternative text \t`label`, the source URI
-% \t`src`, and the title \t`title`.
+%
+% Define \luamdef{writer->image} as a function that will transform an input
+% image to the output format, where \t`lab` corresponds to the label, \t`src`
+% to the \acro{url}, and \t`tit` to the title of the image.
 %  \begin{macrocode}
   function self.image(lab,src,tit)
-    return {"\\markdownRendererImage{",self.string(lab[1]),"}",
+    return {"\\markdownRendererImage{",lab,"}",
                            "{",self.string(src),"}",
                            "{",self.string(tit),"}"}
   end
 %    \end{macrocode}
-% The formatter for a bullet list with contents \t`items` (an array).  If
-% \t`tight` is true, the list should have minimal spacing between items.
+%
+% Define \luamdef{writer->bulletlist} as a function that will transform an input
+% bullet list to the output format, where \t`items` is an array of the list
+% items and \t`tight` specifies, whether the list is tight or not.
 %  \begin{macrocode}
   local function ulitem(s)
     return {"\\markdownRendererUlItem ",s}
@@ -1279,10 +1366,12 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter for an ordered list with contents \t`items` (an array). If
-% \t`tight` is true, the list should have minimal spacing between items. If the
-% optional number \t`num` is present, it should be used as the number of the
-% first list item.
+%
+% Define \luamdef{writer->ollist} as a function that will transform an input
+% ordered list to the output format, where \t`items` is an array of the list
+% items and \t`tight` specifies, whether the list is tight or not. If the
+% optional parameter \t`startnum` is present, it should be used as the number
+% of the first list item.
 %  \begin{macrocode}
   local function olitem(s,num)
     if num ~= nil then
@@ -1311,10 +1400,12 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter for a definition list. \t`items` is an array of tables, each of
-% the form \t`{ term = t, definitions = defs, tight = tight }`, where \t`t` is a
-% string and \t`defs` is an array of strings.  If \t`tight` is true, the list
-% should have minimal spacing between items.
+%
+% Define \luamdef{writer->definitionlist} as a function that will transform an
+% input definition list to the output format, where \t`items` is an array of
+% tables, each of the form \t`\{ term = t, definitions = defs \}`, where \t`t`
+% is a term and \t`defs` is an array of definitions. \t`tight` specifies,
+% whether the list is tight or not.
 %  \begin{macrocode}
   local function dlitem(term,defs)
       return {"\\markdownRendererDlItem{",term,"}\n",defs}
@@ -1336,26 +1427,37 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The emphasized text formatter.
+%
+% Define \luamdef{writer->emphasis} as a function that will transform an
+% emphasized span \t`s` of input text to the output format.
 %  \begin{macrocode}
   function self.emphasis(s)
     return {"\\markdownRendererEmphasis{",s,"}"}
   end
 %    \end{macrocode}
-% The strongly emphasized text formatter.
+%
+% Define \luamdef{writer->strong} as a function that will transform a strongly
+% emphasized span \t`s` of input text to the output format.
 %  \begin{macrocode}
   function self.strong(s)
     return {"\\markdownRendererStrongEmphasis{",s,"}"}
   end
 %    \end{macrocode}
-% The block quotation formatter.
+%
+% Define \luamdef{writer->blockquote} as a function that will transform an
+% input block quote \t`s` to the output format.
 %  \begin{macrocode}
   function self.blockquote(s)
     return {"\\markdownRendererBlockQuoteBegin\n",s,
       "\n\\markdownRendererBlockQuoteEnd "}
   end
 %    \end{macrocode}
-% The block verbatim code formatter.
+%
+% Define \luamdef{writer->verbatim} as a function that will transform an
+% input code block \t`s` to the output format. If the \Opt{verbatim} option is
+% \t`true`, store \t`s` in an external file and output an indirect link.
+% Otherwise, escape \t`s` using the \luam{escape} function and return it
+% directly.
 %  \begin{macrocode}
   function self.verbatim(s)
     if options.verbatim then
@@ -1367,9 +1469,11 @@ function M.writer.new(options)
     end
   end
 %    \end{macrocode}
-% The formatter of a header \t`s` at level \t`level`.
+%
+% Define \luamdef{writer->heading} as a function that will transform an
+% input heading \t`s` at level \t`level` to the output format.
 %  \begin{macrocode}
-  function self.header(s,level)
+  function self.heading(s,level)
     local cmd
     if level == 1 then
       cmd = "\\markdownRendererHeadingOne"
@@ -1389,10 +1493,12 @@ function M.writer.new(options)
     return {cmd,"{",s,"}"}
   end
 %    \end{macrocode}
-% The footnote formatter.
+%
+% Define \luamdef{writer->footnote} as a function that will transform an
+% input footnote \t`s` to the output format.
 %  \begin{macrocode}
-  function self.note(contents)
-    return {"\\markdownRendererFootnote{",contents,"}"}
+  function self.note(s)
+    return {"\\markdownRendererFootnote{",s,"}"}
   end
 
   return self
@@ -1793,6 +1899,12 @@ function M.reader.new(writer, options)
                       + headerstart
                     ) * spacechar^0 / writer.space
 
+%    \end{macrocode}
+% Make two and more trailing spaces before a newline produce a forced line
+% break, throw away one or more trailing spaces and an optional newline at the
+% end of a file, and reduce one or more spaces and an optional newline into a
+% single space.
+%  \begin{macrocode}
   local Space     = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
@@ -1993,14 +2105,14 @@ function M.reader.new(writer, options)
                      * optionalspace
                      * (C(line) / strip_atx_end / parse_inlines)
                      * Cb("level")
-                     / writer.header
+                     / writer.heading
 
   -- parse setext header
   local SetextHeading = #(line * S("=-"))
                      * Ct(line / parse_inlines)
                      * HeadingLevel
                      * optionalspace * newline
-                     / writer.header
+                     / writer.heading
 %    \end{macrocode}
 % \paragraph{Syntax Specification}
 %  \begin{macrocode}
@@ -2117,10 +2229,10 @@ function M.reader.new(writer, options)
 end
 
 %    \end{macrocode}
-% \subsubsection{Conversion from Markdown to \TeX{}}
+% \subsubsection{Conversion from Markdown to Plain \TeX{}}
 % \blindtext
 %  \begin{macrocode}
-function M.converter.new(options)
+function M.new(options)
   local writer = M.writer.new(options)
   local reader = M.reader.new(writer, options)
   return reader.convert
@@ -2136,7 +2248,7 @@ return M
 % \fi\subsection{Plain \TeX{} Implementation}\label{sec:teximplementation}
 % The plain \TeX{} implementation provides macros for the interfacing between
 % \TeX{} and Lua and for the buffering of input text. These macros are then
-% used to implement the macros for the conversion from markdown to \TeX{}
+% used to implement the macros for the conversion from markdown to plain \TeX{}
 % exposed by the plain \TeX{} interface (see Section \ref{sec:texinterface}).
 %
 % \subsubsection{Logging Facilities}
@@ -2197,8 +2309,8 @@ return M
 %    \end{macrocode}
 %
 % The \mdef{markdownPrepare} macro contains the Lua code that is executed prior
-% to any conversion from markdown to \TeX{}. It exposes the \luam{convert}
-% function for the use by any further Lua code.
+% to any conversion from markdown to plain \TeX{}. It exposes the
+% \luam{convert} function for the use by any further Lua code.
 %  \begin{macrocode}
 \def\markdownPrepare{%
 %    \end{macrocode}
@@ -2210,12 +2322,12 @@ return M
     assert(lfs.mkdir(cacheDir))
   end
 %    \end{macrocode}
-% Next, load the \t`markdown` module and create a \t`converter` function using
+% Next, load the \t`markdown` module and create a converter function using
 % the plain \TeX{} options, which were serialized to a Lua table via the
 % \m{markdownLuaOptions} macro.
 %  \begin{macrocode}
   local md = require("markdown")
-  local convert = md.converter.new(\markdownLuaOptions)
+  local convert = md.new(\markdownLuaOptions)
 }%
 %    \end{macrocode}
 %
@@ -2329,13 +2441,11 @@ return M
         input file "|markdownOptionInputTempFileName" and scanning %
         for the closing \#1 command}%
 %    \end{macrocode}
-% Locally change the category of the special characters to \emph{other} in
-% order to prevent unwanted interpretation of the input.
+% Locally change the category of the special plain \TeX{} characters to
+% \emph{other} in order to prevent unwanted interpretation of the input.
 %  \begin{macrocode}
-      |catcode`| =12|catcode`|\=12|catcode`|{=12%
-      |catcode`|}=12|catcode`|$=12|catcode`|&=12%
-      |catcode`|#=12|catcode`|^=12|catcode`|_=12%
-      |catcode`|%=12|catcode`|~=12%
+      |def|do##1{|catcode`##1=12}|dospecials%
+      |catcode`| =12%
 %    \end{macrocode}
 % The \m{markdownReadAndConvertProcessLine} macro will process the individual
 % lines of output. Note the use of the comments to ensure that the entire macro
@@ -2353,8 +2463,8 @@ return M
 % When the ending control sequence appears in the line, make the next newline
 % character close the \m{markdownOptionInputTempFileName} file, return the
 % character categories back to the former state, convert the
-% \m{markdownOptionInputTempFileName} file from markdown to \TeX{} and \m{input}
-% the result of the conversion.
+% \m{markdownOptionInputTempFileName} file from markdown to plain \TeX{} and
+% \m{input} the result of the conversion.
 %  \begin{macrocode}
           |def^^M{%
             |immediate|closeout|markdownOptionFileStream%
@@ -2452,8 +2562,8 @@ return M
         callback.register("process_input_buffer", function (line)
 %    \end{macrocode}
 % When the ending control sequence appears on a line, unregister the callback,
-% convert the contents of our buffer from markdown to \TeX{}, and insert the
-% result into the input line buffer of \TeX{}.
+% convert the contents of our buffer from markdown to plain \TeX{}, and insert
+% the result into the input line buffer of \TeX{}.
 %  \begin{macrocode}
           if line:match[[^.-\/1]] then
             buffer[#buffer+1] = line:gsub([[\/1.*]], "")
@@ -2468,7 +2578,7 @@ return M
 %  \begin{macrocode}
           else
             buffer[#buffer+1] = line
-            return #buffer == 1 and [[\]] .. "fi" or ""
+            return [[\]] .. (#buffer == 1 and "fi" or "relax")
           end
         end)}@
 %    \end{macrocode}
@@ -2483,7 +2593,7 @@ return M
 \fi
 %    \end{macrocode}
 %
-% \subsubsection{Conversion from Markdown to \TeX{}}
+% \subsubsection{Conversion from Markdown to Plain \TeX{}}
 % The \m{markdownBegin} macro is a special instance of the
 % \m{markdownReadAndConvert} macro that recognizes the 
 % \m{markdownEnd} ending control sequence.
@@ -2493,7 +2603,8 @@ return M
 %
 % The \m{markdownInput} macro uses an implementation of the
 % \m{markdownLuaExecute} macro to convert the contents of the file whose
-% filename it has received as its single argument from markdown to \TeX{}.
+% filename it has received as its single argument from markdown to plain
+% \TeX{}.
 %  \begin{macrocode}
 \def\markdownInput#1{%
   \markdownInfo{Including markdown document "#1"}%
