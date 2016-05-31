@@ -166,10 +166,8 @@ local md5 = require("md5")
 % The \pkg{Lua File System} module is statically linked into the Lua\TeX{}
 % engine (see \cite[Section~3.3]{luatex16}).
 %
-% The \TeX{} part of the package also requires that either the Lua\TeX{}
-% \m{luaescapestring} primitive or the \Hologo{eTeX} \m{detokenize} primitive
-% is available for the definition of the \m{markdownLuaEscape} macro, and that
-% either the Lua\TeX{} \m{directlua} primitive or the \hologo{pdfTeX}
+% The \TeX{} part of the package also requires that the plain format is loaded
+% and that either the Lua\TeX{} \m{directlua} primitive or the \hologo{pdfTeX}
 % shell access file stream 18 is available for the definition of the
 % \m{markdownLuaExecute} macro.
 %
@@ -410,6 +408,17 @@ defaultOptions.verbatim = true
 \let\markdownBegin\relax
 \let\markdownEnd\relax
 %    \end{macrocode}
+% Note that the macros will consume the rest of the lines at which they appear.
+% In the following example \TeX{} code, the characters \t`c` and \t`f` will not
+% appear in the output.
+% \begin{verbatim}
+% \input markdown
+% a
+% b \markdownBegin c 
+% d 
+% e \markdownEnd   f
+% g 
+% \bye\end{verbatim}
 %
 % The \m{markdownInput} macro accepts a single parameter containing the
 % filename of a markdown document and expands to the result of the conversion
@@ -427,7 +436,85 @@ defaultOptions.verbatim = true
 % \markdownBegin
 %   _Hello world!_
 % \markdownEnd
-% \markdownInput{hello.md}\end{verbatim}
+% \markdownInput{hello.md}
+% \bye\end{verbatim}
+%
+% \subsubsection{Options}\label{sec:texoptions}
+% The \TeX{} options are represented by \TeX{} macros. Some of them map
+% directly to the options recognized by the Lua interface (see Section
+% \ref{sec:luaoptions}), while some of them are specific to the \TeX{}
+% interface.
+%
+% \paragraph{File and directory names}
+% The \mdef{markdownOptionHelperScriptFileName} macro sets the filename of the
+% helper Lua script file that is created during the conversion from markdown to
+% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
+% \m{jobname}\t`.markdown.lua`, where \m{jobname} is the base name of the
+% document being typeset.
+%
+% The expansion of this macro must not contain quotation marks (\t`"`) or
+% backslash symbols (\t`\textbackslash`). Mind that \TeX{} engines tend to
+% put quotation marks around \m{jobname}, when it contains spaces.
+%  \begin{macrocode}
+\def\markdownOptionHelperScriptFileName{\jobname.markdown.lua}%
+%    \end{macrocode}
+%
+% The \mdef{markdownOptionInputTempFileName} macro sets the filename of the
+% temporary input file that is created during the conversion from markdown to
+% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
+% \m{jobname}\t`.markdown.out`. The same limitations as in the case of the
+% \m{markdownOptionHelperScriptFileName} macro apply here.
+%  \begin{macrocode}
+\def\markdownOptionInputTempFileName{\jobname.markdown.in}%
+%    \end{macrocode}
+%
+% The \mdef{markdownOptionOutputTempFileName} macro sets the filename of the
+% temporary output file that is created during the conversion from markdown to
+% \TeX{} in \TeX{} engines without the \m{directLua} primitive. It defaults to
+% \m{jobname}\t`.markdown.out`. The same limitations as in the case of the
+% \m{markdownOptionHelperScriptFileName} macro apply here.
+%  \begin{macrocode}
+\def\markdownOptionOutputTempFileName{\jobname.markdown.out}%
+%    \end{macrocode}
+%
+% The \mdef{markdownOptionCacheDir} macro corresponds to the Lua interface
+% \Opt{cacheDir} option that sets the name of the directory that will contain
+% the produced cache files. The option defaults to \t`markdown-`\m{jobname}.
+% The same limitations as in the case of the
+% \m{markdownOptionHelperScriptFileName} macro apply here.
+%  \begin{macrocode}
+\def\markdownOptionCacheDir{markdown-\jobname}%
+%    \end{macrocode}
+%
+% \paragraph{Lua Wrappers}
+% The following macros map directly to the options recognized by the Lua
+% interface (see Section \ref{sec:luaoptions}) and are not processed by the
+% \TeX{} implementation, only passed along to Lua. They are undefined, which
+% makes them fall back to the default values provided by the Lua interface.
+%  \begin{macrocode}
+\let\markdownOptionBlankBeforeBlockquote\undefined
+\let\markdownOptionBlankBeforeHeading\undefined
+\let\markdownOptionDefinitionLists\undefined
+\let\markdownOptionHashEnumerator\undefined
+\let\markdownOptionHybrid\undefined
+\let\markdownOptionNotes\undefined
+\let\markdownOptionPreserveTabs\undefined
+\let\markdownOptionSmartEllipses\undefined
+\let\markdownOptionStartNumber\undefined
+\let\markdownOptionVerbatim\undefined
+%    \end{macrocode}
+%
+% \paragraph{Miscellaneous}
+% The \m{markdownOptionFileStream} macro may contain the file stream number the
+% \TeX{} implementation should use when accessing temporary files during the
+% conversion from markdown to \TeX{} in \TeX{} engines without the \m{directLua}
+% primitive. This macro must be defined prior to \m{input}ting the
+% \t`markdown.tex` file. Otherwise a new file stream number will be allocated.
+%  \begin{macrocode}
+\ifx\markdownOptionFileStream\undefined
+  \newwrite\markdownOptionFileStream
+\fi
+%    \end{macrocode}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
 % The following \TeX{} macros may occur inside the output of the \luam{convert}
@@ -581,7 +668,7 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlItem} macro represents an item in a definition
-% list. The macro receives one argument that corresponds to the term being
+% list. The macro receives a single argument that corresponds to the term being
 % defined.
 %  \begin{macrocode}
 \def\markdownRendererDlItem{%
@@ -606,7 +693,7 @@ defaultOptions.verbatim = true
 %
 % \paragraph{Emphasis Renderers}
 % The \mdef{markdownRendererEmphasis} macro represents an emphasized span of
-% text. The macro receives one argument that corresponds to the emphasized
+% text. The macro receives a single argument that corresponds to the emphasized
 % span of text.
 %  \begin{macrocode}
 \def\markdownRendererEmphasis{%
@@ -614,8 +701,8 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererStrongEmphasis} macro represents a strongly
-% emphasized span of text. The macro receives one argument that corresponds to
-% the emphasized span of text.
+% emphasized span of text. The macro receives a single argument that
+% corresponds to the emphasized span of text.
 %  \begin{macrocode}
 \def\markdownRendererStrongEmphasis{%
   \markdownRendererStrongEmphasisPrototype}%
@@ -655,8 +742,8 @@ defaultOptions.verbatim = true
 %
 % The \mdef{markdownRendererInputVerbatim} macro represents a code
 % block. This macro will only be produced, when the \Opt{verbatim} option is
-% \t`true`. The macro receives one argument that corresponds to the filename of
-% a file contaning the code block to input.
+% \t`true`. The macro receives a single argument that corresponds to the
+% filename of a file contaning the code block to input.
 %  \begin{macrocode}
 \def\markdownRendererInputVerbatim{%
   \markdownRendererInputVerbatimPrototype}%
@@ -664,14 +751,14 @@ defaultOptions.verbatim = true
 %
 % \paragraph{Heading Renderers}
 % The \mdef{markdownRendererHeadingOne} macro represents a first level heading.
-% The macro receives one argument that corresponds to the heading text.
+% The macro receives a single argument that corresponds to the heading text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingOne{%
   \markdownRendererHeadingOnePrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingTwo} macro represents a second level
-% heading. The macro receives one argument that corresponds to the heading
+% heading. The macro receives a single argument that corresponds to the heading
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingTwo{%
@@ -679,7 +766,7 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingThree} macro represents a third level
-% heading. The macro receives one argument that corresponds to the heading
+% heading. The macro receives a single argument that corresponds to the heading
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingThree{%
@@ -687,7 +774,7 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingFour} macro represents a fourth level
-% heading. The macro receives one argument that corresponds to the heading
+% heading. The macro receives a single argument that corresponds to the heading
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingFour{%
@@ -695,7 +782,7 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingFive} macro represents a fifth level
-% heading. The macro receives one argument that corresponds to the heading
+% heading. The macro receives a single argument that corresponds to the heading
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingFive{%
@@ -703,7 +790,7 @@ defaultOptions.verbatim = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererHeadingSix} macro represents a sixth level
-% heading. The macro receives one argument that corresponds to the heading
+% heading. The macro receives a single argument that corresponds to the heading
 % text.
 %  \begin{macrocode}
 \def\markdownRendererHeadingSix{%
@@ -721,7 +808,7 @@ defaultOptions.verbatim = true
 % \paragraph{Footnote Renderer}
 % The \mdef{markdownRendererFootnote} macro represents a footnote. This macro
 % will only be produced, when the \Opt{notes} option is \t`true`.  The macro
-% receives one argument that corresponds to the footnote text.
+% receives a single argument that corresponds to the footnote text.
 %  \begin{macrocode}
 \def\markdownRendererFootnote{%
   \markdownRendererFootnotePrototype}%
@@ -771,33 +858,6 @@ defaultOptions.verbatim = true
 \def\markdownRendererHeadingSixPrototype#1{#1}%
 \def\markdownRendererHorizontalRulePrototype{}%
 \def\markdownRendererFootnotePrototype#1{#1}%
-%    \end{macrocode}
-%
-% \subsubsection{Options}\label{sec:texoptions}
-% The \TeX{} options are represented by \TeX{} macros that map directly to the
-% options recognized by the Lua interface (see Section \ref{sec:luaoptions}).
-%
-% The \mdef{markdownOptionCacheDir} macro corresponds to the \Opt{cacheDir}
-% option recognized by the Lua interface. By default, it is set to store the
-% cache files in the \t`markdown-`\m{jobname} directory, where \m{jobname}
-% is the base name of the document being typeset.
-%  \begin{macrocode}
-\def\markdownOptionCacheDir{markdown-\jobname}
-%    \end{macrocode}
-%
-% The rest of the macros are undefined, which makes them fall back to the
-% defaults provided by the Lua interface (see Section \ref{sec:luainterface}).
-%  \begin{macrocode}
-\let\markdownOptionBlankBeforeBlockquote\undefined
-\let\markdownOptionBlankBeforeHeading\undefined
-\let\markdownOptionDefinitionLists\undefined
-\let\markdownOptionHashEnumerator\undefined
-\let\markdownOptionHybrid\undefined
-\let\markdownOptionNotes\undefined
-\let\markdownOptionPreserveTabs\undefined
-\let\markdownOptionSmartEllipses\undefined
-\let\markdownOptionStartNumber\undefined
-\let\markdownOptionVerbatim\undefined
 %    \end{macrocode}
 %
 % \iffalse
@@ -1960,7 +2020,7 @@ function M.reader.new(writer, options)
       table.concat(opt_string, ","), function(input)
         return util.rope_to_string(parse_blocks(input))
       end, ".md" .. writer.suffix)
-    return string.format([[\input %s\relax]], name)
+    return string.format([[\input "%s"\relax]], name)
   end
   return self
 end
@@ -1973,13 +2033,29 @@ return M
 %</lua>
 %<*tex>
 % \fi\subsection{\TeX{} Implementation}
-% The \mdef{markdownSerializedOptions} macro expands to a Lua table that
+% \blindtext
+%
+% \subsubsection{Logging Facilities}
+% The \mdef{markdownInfo}, \mdef{markdownWarning}, and
+% \mdef{markdownError} macros provide access to logging to the rest of
+% the macros.
+%  \begin{macrocode}
+\def\markdownInfo#1{%
+  \message{(l.\the\inputlineno) markdown.tex info: #1.}}%
+\def\markdownWarning#1{%
+  \message{(l.\the\inputlineno) markdown.tex warning: #1}}%
+\def\markdownError#1{%
+  \errmessage{(l.\the\inputlineno) markdown.tex error: #1}}%
+%    \end{macrocode}
+%
+% \subsubsection{Lua Snippets}
+% The \mdef{markdownLuaOptions} macro expands to a Lua table that
 % contains the \TeX{} options (see Section \ref{sec:texoptions}) in a format
 % recognized by Lua (see Section \ref{sec:luaoptions}). Note that the boolean
 % options are not sanitized and expect the \TeX{} option macros to expand to
 % either \t`true` or \t`false`.
 %  \begin{macrocode}
-\def\markdownSerializedOptions{{%
+\def\markdownLuaOptions{{%
   \ifx\markdownOptionBlankBeforeBlockquote\undefined\else
     blankBeforeBlockquote = \markdownOptionBlankBeforeBlockquote,
   \fi
@@ -1987,7 +2063,7 @@ return M
     blankBeforeHeading = \markdownOptionBlankBeforeHeading,
   \fi
   \ifx\markdownOptionCacheDir\undefined\else
-    cacheDir = "\markdownLuaEscape{\markdownOptionCacheDir}",
+    cacheDir = "\markdownOptionCacheDir",
   \fi
   \ifx\markdownOptionDefinitionLists\undefined\else
     definitionLists = \markdownOptionDefinitionLists,
@@ -2014,79 +2090,227 @@ return M
     verbatim = \markdownVerbatim,
   \fi}
 }%
+%    \end{macrocode}
+%
+% The \mdef{markdownPrepare} macro contains the Lua code that is executed prior
+% to any conversion from markdown to \TeX{}.
+%  \begin{macrocode}
 \def\markdownPrepare{%
+%    \end{macrocode}
+% First, ensure that the \m{markdownOptionCacheDir} directory exists.
+%  \begin{macrocode}
   local lfs = require("lfs")
-  local cacheDir = "\markdownLuaEscape{\markdownOptionCacheDir}"
+  local cacheDir = "\markdownOptionCacheDir"
   if lfs.isdir(cacheDir) == true then else
     assert(lfs.mkdir(cacheDir))
   end
+%    \end{macrocode}
+% Next, load the \t`markdown.lua` module and instantiate its \t`writer` and
+% \t`reader` classes using the \TeX{} options, which were serialized to a Lua
+% table via the \m{markdownLuaOptions} macro.
+%  \begin{macrocode}
   local md = require("markdown")
-  local options = \markdownSerializedOptions
+  local options = \markdownLuaOptions
   local writer = md.writer.new(options)
   local reader = md.reader.new(writer, options)
 }%
-\ifx\luaescapestring\undefined
-  \def\markdownLuaEscape#1{%
-    \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter
-    \expandafter\markdownLuaEscapeNext\expandafter\expandafter\expandafter
-    \markdownLuaEscapeGobble\expandafter\detokenize\expandafter{%
-    \csname#1\endcsname}\relax}%
-  \def\markdownLuaEscapeGobble#1{}%
-  \begingroup
-    \catcode`\"=12%
-    \catcode`\|=0%
-    \catcode`\\=12%
-    |gdef|markdownLuaEscapeNext#1{%
-      |if#1|relax|else
-        |if#1"%
-          \"|expandafter|expandafter|expandafter
-            |markdownLuaEscapeNext
-        |else
-          |if#1\%
-            \\|expandafter|expandafter|expandafter|expandafter
-              |expandafter|expandafter|expandafter|markdownLuaEscapeNext
-          |else
-            #1|expandafter|expandafter|expandafter|expandafter
-              |expandafter|expandafter|expandafter|markdownLuaEscapeNext
-          |fi
-        |fi
-      |fi}%
-  |endgroup
-\else
-  \let\markdownLuaEscape\luaescapestring
-\fi
+%    \end{macrocode}
+%
+% \subsubsection{Lua \t`\textbackslash write18` Bridge}\label{sec:luabridge}
+% The following \TeX{} code is intended for \TeX{} engines that do not provide
+% direct access to Lua, but expose the shell of the operating system through
+% the output file stream 18 (\Hologo{XeTeX}, \hologo{pdfLaTeX}).
+% The \m{markdownLuaExecute} and \m{markdownReadAndConvert} defined here and in
+% Section \ref{sec:directlua} are meant to be transparent to the remaining
+% code.
+%
+% The package assumes that although the user is not using the Lua\TeX{} engine,
+% their TeX distribution contains it, and uses shell access to produce and
+% execute Lua scripts using the \TeX{}Lua interpreter (see
+% \cite[Section~3.1.1]{luatex16}).
+%  \begin{macrocode}
 \ifx\directlua\undefined
-  \csname newwrite\endcsname\markdownLuaExecuteScript
+%    \end{macrocode}
+%
+% The \mdef{markdownLuaExecuteShellEscape} count register contains the numeric
+% value of either the \m{pdfshellescape} (Lua\TeX{}, \Hologo{pdfTeX}) or the
+% \m{shellescape} (\Hologo{XeTeX}) commands. This value indicates, whether the
+% shell access is enabled (\t`1`), disabled (\t`0`), or restricted (\t`2`). 
+% If neither of these commands is defined, announce that the \TeX{} engine
+% is unsupported.
+%  \begin{macrocode}
+  \csname newcount\endcsname\markdownLuaExecuteShellEscape
+  \ifx\pdfshellescape\undefined
+    \ifx\shellescape\undefined
+      \markdownError{You are using a TeX engine that supports neither
+        Lua nor shell access via the file stream 18. At the moment, the
+        Markdown package does not work with your engine}%
+    \else
+      \markdownLuaExecuteShellEscape=\shellescape
+    \fi
+  \else
+    \markdownLuaExecuteShellEscape=\pdfshellescape
+  \fi
+%    \end{macrocode}
+%
+% The \mdef{markdownLuaExecute} macro executes the Lua code it has received as
+% its first argument. The Lua code may not directly interact with the \TeX{}
+% engine, but it can use the \luam{print} function in the same manner it
+% would use the \luam{tex.print} method.
+%  \begin{macrocode}
   \def\markdownLuaExecute#1{%
-    \ifnum\pdfshellescape=1%
-      \immediate\openout\markdownLuaExecuteScript=\jobname.markdown.lua%
-      \markdownInfoMessage{Writing a helper Lua script to the file
-        "\jobname.markdown.lua"}%
-      \immediate\write\markdownLuaExecuteScript{%
+%    \end{macrocode}
+% If the shell is accessible, create the file
+% \m{markdownOptionHelperScriptFileName} and fill it with the input Lua code
+% prepended with \pkg{kpathsea} initialization, so that Lua modules from the
+% \TeX{} distribution are available.
+%  \begin{macrocode}
+    \ifnum\markdownLuaExecuteShellEscape=1%
+      \immediate\openout\markdownOptionFileStream=%
+        \markdownOptionHelperScriptFileName
+      \markdownInfo{Writing a helper Lua script to the file
+        "\markdownOptionHelperScriptFileName"}%
+      \immediate\write\markdownOptionFileStream{%
         local kpse = require('kpse')
         kpse.set_program_name('luatex') #1}%
-      \immediate\closeout\markdownLuaExecuteScript
-      \markdownInfoMessage{Executing a helper Lua script from the file
-        "\jobname.markdown.lua"}%
-      \input|"texlua \jobname.markdown.lua"
+      \immediate\closeout\markdownOptionFileStream
+%    \end{macrocode}
+% Execute the generated \m{markdownOptionHelperScriptFileName} Lua script using
+% the \TeX{}Lua binary and store the output in the
+% \m{markdownOptionOutputTempFileName} file.
+%  \begin{macrocode}
+      \markdownInfo{Executing a helper Lua script from the file
+        "\markdownOptionHelperScriptFileName" and storing the result in the
+        file "\markdownOptionOutputTempFileName"}%
+      \immediate\write18{texlua "\markdownOptionHelperScriptFileName" >
+        "\markdownOptionOutputTempFileName"}%
+%    \end{macrocode}
+% \m{input} the generated \m{markdownOptionOutputTempFileName} file.
+%  \begin{macrocode}
+      \input\markdownOptionOutputTempFileName\relax
     \else
-      \markdownErrorMessage{I can not access the shell. Run the TeX
+%    \end{macrocode}
+% If the shell is inaccessible, let the user know and suggest a remedy.
+%  \begin{macrocode}
+      \markdownError{I can not access the shell. Run the TeX
         compiler with the --shell-escape or the --enable-write18 flag}%
     \fi}%
-  % TODO: define markdownReadAndConvert
-\else
-  \def\markdownLuaExecute#1{\directlua{%
-    local print = tex.print #1}}%
 %    \end{macrocode}
-% In the definition of the \m{markdownReadAndConvert} macro, we will be using
-% the hash symbol (\t`\#`), the underscore symbol (\t`\_`), the caret symbol
-% (\t`\^`), the backslash symbol (\t`\textbackslash`), the percent sign
-% (\t`\%`), and the braces (\t`\{\}`) as a part of the Lua syntax.
+%
+% The \mdef{markdownReadAndConvert} macro stores any subsequent lines of input
+% in the file \m{markdownOptionInputTempFileName} before it encounters a control
+% sequence specified by its single argument. After that, the macro coverts the
+% contents of the file \m{markdownOptionInputTempFileName} from markdown to
+% \TeX{} and \t`input`s it.
+%
+% This macro is largely a rewrite of the \Hologo{LaTeX2e} \m{filecontents} macro
+% to plain \TeX{}.
+%  \begin{macrocode}
+  \begingroup
+%    \end{macrocode}
+% Make the newline character active and swap the character codes of the
+% backslash symbol (\t`\textbackslash`) and the pipe symbol (\t`|`), so that
+% we can use the backslash as an ordinary character inside the macro definition.
+%  \begin{macrocode}
+    \catcode`\^^M=13%
+    \catcode`|=0%
+    \catcode`\\=12%
+    |gdef|markdownReadAndConvert#1{%
+      |begingroup%
+%    \end{macrocode}
+% Open the \m{markdownOptionInputTempFileName} file for writing.
+%  \begin{macrocode}
+      |immediate|openout|markdownOptionFileStream%
+        |markdownOptionInputTempFileName%
+      |markdownInfo{Buffering markdown input into the temporary %
+        input file "|markdownOptionInputTempFileName" and scanning %
+        for the closing \#1 command}%
+%    \end{macrocode}
+% Locally change the category of the special characters to \emph{other} in
+% order to prevent unwanted interpretation of the input.
+%  \begin{macrocode}
+      |catcode`| =12|catcode`|\=12|catcode`|{=12%
+      |catcode`|}=12|catcode`|$=12|catcode`|&=12%
+      |catcode`|#=12|catcode`|^=12|catcode`|_=12%
+      |catcode`|%=12|catcode`|~=12%
+%    \end{macrocode}
+% The \m{markdownReadAndConvertProcessLine} macro will process the individual
+% lines of output. Note the use of the comments to ensure that the entire macro
+% is at a single line and therefore no (active) newline symbols are produced.
+%  \begin{macrocode}
+      |def|markdownReadAndConvertProcessLine##1\#1##2\#1##3|relax{%
+%    \end{macrocode}
+% When the ending control sequence does not appear in the line, store it in the
+% \m{markdownOptionInputTempFileName} file.
+%  \begin{macrocode}
+        |ifx|relax##3|relax%
+          |immediate|write|markdownOptionFileStream{##1}%
+        |else%
+%    \end{macrocode}
+% When the ending control sequence appears in the line, make the next newline
+% character close the \m{markdownOptionInputTempFileName} file, return the
+% character categories back to the former state, convert the
+% \m{markdownOptionInputTempFileName} file from markdown to \TeX{} and \m{input}
+% the result of the conversion.
+%  \begin{macrocode}
+          |def^^M{%
+            |immediate|closeout|markdownOptionFileStream%
+            |endgroup%
+            |markdownInput|markdownOptionInputTempFileName}%
+%    \end{macrocode}
+% When the ending control sequence does not appear at the beginning of the line,
+% append the preceding string to the \m{markdownOptionInputTempFileName} file.
+%  \begin{macrocode}
+          |ifx|relax##1|relax|else%
+            |immediate|write|markdownOptionFileStream{##1}%
+          |fi%
+        |fi%
+%    \end{macrocode}
+% Repeat with the next line.
+%  \begin{macrocode}
+        ^^M}%
+%    \end{macrocode}
+% Make the newline character active at expansion time and make it consume the
+% rest of the line on expansion. Throw away the rest of the first line and
+% pass the second line to the \m{markdownReadAndConvertProcessLine} macro.
+%  \begin{macrocode}
+      |catcode`|^^M=13%
+      |def^^M##1^^M{%
+        |def^^M####1^^M{%
+          |markdownReadAndConvertProcessLine####1\#1\#1|relax}%
+        ^^M}%
+      ^^M}%
+%    \end{macrocode}
+% Reset the character categories back to the former state.
+%  \begin{macrocode}
+  |endgroup
+%    \end{macrocode}
+%
+% \subsubsection{Direct Lua Access}\label{sec:directlua}
+% The following \TeX{} code is intended for \TeX{} engines that provide
+% direct access to Lua (Lua\TeX{}). The \m{markdownLuaExecute} and
+% \m{markdownReadAndConvert} defined here and in Section \ref{sec:luabridge}
+% are meant to be transparent to the remaining code.
+%  \begin{macrocode}
+\else
+%    \end{macrocode}
+% The direct Lua access version of the \m{markdownLuaExecute} macro is defined
+% in terms of the \m{directlua} primitive. The \luam{print} function is set as
+% an alias to the \m{tex.print} method in order to mimic the behaviour of the
+% \m{markdownLuaExecute} definition from Section \ref{sec:luabridge},
+%  \begin{macrocode}
+  \def\markdownLuaExecute#1{\directlua{local print = tex.print #1}}%
+%    \end{macrocode}
+% In the definition of the direct Lua access version of the
+% \m{markdownReadAndConvert} macro, we will be using the hash symbol (\t`\#`),
+% the underscore symbol (\t`\_`), the caret symbol (\t`\^`), the backslash
+% symbol (\t`\textbackslash`), the percent sign (\t`\%`), and the braces
+% (\t`\{\}`) as a part of the Lua syntax.
 %  \begin{macrocode}
   \begingroup
 %    \end{macrocode}
 %
-% To this end, we will make the underscore, and caret symbols ordinary
+% To this end, we will make the underscore and caret symbols ordinary
 % characters,
 %  \begin{macrocode}
     \catcode`\_=12%
@@ -2111,36 +2335,68 @@ return M
 % expansion, so we do not need to bother with changing their category codes.
 %  \begin{macrocode}
     |gdef|markdownReadAndConvert/1{@
-      |markdownInfoMessage{Buffering markdown input and scanning for the
+      |markdownInfo{Buffering markdown input and scanning for the
         closing \/1 command}@
-      |markdownLuaExecute{@
+      |directlua{@
+%    \end{macrocode}
+% Set up an empty Lua table that will serve as our buffer.
+%  \begin{macrocode}
         |markdownPrepare
         local buffer = {}
+%    \end{macrocode}
+% Register a callback that will notify you about new lines of input.
+%  \begin{macrocode}
         callback.register("process_input_buffer", function (line)
+%    \end{macrocode}
+% When the ending control sequence appears on a line, unregister the callback,
+% convert the contents of out buffer from markdown to \TeX{}, and insert the
+% result into the input line buffer of \TeX{}.
+%  \begin{macrocode}
           if line:match[[^.-\/1]] then
             buffer[#buffer+1] = line:gsub([[\/1.*]], "")
             callback.register("process_input_buffer", nil)
-            local input = table.concat(buffer, "\n"):
-              gsub("^%s*", ""):gsub("%s*$", "")
-            return [[\markdownInfoMessage{Done buffering markdown input}]] ..
-              reader.convert(input) .. line:gsub([[^.-\/1]], "")
+            local input = table.concat(buffer, "\n")
+            local output = reader.convert(input)
+            return [[\markdownInfo{The \/1 command was found}]] .. output
+%    \end{macrocode}
+% When the ending control sequence does not appear on a line, store the line in
+% our buffer, and insert either \m{fi}, if this is the first line of input,
+% or an empty token list to the input line buffer of \TeX{}.
+%  \begin{macrocode}
           else
             buffer[#buffer+1] = line
-            return ""
+            return #buffer == 1 and [[\]] .. "fi" or ""
           end
-        end)}}@
+        end)}@
+%    \end{macrocode}
+% Insert \m{iffalse} after the \m{markdownReadAndConvert} macro in order to
+% consume the rest of the first line of input.
+%  \begin{macrocode}
+      |iffalse}@
+%    \end{macrocode}
+% Reset the character categories back to the former state.
+%  \begin{macrocode}
   |endgroup
 \fi
-\def\markdownInfoMessage#1{%
-  \message{(l.\the\inputlineno) markdown.tex: #1.}}%
-\def\markdownErrorMessage#1{%
-  \errmessage{(l.\the\inputlineno) markdown.tex: #1}}%
+%    \end{macrocode}
+%
+% \subsubsection{Markdown Conversion}
+% The \m{markdownBegin} macro is a special instance of the
+% \m{markdownReadAndConvert} macro that recognizes the 
+% \m{markdownEnd} ending control sequence.
+%  \begin{macrocode}
 \def\markdownBegin{\markdownReadAndConvert{markdownEnd}}%
+%    \end{macrocode}
+%
+% The \m{markdownInput} macro uses an implementation of the
+% \m{markdownLuaExecute} macro to convert the contents of the file whose
+% filename it has received as its single argument from markdown to \TeX{}.
+%  \begin{macrocode}
 \def\markdownInput#1{%
-  \markdownInfoMessage{Including markdown document "#1"}%
+  \markdownInfo{Including markdown document "#1"}%
   \markdownLuaExecute{%
     \markdownPrepare
-    local input = assert(io.open("\markdownLuaEscape{#1}","r")):read("*a")
+    local input = assert(io.open("#1","r")):read("*a")
     print(reader.convert(input))}}%
 %    \end{macrocode}
 %
