@@ -897,7 +897,7 @@ defaultOptions.verbatim = true
 %
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
-\def\markdownRendererEllipsisPrototype{...}%
+\let\markdownRendererEllipsisPrototype\dots
 \def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
 \def\markdownRendererLinkPrototype#1#2#3{#1}%
 \def\markdownRendererImagePrototype#1#2#3{#1}%
@@ -2612,6 +2612,7 @@ return M
 % characters,
 %  \begin{macrocode}
     \catcode`\_=12%
+    \catcode`\$=12%
     \catcode`\^=12%
 %    \end{macrocode}
 % swap the category codes of the hash symbol and the slash symbol (\t`/`).
@@ -2648,16 +2649,22 @@ return M
         |markdownPrepare
         local buffer = {}
 %    \end{macrocode}
+% Create a regex that will match the ending input sequence. Escape any special
+% regex characters (like a star inside \t`\textbackslash end\{markdown*\}`)
+% inside the input.
+%  \begin{macrocode}
+        local ending_sequence = "^.-" .. ([[/1]]):gsub(
+          "([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+%    \end{macrocode}
 % Register a callback that will notify you about new lines of input.
 %  \begin{macrocode}
-local test = io.open("test", "w")
         local function process_line(line)
 %    \end{macrocode}
 % When the ending token sequence appears on a line, unregister the callback,
 % convert the contents of our buffer from markdown to plain \TeX{}, and insert
 % the result into the input line buffer of \TeX{}.
 %  \begin{macrocode}
-          if line:match[[^.-/1]] then
+          if line:match(ending_sequence) then
             |markdownLuaUnregisterIBCallback{process_line}
             local input = table.concat(buffer, "\n")
             local output = convert(input)
@@ -2708,6 +2715,193 @@ local test = io.open("test", "w")
 %  \begin{macrocode}
 \input markdown.tex
 
+\RequirePackage{keyval}
+\define@key{markdownOptions}{helperScriptFileName}{%
+  \def\markdownOptionHelperScriptFileName{#1}}%
+\define@key{markdownOptions}{inputTempFileName}{%
+  \def\markdownOptionInputTempFileName{#1}}%
+\define@key{markdownOptions}{outputTempFileName}{%
+  \def\markdownOptionOutputTempFileName{#1}}%
+\define@key{markdownOptions}{blankBeforeBlockquote}[true]{%
+  \def\markdownOptionBlankBeforeBlockquote{#1}}%
+\define@key{markdownOptions}{blankBeforeHeading}[true]{%
+  \def\markdownOptionBlankBeforeHeading{#1}}%
+\define@key{markdownOptions}{cacheDir}{%
+  \def\markdownOptionCacheDir{#1}}%
+\define@key{markdownOptions}{definitionLists}[true]{%
+  \def\markdownOptionDefinitionLists{#1}}%
+\define@key{markdownOptions}{hashEnumerator}[true]{%
+  \def\markdownOptionHashEnumerator{#1}}%
+\define@key{markdownOptions}{hybrid}[true]{%
+  \def\markdownOptionHybrid{#1}}%
+\define@key{markdownOptions}{notes}[true]{%
+  \def\markdownOptionNotes{#1}}%
+\define@key{markdownOptions}{preserveTabs}[true]{%
+  \def\markdownOptionPreserveTabs{#1}}%
+\define@key{markdownOptions}{smartEllipses}[true]{%
+  \def\markdownOptionSmartEllipses{#1}}%
+\define@key{markdownOptions}{startNumber}[true]{%
+  \def\markdownOptionStartNumber{#1}}%
+\define@key{markdownOptions}{verbatim}[true]{%
+  \def\markdownOptionVerbatim{#1}}%
+\define@key{markdownOptions}{renderers}{%
+  \setkeys{markdownRenderers}{#1}}%
+\define@key{markdownOptions}{rendererPrototypes}{%
+  \setkeys{markdownRendererPrototypes}{#1}}%
+
+\define@key{markdownRenderers}{lineBreak}{%
+  \renewcommand\markdownRendererLineBreak{#1}}%
+\define@key{markdownRenderers}{ellipsis}{%
+  \renewcommand\markdownRendererEllipsis{#1}}%
+\define@key{markdownRenderers}{codeSpan}{%
+  \renewcommand\markdownRendererCodeSpan[1]{#1}}%
+\define@key{markdownRenderers}{link}{%
+  \renewcommand\markdownRendererLink[3]{#1}}%
+\define@key{markdownRenderers}{image}{%
+  \renewcommand\markdownRendererImage[3]{#1}}%
+\define@key{markdownRenderers}{ulBegin}{%
+  \renewcommand\markdownRendererUlBegin{#1}}%
+\define@key{markdownRenderers}{ulBeginTight}{%
+  \renewcommand\markdownRendererUlBeginTight{#1}}%
+\define@key{markdownRenderers}{ulItem}{%
+  \renewcommand\markdownRendererUlItem{#1}}%
+\define@key{markdownRenderers}{ulEnd}{%
+  \renewcommand\markdownRendererUlEnd{#1}}%
+\define@key{markdownRenderers}{ulEndTight}{%
+  \renewcommand\markdownRendererUlEndTight{#1}}%
+\define@key{markdownRenderers}{olBegin}{%
+  \renewcommand\markdownRendererOlBegin{#1}}%
+\define@key{markdownRenderers}{olBeginTight}{%
+  \renewcommand\markdownRendererOlBeginTight{#1}}%
+\define@key{markdownRenderers}{olItem}{%
+  \renewcommand\markdownRendererOlItem{#1}}%
+\define@key{markdownRenderers}{olItemWithNumber}{%
+  \renewcommand\markdownRendererOlItemWithNumber[1]{#1}}%
+\define@key{markdownRenderers}{olEnd}{%
+  \renewcommand\markdownRendererOlEnd{#1}}%
+\define@key{markdownRenderers}{olEndTight}{%
+  \renewcommand\markdownRendererOlEndTight{#1}}%
+\define@key{markdownRenderers}{dlBegin}{%
+  \renewcommand\markdownRendererDlBegin{#1}}%
+\define@key{markdownRenderers}{dlBeginTight}{%
+  \renewcommand\markdownRendererDlBeginTight{#1}}%
+\define@key{markdownRenderers}{dlItem}{%
+  \renewcommand\markdownRendererDlItem[1]{#1}}%
+\define@key{markdownRenderers}{dlEnd}{%
+  \renewcommand\markdownRendererDlEnd{#1}}%
+\define@key{markdownRenderers}{dlEndTight}{%
+  \renewcommand\markdownRendererDlEndTight{#1}}%
+\define@key{markdownRenderers}{emphasis}{%
+  \renewcommand\markdownRendererEmphasis[1]{#1}}%
+\define@key{markdownRenderers}{strongEmphasis}{%
+  \renewcommand\markdownRendererStrongEmphasis[1]{#1}}%
+\define@key{markdownRenderers}{blockQuoteBegin}{%
+  \renewcommand\markdownRendererBlockQuoteBegin{#1}}%
+\define@key{markdownRenderers}{blockQuoteEnd}{%
+  \renewcommand\markdownRendererBlockQuoteEnd{#1}}%
+\define@key{markdownRenderers}{codeBlockBegin}{%
+  \renewcommand\markdownRendererCodeBlockBegin{#1}}%
+\define@key{markdownRenderers}{codeBlockEnd}{%
+  \renewcommand\markdownRendererCodeBlockEnd{#1}}%
+\define@key{markdownRenderers}{inputVerbatim}{%
+  \renewcommand\markdownRendererInputVerbatim[1]{#1}}%
+\define@key{markdownRenderers}{headingOne}{%
+  \renewcommand\markdownRendererHeadingOne[1]{#1}}%
+\define@key{markdownRenderers}{headingTwo}{%
+  \renewcommand\markdownRendererHeadingTwo[1]{#1}}%
+\define@key{markdownRenderers}{headingThree}{%
+  \renewcommand\markdownRendererHeadingThree[1]{#1}}%
+\define@key{markdownRenderers}{headingFour}{%
+  \renewcommand\markdownRendererHeadingFour[1]{#1}}%
+\define@key{markdownRenderers}{headingFive}{%
+  \renewcommand\markdownRendererHeadingFive[1]{#1}}%
+\define@key{markdownRenderers}{headingSix}{%
+  \renewcommand\markdownRendererHeadingSix[1]{#1}}%
+\define@key{markdownRenderers}{horizontalRule}{%
+  \renewcommand\markdownRendererHorizontalRule{#1}}%
+\define@key{markdownRenderers}{footnote}{%
+  \renewcommand\markdownRendererFootnote[1]{#1}}%
+
+\define@key{markdownRendererPrototypes}{lineBreak}{%
+  \renewcommand\markdownRendererLineBreakPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ellipsis}{%
+  \renewcommand\markdownRendererEllipsisPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeSpan}{%
+  \renewcommand\markdownRendererCodeSpanPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{link}{%
+  \renewcommand\markdownRendererLink[3]{#1}}%
+\define@key{markdownRendererPrototypes}{image}{%
+  \renewcommand\markdownRendererImage[3]{#1}}%
+\define@key{markdownRendererPrototypes}{ulBegin}{%
+  \renewcommand\markdownRendererUlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulBeginTight}{%
+  \renewcommand\markdownRendererUlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulItem}{%
+  \renewcommand\markdownRendererUlItemPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulEnd}{%
+  \renewcommand\markdownRendererUlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulEndTight}{%
+  \renewcommand\markdownRendererUlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olBegin}{%
+  \renewcommand\markdownRendererOlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olBeginTight}{%
+  \renewcommand\markdownRendererOlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olItem}{%
+  \renewcommand\markdownRendererOlItemPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olItemWithNumber}{%
+  \renewcommand\markdownRendererOlItemWithNumberPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{olEnd}{%
+  \renewcommand\markdownRendererOlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olEndTight}{%
+  \renewcommand\markdownRendererOlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlBegin}{%
+  \renewcommand\markdownRendererDlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlBeginTight}{%
+  \renewcommand\markdownRendererDlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlItem}{%
+  \renewcommand\markdownRendererDlItemPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{dlEnd}{%
+  \renewcommand\markdownRendererDlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlEndTight}{%
+  \renewcommand\markdownRendererDlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{emphasis}{%
+  \renewcommand\markdownRendererEmphasisPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{strongEmphasis}{%
+  \renewcommand\markdownRendererStrongEmphasisPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{blockQuoteBegin}{%
+  \renewcommand\markdownRendererBlockQuoteBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{blockQuoteEnd}{%
+  \renewcommand\markdownRendererBlockQuoteEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeBlockBegin}{%
+  \renewcommand\markdownRendererCodeBlockBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeBlockEnd}{%
+  \renewcommand\markdownRendererCodeBlockEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{inputVerbatim}{%
+  \renewcommand\markdownRendererInputVerbatimPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingOne}{%
+  \renewcommand\markdownRendererHeadingOnePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingTwo}{%
+  \renewcommand\markdownRendererHeadingTwoPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingThree}{%
+  \renewcommand\markdownRendererHeadingThreePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingFour}{%
+  \renewcommand\markdownRendererHeadingFourPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingFive}{%
+  \renewcommand\markdownRendererHeadingFivePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingSix}{%
+  \renewcommand\markdownRendererHeadingSixPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{horizontalRule}{%
+  \renewcommand\markdownRendererHorizontalRulePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{footnote}{%
+  \renewcommand\markdownRendererFootnotePrototype[1]{#1}}%
+
+\newcommand\markdownSetup[1]{%
+  \setkeys{markdownOptions}{#1}}%
+
+\DeclareOption*{%
+  \expandafter\markdownSetup\expandafter{\CurrentOption}}%
+\ProcessOptions\relax
+
 \renewcommand\markdownInfo[1]{\PackageInfo{markdown}{#1}}
 \renewcommand\markdownWarning[1]{\PackageWarning{markdown}{#1}}
 \renewcommand\markdownError[2]{\PackageError{markdown}{#1}{#2.}}
@@ -2719,18 +2913,36 @@ local test = io.open("test", "w")
   luatexbase.remove_from_callback("process_input_buffer",%
     "The markdown input processor")}
  
-\newenvironment{markdown}\relax\relax
-\newenvironment{markdownDocument}\relax\relax
+\newenvironment{markdown}{%
+  \begingroup
+  \markdownReadAndConvert@markdown{}}\relax
+\newenvironment{markdown*}[1]{%
+  \begingroup
+  \markdownSetup{#1}%
+  \markdownReadAndConvert@markdown*}\relax
 \begingroup
   \catcode`\|=0\catcode`\<=1\catcode`\>=2%
   \catcode`\\=12|catcode`|{=12|catcode`|}=12%
-  |gdef|markdown<%
-    |markdownReadAndConvert<\end{markdown}>%
-                           <|end<markdown>>>%
-  |gdef|markdownDocument<%
-    |begin<document>%
-    |markdownReadAndConvert<\end{markdownDocument}>%
-                           <|end<markdownDocument>|end<document>>>%
+  |gdef|markdownReadAndConvert@markdown#1<%
+    |markdownReadAndConvert<\end{markdown#1}>%
+                           <|end<markdown#1>%
+                            |endgroup>>%
+|endgroup
+
+\newenvironment{markdownDocument}{%
+  \begin{document}%
+  \markdownReadAndConvert@markdownDocument{}}\relax
+\newenvironment{markdownDocument*}[1]{%
+  \begin{document}%
+  \markdownSetup{#1}%
+  \markdownReadAndConvert@markdownDocument*}\relax
+\begingroup
+  \catcode`\|=0\catcode`\<=1\catcode`\>=2%
+  \catcode`\\=12|catcode`|{=12|catcode`|}=12%
+  |gdef|markdownReadAndConvert@markdownDocument#1<%
+    |markdownReadAndConvert<\end{markdownDocument#1}>%
+                           <|end<markdownDocument#1>%
+                            |end<document>>>%
 |endgroup
 
 \newcommand\markdownMakeOther{%
