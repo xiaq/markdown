@@ -3,7 +3,7 @@ AUXDIRS=_minted-markdown
 DTXARCHIVE=markdown.dtx
 INSTALLER=markdown.ins
 MANUAL=markdown.pdf
-INSTALLABLES=markdown.lua markdown.tex markdown.sty
+INSTALLABLES=markdown.lua markdown.tex markdown.sty markdown-context.tex
 MAKEABLES=$(MANUAL) $(INSTALLABLES)
 
 # This is the default pseudo-target.
