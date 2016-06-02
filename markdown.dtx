@@ -8,6 +8,7 @@
 \usepackage{microtype}
 \usepackage{amsmath}
 \usepackage{blindtext}
+\usepackage{fancyvrb}
 \let\blindtext\relax % TODO: Remove these.
 \let\Blindtext\relax
 \usepackage{hologo}
@@ -15,6 +16,7 @@
 \usepackage{doc}
 
 % Set up the style.
+\emergencystretch=1em
 \setcounter{secnumdepth}{4}
 \addtokomafont{title}{\sffamily}
 \addtokomafont{paragraph}{\spotcolor}
@@ -34,6 +36,10 @@
   \phantomsection\label{macro:#1}\textcolor{spot}{\cs{#1}}}
 \newcommand\m[1]{% A TeX macro reference
   \hyperref[macro:#1]{\textcolor{spot}{\cs{#1}}}}
+\newcommand\envmdef[1]{% A TeX macro definition
+  \phantomsection\label{environment:#1}\textcolor{spot}{\t`#1`}}
+\newcommand\envm[1]{% A LaTeX environment reference
+  \hyperref[environment:#1]{\textcolor{spot}{\t`#1`}}}
 \newcommand\luamdef[1]{% A Lua object / method definition
   \phantomsection\label{lua:#1}\textcolor{spot}{\t`#1`}}
 \newcommand\luam[1]{% A Lua object / method reference
@@ -67,10 +73,18 @@
 \usepackage{filecontents}
 \begin{filecontents}{markdown.bib}
   @book{luatex16,
-    author  = {{Lua\TeX{} development team}},
-    title   = {Lua\TeX{} reference manual (0.95.0)},
-    url     = {http://www.luatex.org/svn/trunk/manual/luatex.pdf},
-    urldate = {2016-05-12}}
+    author    = {{Lua\TeX{} development team}},
+    title     = {Lua\TeX{} reference manual (0.95.0)},
+    url       = {http://www.luatex.org/svn/trunk/manual/luatex.pdf},
+    urldate   = {2016-05-12}}
+  @book{latex16,
+    author    = {Braams, Johannes and Carlisle, David and Jeffrey, Alan and
+                 Lamport, Leslie and Mittelbach, Frank and Rowley, Chris and
+                 Schöpf, Rainer},
+    title     = {The \Hologo{LaTeX2e} Sources},
+    date      = {2016-03-31},
+    url       = {http://mirrors.ctan.org/macros/latex/base/source2e.pdf},
+    urldate   = {2016-06-02}}
   @book{ierusalimschy13,
     author    = {Ierusalimschy, Roberto},
     year      = {2013},
@@ -149,7 +163,7 @@ if not modules then modules = { } end modules ['markdown-lunamark'] = {
 % ensure that you have thoroughly studied this manual. If you do not want to
 % report a bug or request a feature but are simply in need of assistance, you
 % might want to consider posting your question on the \TeX-\LaTeX{} Stack
-% Exchange\footnote{\url{http://tex.stackexchange.com}}.
+% Exchange\footnote{\url{https://tex.stackexchange.com}}.
 %
 % \subsection{Acknowledgements}
 % I would like to thank the Faculty of Informatics at the Masaryk University in
@@ -158,15 +172,16 @@ if not modules then modules = { } end modules ['markdown-lunamark'] = {
 % module, John Macfarlane, for releasing Lunamark under a permissive license
 % that enabled its inclusion into the package.
 %
-% The plain \TeX, \LaTeX, and \Hologo{ConTeXt} code draws inspiration from
-% several sources including the source code of \Hologo{LaTeX2e}, the
-% \pkg{minted} package by Geoffrey M. Poore -- which likewise tackles the issue
-% of interfacing with an external interpreter from \TeX, and others.
+% The \TeX{} part of the package draws inspiration from several sources
+% including the source code of \Hologo{LaTeX2e}, the \pkg{minted} package by
+% Geoffrey M. Poore -- which likewise tackles the issue of interfacing with an
+% external interpreter from \TeX, the \pkg{filecontents} package by Scott
+% Pakin, and others.
 %
 % \subsection{Prerequisites}
 % This section gives an overview of all resources required by the package.
 %
-% \subsubsection{Lua prerequisites}
+% \subsubsection{Lua Prerequisites}\label{sec:luaprerequisites}
 % The Lua part of the package requires the following Lua modules:
 % \begin{description}
 %   \item[\pkg{LPeg}] A pattern-matching library for the writing of recursive
@@ -195,7 +210,7 @@ local md5 = require("md5")
 %</lua>
 %<*tex>
 % \fi
-% \subsubsection{Plain \TeX{} prerequisites}
+% \subsubsection{Plain \TeX{} Prerequisites}\label{sec:texprerequisites}
 % The plain \TeX{} part of the package requires the following Lua module:
 % \begin{description}
 %   \item[\pkg{Lua File System}] A library that provides access to the
@@ -212,20 +227,45 @@ local md5 = require("md5")
 % The \pkg{Lua File System} module is statically linked into the Lua\TeX{}
 % engine (see \cite[Section~3.3]{luatex16}).
 %
-% The \TeX{} part of the package also requires that the plain format is loaded
-% and that either the Lua\TeX{} \m{directlua} primitive or the \hologo{pdfTeX}
-% shell access file stream 18 is available for the definition of the
-% \m{markdownLuaExecute} macro.
+% The plain \TeX{} part of the package also requires that the plain \TeX{}
+% format (or its superset) is loaded and that either the Lua\TeX{}
+% \m{directlua} primitive or the shell access file stream 18 is available.
 %
 % \iffalse
 %</tex>
 %<*latex>
 % \fi
-% \subsubsection{\LaTeX{} prerequisites}
-% The \LaTeX{} part of the package requires the \Hologo{LaTeX2e} format.
+% \subsubsection{\LaTeX{} Prerequisites}\label{sec:latexprerequisites}
+% The \LaTeX{} part of the package requires the \Hologo{LaTeX2e} format and
+% also, since it uses the plain \TeX{} implementation, all the plain \TeX{}
+% prerequisites (see Section \ref{sec:texprerequisites}).
 %  \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}
 %    \end{macrocode}
+%
+% The following \Hologo{LaTeX2e} packages are also required:
+% \begin{description}
+%   \item[\pkg{keyval}] A package that enables the creation of parameter sets.
+%     This package is used to provide the \m{markdownSetup} macro, the package
+%     options processing, as well as the parameters of the \envm{markdown*} and
+%     \envm{markdownDocument*} environments.
+%   \item[\pkg{url}] A package that provides the \m{url} macro for the
+%     typesetting of \acro{url}s. It is used to provide the default token renderer
+%     prototype (see Section \ref{sec:texrendererprototypes}) for links.
+%   \item[\pkg{graphicx}] A package that provides the \m{includegraphics} macro for
+%     the typesetting of images. It is used to provide the corresponding
+%     default token renderer prototype (see Section
+%     \ref{sec:texrendererprototypes}).
+%   \item[\pkg{paralist}] A package that provides the \envm{compactitem},
+%     \envm{compactenum}, and \envm{compactdesc} macros for the
+%     typesetting of tight bullet lists, ordered lists, and definition lists.
+%     It is used to provide the corresponding default token renderer prototypes
+%     (see Section \ref{sec:texrendererprototypes}).
+%   \item[\pkg{fancyvrb}] A package that provides the \m{VerbatimInput} macros
+%     for the verbatim inclusion of files containing code.  It is used to
+%     provide the corresponding default token renderer prototype (see Section
+%     \ref{sec:texrendererprototypes}).
+% \end{description}
 %
 % \iffalse
 %</latex>
@@ -262,12 +302,12 @@ local M = {}
 %
 % \subsubsection{Conversion from Markdown to Plain \TeX{}}
 % \label{sec:luaconversion}
-% The Lua interface exposes the \luamdef{new}\t`(options)` method.
+% The Lua interface exposes the \luamdef{new}\t`(\meta{options}`\t`)` method.
 % This method creates converter functions that perform the conversion from
-% markdown to plain \TeX{} according to the Lua options \t`options` (see
-% Section \ref{sec:luaoptions}). The \t`options` parameter is optional; when
-% unspecified, the behaviour will be the same as if \t`options` were an empty
-% table.
+% markdown to plain \TeX{} according to the table \t`options` that contains Lua
+% options (see Section \ref{sec:luaoptions}). The \t`options` parameter is
+% optional; when unspecified, the behaviour will be the same as if \t`options`
+% were an empty table.
 %  \begin{macrocode}
 M.new = {}
 %    \end{macrocode}
@@ -282,7 +322,7 @@ M.new = {}
 %
 % \subsubsection{Options}\label{sec:luaoptions}
 % The Lua interface recognizes the following options. When unspecified, the
-% options are taken from the \luamdef{defaultOptions} table.
+% value of a key is taken from the \luamdef{defaultOptions} table.
 %  \begin{macrocode}
 local defaultOptions = {}
 %    \end{macrocode}
@@ -311,6 +351,12 @@ defaultOptions.blankBeforeHeading = false
 %
 %   \Valitem[.]{cacheDir}{directory}
 %     The path to the directory containing auxiliary cache files.
+% 
+%     When iteratively writing and typesetting a markdown document, the cache
+%     files are going to accumulate over time. You are advised to clean the
+%     cache directory every now and then, or to set it to a temporary filesystem
+%     (such as \t`/tmp` on \acro{un*x} systems), which gets periodically
+%     emptied.
 %  \begin{macrocode}
 defaultOptions.cacheDir = "."
 %    \end{macrocode}
@@ -336,7 +382,7 @@ defaultOptions.cacheDir = "."
 defaultOptions.definitionLists = false
 %    \end{macrocode}
 % 
-%   \Optitem[false]{hashEnumerator}{\opt{true}, \opt{false}}
+%   \Optitem[false]{hashEnumerators}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the use of hash symbols (\t`\#`) as ordered item
 %         list markers.
@@ -344,7 +390,7 @@ defaultOptions.definitionLists = false
 %         list markers.
 %     \end{valuelist}
 %  \begin{macrocode}
-defaultOptions.hashEnumerator = false
+defaultOptions.hashEnumerators = false
 %    \end{macrocode}
 %
 %   \Optitem[false]{hybrid}{\opt{true}, \opt{false}}
@@ -365,7 +411,7 @@ defaultOptions.hashEnumerator = false
 defaultOptions.hybrid = false
 %    \end{macrocode}
 %
-%   \Optitem[false]{notes}{\opt{true}, \opt{false}}
+%   \Optitem[false]{footnotes}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the pandoc footnote syntax extension:
 %         \begin{verbatim}
@@ -389,7 +435,7 @@ defaultOptions.hybrid = false
 %       \item[false] Disable the pandoc footnote syntax extension.
 %     \end{valuelist}
 %  \begin{macrocode}
-defaultOptions.notes = false
+defaultOptions.footnotes = false
 %    \end{macrocode}
 %
 %   \Optitem[false]{preserveTabs}{\opt{true}, \opt{false}}
@@ -414,7 +460,7 @@ defaultOptions.smartEllipses = false
 %   \Optitem[true]{startNumber}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Make the number in the first item in ordered lists
-%         significant. The number of each item will be passed to the
+%         significant. The item numbers will be passed to the
 %         \m{markdownRendererOlItemWithNumber} \TeX{} macro.
 %       \item[false] Ignore the number in the items of ordered lists. Each
 %         item will only produce a \m{markdownRendererOlItem} \TeX{} macro.
@@ -443,29 +489,32 @@ defaultOptions.verbatim = true
 %</lua>
 %<*tex>
 % \fi\subsection{Plain \TeX{} Interface}\label{sec:texinterface}
-% The plain \TeX{} interface provides macros for the conversion from markdown
-% to plain \TeX{} from within \TeX{} with the Lua options (see Section
-% \ref{sec:luaoptions}) and the way markdown tokens are rendered exposed as
-% \TeX{} macros.
+% The plain \TeX{} interface provides macros for the typesetting of markdown input
+% from within plain \TeX{}, for setting the Lua interface options (see Section
+% \ref{sec:luaoptions}) used during the conversion from markdown to plain
+% \TeX{}, and for changing the way markdown the tokens are rendered.
 %
-% The plain \TeX{} interface is implemented by the \t`markdown.tex` file. It is
-% expected that at least some of the basic characters that make up the syntax
-% of plain \TeX{} (\t`\textbackslash\{\}\#\%\textvisiblespace`) have the
-% expected category codes, when \m{input}ting the file.
+% The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
+% can be loaded as follows:
+% \begin{verbatim}
+% \input markdown\end{verbatim}
+% It is expected that the special plain \TeX{} characters have the expected
+% category codes, when \m{input}ting the file.
 %
-% \subsubsection{Conversion from Markdown to Plain \TeX{}}
+% \subsubsection{Typesetting Markdown}\label{sec:textypesetting}
 % The interface exposes the \mdef{markdownBegin}, \mdef{markdownEnd}, and
 % \mdef{markdownInput} macros.
 %
 % The \m{markdownBegin} macro marks the beginning of a markdown document
-% fragment and the \m{markdownEnd} macro marks its end. You may prepend
-% your own code to the \m{markdownBegin} macro and redefine the
-% \m{markdownEnd} macro to produce special effects before and after the
-% markdown block.
+% fragment and the \m{markdownEnd} macro marks its end.
 %  \begin{macrocode}
 \let\markdownBegin\relax
 \let\markdownEnd\relax
 %    \end{macrocode}
+% You may prepend your own code to the \m{markdownBegin} macro and redefine the
+% \m{markdownEnd} macro to produce special effects before and after the
+% markdown block.
+%
 % There are several limitations to the macros you need to be aware of.
 % The first limitation concerns the \m{markdownEnd} macro, which must be
 % visible directly from the input line buffer (it may not be produced as a
@@ -494,6 +543,15 @@ defaultOptions.verbatim = true
 % Note that you may also not nest the \m{markdownBegin} and \m{markdownEnd}
 % macros.
 %
+% The following example plain \TeX{} code showcases the usage of the
+% \m{markdownBegin} and \m{markdownEnd} macros:
+% \begin{verbatim}
+% \input markdown
+% \markdownBegin
+% _Hello_ **world** ...
+% \markdownEnd
+% \bye\end{verbatim}
+%
 % The \m{markdownInput} macro accepts a single parameter containing the
 % filename of a markdown document and expands to the result of the conversion
 % of the input markdown document to plain \TeX{}.
@@ -503,17 +561,11 @@ defaultOptions.verbatim = true
 % This macro is not subject to the abovelisted limitations of the
 % \m{markdownBegin} and \m{markdownEnd} macros.
 %
-% The following example \TeX{} code produces a document containing the result
-% of the conversion of the markdown string \t`_Hello world!_` two times,
-% supposing that the \t`hello.md` file contains the \t`_Hello world!_`
-% string.
+% The following example plain \TeX{} code showcases the usage of the
+% \m{markdownInput} macro:
 % \begin{verbatim}
 % \input markdown
-% \markdownBegin
-%   _Hello world!_
-% \markdownEnd
-% \markdownInput{hello.md}
-% \bye\end{verbatim}
+% \markdownInput{hello.md}\bye\end{verbatim}
 %
 % \subsubsection{Options}\label{sec:texoptions}
 % The plain \TeX{} options are represented by \TeX{} macros. Some of them map
@@ -563,7 +615,7 @@ defaultOptions.verbatim = true
 \def\markdownOptionCacheDir{_markdown-\jobname}%
 %    \end{macrocode}
 %
-% \paragraph{Lua Wrappers}
+% \paragraph{Lua Interface Options}
 % The following macros map directly to the options recognized by the Lua
 % interface (see Section \ref{sec:luaoptions}) and are not processed by the
 % plain \TeX{} implementation, only passed along to Lua. They are undefined, which
@@ -574,7 +626,7 @@ defaultOptions.verbatim = true
 \let\markdownOptionDefinitionLists\undefined
 \let\markdownOptionHashEnumerator\undefined
 \let\markdownOptionHybrid\undefined
-\let\markdownOptionNotes\undefined
+\let\markdownOptionFootnotes\undefined
 \let\markdownOptionPreserveTabs\undefined
 \let\markdownOptionSmartEllipses\undefined
 \let\markdownOptionStartNumber\undefined
@@ -587,7 +639,7 @@ defaultOptions.verbatim = true
 % \ref{sec:luaconversion}) and represent the parsed markdown tokens. These
 % macros are intended to be redefined by the user who is typesetting a
 % document. By default, they point to the corresponding prototypes (see Section
-% \ref{sec:texrenderersprototypes}).
+% \ref{sec:texrendererprototypes}).
 %
 % \paragraph{Line Break Renderer}
 % The \mdef{markdownRendererLineBreak} macro represents a forced line break.
@@ -880,58 +932,68 @@ defaultOptions.verbatim = true
 %
 % \paragraph{Footnote Renderer}
 % The \mdef{markdownRendererFootnote} macro represents a footnote. This macro
-% will only be produced, when the \Opt{notes} option is \t`true`.  The macro
-% receives a single argument that corresponds to the footnote text.
+% will only be produced, when the \Opt{footnotes} option is \t`true`.  The
+% macro receives a single argument that corresponds to the footnote text.
 %  \begin{macrocode}
 \def\markdownRendererFootnote{%
   \markdownRendererFootnotePrototype}%
 %    \end{macrocode}
 %
-% \subsubsection{Token Renderer Prototypes}\label{sec:texrenderersprototypes}
+% \subsubsection{Token Renderer Prototypes}\label{sec:texrendererprototypes}
 % The following \TeX{} macros provide definitions for the token renderers (see
 % Section \ref{sec:texrenderersuser}) that have not been redefined by the
 % user. These macros are intended to be redefined by macro package authors
 % who wish to provide sensible default token renderers. They are also redefined
 % by the \LaTeX{} and \Hologo{ConTeXt} implementations (see sections
 % \ref{sec:lateximplementation} and \ref{sec:contextimplementation}).
-%
 %  \begin{macrocode}
-\def\markdownRendererLineBreakPrototype{\hfil\break}%
-\let\markdownRendererEllipsisPrototype\dots
-\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
-\def\markdownRendererLinkPrototype#1#2#3{#1}%
-\def\markdownRendererImagePrototype#1#2#3{#1}%
-\def\markdownRendererUlBeginPrototype{}%
-\def\markdownRendererUlBeginTightPrototype{}%
-\def\markdownRendererUlItemPrototype{}%
-\def\markdownRendererUlEndPrototype{}%
-\def\markdownRendererUlEndTightPrototype{}%
-\def\markdownRendererOlBeginPrototype{}%
-\def\markdownRendererOlBeginTightPrototype{}%
-\def\markdownRendererOlItemPrototype{}%
-\def\markdownRendererOlItemWithNumberPrototype#1{}%
-\def\markdownRendererOlEndPrototype{}%
-\def\markdownRendererOlEndTightPrototype{}%
-\def\markdownRendererDlBeginPrototype{}%
-\def\markdownRendererDlBeginTightPrototype{}%
-\def\markdownRendererDlItemPrototype#1{#1}%
-\def\markdownRendererDlEndPrototype{}%
-\def\markdownRendererDlEndTightPrototype{}%
-\def\markdownRendererEmphasisPrototype#1{{\it#1}}%
-\def\markdownRendererStrongEmphasisPrototype#1{{\it#1}}%
-\def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}%
-\def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}%
-\def\markdownRendererCodeBlockBeginPrototype{\par\begingroup\tt}%
-\def\markdownRendererCodeBlockEndPrototype{\endgroup\par}%
-\def\markdownRendererInputVerbatimPrototype#1{\par{\tt\input{#1}}\par}%
-\def\markdownRendererHeadingOnePrototype#1{#1}%
-\def\markdownRendererHeadingTwoPrototype#1{#1}%
-\def\markdownRendererHeadingThreePrototype#1{#1}%
-\def\markdownRendererHeadingFourPrototype#1{#1}%
-\def\markdownRendererHeadingFivePrototype#1{#1}%
-\def\markdownRendererHeadingSixPrototype#1{#1}%
-\def\markdownRendererHorizontalRulePrototype{}%
-\def\markdownRendererFootnotePrototype#1{#1}%
+\def\markdownRendererLineBreakPrototype{}
+\def\markdownRendererEllipsisPrototype{}
+\def\markdownRendererCodeSpanPrototype#1{}
+\def\markdownRendererLinkPrototype#1#2#3{}
+\def\markdownRendererImagePrototype#1#2#3{}
+\def\markdownRendererUlBeginPrototype{}
+\def\markdownRendererUlBeginTightPrototype{}
+\def\markdownRendererUlItemPrototype{}
+\def\markdownRendererUlEndPrototype{}
+\def\markdownRendererUlEndTightPrototype{}
+\def\markdownRendererOlBeginPrototype{}
+\def\markdownRendererOlBeginTightPrototype{}
+\def\markdownRendererOlItemPrototype{}
+\def\markdownRendererOlItemWithNumberPrototype#1{}
+\def\markdownRendererOlEndPrototype{}
+\def\markdownRendererOlEndTightPrototype{}
+\def\markdownRendererDlBeginPrototype{}
+\def\markdownRendererDlBeginTightPrototype{}
+\def\markdownRendererDlItemPrototype#1{}
+\def\markdownRendererDlEndPrototype{}
+\def\markdownRendererDlEndTightPrototype{}
+\def\markdownRendererEmphasisPrototype#1{}
+\def\markdownRendererStrongEmphasisPrototype#1{}
+\def\markdownRendererBlockQuoteBeginPrototype{}
+\def\markdownRendererBlockQuoteEndPrototype{}
+\def\markdownRendererCodeBlockBeginPrototype{}
+\def\markdownRendererCodeBlockEndPrototype{}
+\def\markdownRendererInputVerbatimPrototype#1{}
+\def\markdownRendererHeadingOnePrototype#1{}
+\def\markdownRendererHeadingTwoPrototype#1{}
+\def\markdownRendererHeadingThreePrototype#1{}
+\def\markdownRendererHeadingFourPrototype#1{}
+\def\markdownRendererHeadingFivePrototype#1{}
+\def\markdownRendererHeadingSixPrototype#1{}
+\def\markdownRendererHorizontalRulePrototype{}
+\def\markdownRendererFootnotePrototype#1{}
+%    \end{macrocode}
+%
+% \subsubsection{Logging Facilities}\label{sec:texinterfacelogging}
+%  \begin{macrocode}
+\def\markdownInfo#1{%
+  \message{(l.\the\inputlineno) markdown.tex info: #1.}}%
+\def\markdownWarning#1{%
+  \message{(l.\the\inputlineno) markdown.tex warning: #1}}%
+\def\markdownError#1#2{%
+  \errhelp{#2.}%
+  \errmessage{(l.\the\inputlineno) markdown.tex error: #1}}%
 %    \end{macrocode}
 %
 % \subsubsection{Miscellanea}
@@ -983,9 +1045,339 @@ defaultOptions.verbatim = true
 %</tex>
 %<*latex>
 % \fi\subsection{\LaTeX{} Interface}\label{sec:latexinterface}
+% The \LaTeX{} interface provides \LaTeX{} environments for the typesetting of
+% markdown input from within \LaTeX{}, facilities for setting the Lua interface
+% options (see Section \ref{sec:luaoptions}) used during the conversion from
+% markdown to plain \TeX{}, and facilities for changing the way markdown tokens
+% are rendered.
 %  \begin{macrocode}
-\ProvidesPackage{markdown}[2016/06/01]
+\ProvidesPackage{markdown}[2016/06/02]
 %    \end{macrocode}
+%
+% The plain \TeX{} interface is implemented by the \t`markdown.sty` file, which
+% can be loaded from the \LaTeX{} document preamble as follows:
+% \begin{Verbatim}[commandchars=\\\{\}, gobble=2]
+% \textbackslash{}usepackage[\textrm{\meta{options}}]\{markdown\}
+% \end{Verbatim}
+% where \meta{options} are the \LaTeX{} interface options (see Section
+% \ref{sec:latexoptions}).
+%
+% \subsubsection{Typesetting Markdown}
+% The interface exposes the \envmdef{markdownDocument},
+% \envmdef{markdownDocument*}, \envmdef{markdown}, and \envmdef{markdown*}
+% \LaTeX{} environments.
+%
+% The \envm{markdownDocument} and \envm{markdownDocument*} \LaTeX{}
+% environments are used to typeset an entire markdown document. These
+% envirnoments act as a replacement for the standard \LaTeX{} \envm{document}
+% environment. The starred version of the \envm{markdownDocument} environment
+% accepts a list of \LaTeX{} interface options (see Section
+% \ref{sec:latexoptions}) as its only argument. These options will influence
+% the entire document.
+%  \begin{macrocode}
+\newenvironment{markdownDocument}\relax\relax
+\newenvironment{markdownDocument*}[1]\relax\relax
+%    \end{macrocode}
+% You may prepend your own code to the \m{markdownDocument} macro and append
+% your own code to the \m{endmarkdownDocument} macro to produce special effects
+% before and after the \envm{markdownDocument} \LaTeX{} environment (and
+% likewise for the starred version).
+%
+% The \envm{markdownDocument} and \envm{markdownDocument*} \LaTeX{} environments
+% are subject to the same limitations as the \m{markdownBegin} and
+% \m{markdownEnd} plain \TeX{} macros.
+%
+% The following example \LaTeX{} code showcases the usage of the
+% \envm{markdownDocument} and \envm{markdownDocument*} environments:
+% \begin{verbatim}
+% \documentclass{article}            \documentclass{article}
+% \usepackage{markdown}              \usepackage{markdown}
+% \begin{markdownDocument}           \begin{markdownDocument*}{smartEllipses}
+% _Hello_ **world** ...              _Hello_ **world** ...
+% \end{markdownDocument}             \end{markdownDocument*}\end{verbatim}
+%
+% The \envm{markdown} and \envm{markdown*} \LaTeX{}
+% environments are used to typeset markdown document fragments. The starred
+% version of the \envm{markdown} environment accepts a list of \LaTeX{}
+% interface options (see Section \ref{sec:latexoptions}) as its only argument.
+% These options will only influnce this markdown document fragment.
+%  \begin{macrocode}
+\newenvironment{markdown}\relax\relax
+\newenvironment{markdown*}[1]\relax\relax
+%    \end{macrocode}
+% You may prepend your own code to the \m{markdown} macro and append your own
+% code to the \m{endmarkdown} macro to produce special effects before and after
+% the \envm{markdown} \LaTeX{} environment (and likewise for the starred
+% version).
+%
+% The \envm{markdown} and \envm{markdown*} \LaTeX{} environments are subject to
+% the same limitations as the \m{markdownBegin} and \m{markdownEnd} plain
+% \TeX{} macros.
+%
+% The following example \LaTeX{} code showcases the usage of the
+% \envm{markdown} and \envm{markdown*} environments:
+% \begin{verbatim}
+% \documentclass{article}            \documentclass{article}
+% \usepackage{markdown}              \usepackage{markdown}
+% \begin{document}                   \begin{document}
+% % ...                              % ...
+% \begin{markdown}                   \begin{markdown*}{smartEllipses}
+% _Hello_ **world** ...              _Hello_ **world** ...
+% \end{markdown}                     \end{markdown*}
+% % ...                              % ...
+% \end{document}                     \end{document}\end{verbatim}
+%
+% \subsubsection{Options}\label{sec:latexoptions}
+% The \LaTeX{} options are represented by a comma-delimited list of
+% \meta{\meta{key}=\meta{value}} pairs. For boolean options, the
+% \meta{=\meta{value}} part is optional, and \meta{\meta{key}} will be
+% interpreted as \meta{\meta{key}=true}.
+
+% The \LaTeX{} options map directly to the options recognized by the plain
+% \TeX{} interface (see Section \ref{sec:texoptions}) and to the markdown token
+% renderers and their prototypes recognized by the plain \TeX{} interface (see
+% Sections \ref{sec:texrenderersuser} and \ref{sec:texrendererprototypes}).
+%
+% The \LaTeX{} options may be specified when loading the \LaTeX{} package (see
+% Section \ref{sec:latexinterface}), when using the \envm{markdownDocument*} and
+% \envm{markdown*} \LaTeX{} environments, or via the \mdef{markdownSetup} macro.
+% The \m{markdownSetup} macro receives the options to set up as its only
+% argument.
+%  \begin{macrocode}
+\newcommand\markdownSetup[1]{%
+  \setkeys{markdownOptions}{#1}}%
+%    \end{macrocode}
+%
+% \paragraph{Plain \TeX{} Interface Options}
+% The following options map directly to the option macros exposed by the plain
+% \TeX{} interface (see Section \ref{sec:texoptions}).
+%  \begin{macrocode}
+\RequirePackage{keyval}
+\define@key{markdownOptions}{helperScriptFileName}{%
+  \def\markdownOptionHelperScriptFileName{#1}}%
+\define@key{markdownOptions}{inputTempFileName}{%
+  \def\markdownOptionInputTempFileName{#1}}%
+\define@key{markdownOptions}{outputTempFileName}{%
+  \def\markdownOptionOutputTempFileName{#1}}%
+\define@key{markdownOptions}{blankBeforeBlockquote}[true]{%
+  \def\markdownOptionBlankBeforeBlockquote{#1}}%
+\define@key{markdownOptions}{blankBeforeHeading}[true]{%
+  \def\markdownOptionBlankBeforeHeading{#1}}%
+\define@key{markdownOptions}{cacheDir}{%
+  \def\markdownOptionCacheDir{#1}}%
+\define@key{markdownOptions}{definitionLists}[true]{%
+  \def\markdownOptionDefinitionLists{#1}}%
+\define@key{markdownOptions}{hashEnumerators}[true]{%
+  \def\markdownOptionHashEnumerators{#1}}%
+\define@key{markdownOptions}{hybrid}[true]{%
+  \def\markdownOptionHybrid{#1}}%
+\define@key{markdownOptions}{footnotes}[true]{%
+  \def\markdownOptionFootnotes{#1}}%
+\define@key{markdownOptions}{preserveTabs}[true]{%
+  \def\markdownOptionPreserveTabs{#1}}%
+\define@key{markdownOptions}{smartEllipses}[true]{%
+  \def\markdownOptionSmartEllipses{#1}}%
+\define@key{markdownOptions}{startNumber}[true]{%
+  \def\markdownOptionStartNumber{#1}}%
+\define@key{markdownOptions}{verbatim}[true]{%
+  \def\markdownOptionVerbatim{#1}}%
+%    \end{macrocode}
+%
+% The following example \LaTeX{} code showcases a possible configuration of
+% plain \TeX{} interface options \m{markdownOptionHybrid},
+% \m{markdownOptionSmartEllipses}, and \m{mardownOptionsCacheDir}.
+% \begin{verbatim}
+% \markdownSetup{
+%   hybrid,
+%   smartEllipses,
+%   cacheDir=/tmp,
+% }\end{verbatim}
+%
+% \paragraph{Plain \TeX{} Markdown Token Renderers}
+% The \LaTeX{} interface recognizes and option with the \t`renderers` key,
+% whose value must be a list of options that map directly to the markdown token
+% renderer macros exposed by the plain \TeX{} interface (see Section
+% \ref{sec:texrenderersuser}).
+%  \begin{macrocode}
+\define@key{markdownOptions}{renderers}{%
+  \setkeys{markdownRenderers}{#1}}%
+\define@key{markdownRenderers}{lineBreak}{%
+  \renewcommand\markdownRendererLineBreak{#1}}%
+\define@key{markdownRenderers}{ellipsis}{%
+  \renewcommand\markdownRendererEllipsis{#1}}%
+\define@key{markdownRenderers}{codeSpan}{%
+  \renewcommand\markdownRendererCodeSpan[1]{#1}}%
+\define@key{markdownRenderers}{link}{%
+  \renewcommand\markdownRendererLink[3]{#1}}%
+\define@key{markdownRenderers}{image}{%
+  \renewcommand\markdownRendererImage[3]{#1}}%
+\define@key{markdownRenderers}{ulBegin}{%
+  \renewcommand\markdownRendererUlBegin{#1}}%
+\define@key{markdownRenderers}{ulBeginTight}{%
+  \renewcommand\markdownRendererUlBeginTight{#1}}%
+\define@key{markdownRenderers}{ulItem}{%
+  \renewcommand\markdownRendererUlItem{#1}}%
+\define@key{markdownRenderers}{ulEnd}{%
+  \renewcommand\markdownRendererUlEnd{#1}}%
+\define@key{markdownRenderers}{ulEndTight}{%
+  \renewcommand\markdownRendererUlEndTight{#1}}%
+\define@key{markdownRenderers}{olBegin}{%
+  \renewcommand\markdownRendererOlBegin{#1}}%
+\define@key{markdownRenderers}{olBeginTight}{%
+  \renewcommand\markdownRendererOlBeginTight{#1}}%
+\define@key{markdownRenderers}{olItem}{%
+  \renewcommand\markdownRendererOlItem{#1}}%
+\define@key{markdownRenderers}{olItemWithNumber}{%
+  \renewcommand\markdownRendererOlItemWithNumber[1]{#1}}%
+\define@key{markdownRenderers}{olEnd}{%
+  \renewcommand\markdownRendererOlEnd{#1}}%
+\define@key{markdownRenderers}{olEndTight}{%
+  \renewcommand\markdownRendererOlEndTight{#1}}%
+\define@key{markdownRenderers}{dlBegin}{%
+  \renewcommand\markdownRendererDlBegin{#1}}%
+\define@key{markdownRenderers}{dlBeginTight}{%
+  \renewcommand\markdownRendererDlBeginTight{#1}}%
+\define@key{markdownRenderers}{dlItem}{%
+  \renewcommand\markdownRendererDlItem[1]{#1}}%
+\define@key{markdownRenderers}{dlEnd}{%
+  \renewcommand\markdownRendererDlEnd{#1}}%
+\define@key{markdownRenderers}{dlEndTight}{%
+  \renewcommand\markdownRendererDlEndTight{#1}}%
+\define@key{markdownRenderers}{emphasis}{%
+  \renewcommand\markdownRendererEmphasis[1]{#1}}%
+\define@key{markdownRenderers}{strongEmphasis}{%
+  \renewcommand\markdownRendererStrongEmphasis[1]{#1}}%
+\define@key{markdownRenderers}{blockQuoteBegin}{%
+  \renewcommand\markdownRendererBlockQuoteBegin{#1}}%
+\define@key{markdownRenderers}{blockQuoteEnd}{%
+  \renewcommand\markdownRendererBlockQuoteEnd{#1}}%
+\define@key{markdownRenderers}{codeBlockBegin}{%
+  \renewcommand\markdownRendererCodeBlockBegin{#1}}%
+\define@key{markdownRenderers}{codeBlockEnd}{%
+  \renewcommand\markdownRendererCodeBlockEnd{#1}}%
+\define@key{markdownRenderers}{inputVerbatim}{%
+  \renewcommand\markdownRendererInputVerbatim[1]{#1}}%
+\define@key{markdownRenderers}{headingOne}{%
+  \renewcommand\markdownRendererHeadingOne[1]{#1}}%
+\define@key{markdownRenderers}{headingTwo}{%
+  \renewcommand\markdownRendererHeadingTwo[1]{#1}}%
+\define@key{markdownRenderers}{headingThree}{%
+  \renewcommand\markdownRendererHeadingThree[1]{#1}}%
+\define@key{markdownRenderers}{headingFour}{%
+  \renewcommand\markdownRendererHeadingFour[1]{#1}}%
+\define@key{markdownRenderers}{headingFive}{%
+  \renewcommand\markdownRendererHeadingFive[1]{#1}}%
+\define@key{markdownRenderers}{headingSix}{%
+  \renewcommand\markdownRendererHeadingSix[1]{#1}}%
+\define@key{markdownRenderers}{horizontalRule}{%
+  \renewcommand\markdownRendererHorizontalRule{#1}}%
+\define@key{markdownRenderers}{footnote}{%
+  \renewcommand\markdownRendererFootnote[1]{#1}}%
+%    \end{macrocode}
+%
+% The following example \LaTeX{} code showcases a possible configuration of the
+% \m{markdownRendererLink} and \m{markdownRendererEmphasis} markdown token
+% renderers.
+% \begin{verbatim}
+% \markdownSetup{
+%   renderers = {
+%     link = {#3},                                            % Render links.
+%     emphasis = {\emph{#1}},                 % Render emphasized code spans.
+%   }
+% }\end{verbatim}
+%
+% \paragraph{Plain \TeX{} Markdown Token Renderer Prototypes}
+% The \LaTeX{} interface recognizes and option with the \t`rendererPrototypes`
+% key, whose value must be a list of options that map directly to the markdown
+% token renderer prototype macros exposed by the plain \TeX{} interface (see
+% Section \ref{sec:texrendererprototypes}).
+%  \begin{macrocode}
+\define@key{markdownOptions}{rendererPrototypes}{%
+  \setkeys{markdownRendererPrototypes}{#1}}%
+\define@key{markdownRendererPrototypes}{lineBreak}{%
+  \renewcommand\markdownRendererLineBreakPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ellipsis}{%
+  \renewcommand\markdownRendererEllipsisPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeSpan}{%
+  \renewcommand\markdownRendererCodeSpanPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{link}{%
+  \renewcommand\markdownRendererLink[3]{#1}}%
+\define@key{markdownRendererPrototypes}{image}{%
+  \renewcommand\markdownRendererImage[3]{#1}}%
+\define@key{markdownRendererPrototypes}{ulBegin}{%
+  \renewcommand\markdownRendererUlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulBeginTight}{%
+  \renewcommand\markdownRendererUlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulItem}{%
+  \renewcommand\markdownRendererUlItemPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulEnd}{%
+  \renewcommand\markdownRendererUlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulEndTight}{%
+  \renewcommand\markdownRendererUlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olBegin}{%
+  \renewcommand\markdownRendererOlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olBeginTight}{%
+  \renewcommand\markdownRendererOlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olItem}{%
+  \renewcommand\markdownRendererOlItemPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olItemWithNumber}{%
+  \renewcommand\markdownRendererOlItemWithNumberPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{olEnd}{%
+  \renewcommand\markdownRendererOlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{olEndTight}{%
+  \renewcommand\markdownRendererOlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlBegin}{%
+  \renewcommand\markdownRendererDlBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlBeginTight}{%
+  \renewcommand\markdownRendererDlBeginTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlItem}{%
+  \renewcommand\markdownRendererDlItemPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{dlEnd}{%
+  \renewcommand\markdownRendererDlEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlEndTight}{%
+  \renewcommand\markdownRendererDlEndTightPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{emphasis}{%
+  \renewcommand\markdownRendererEmphasisPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{strongEmphasis}{%
+  \renewcommand\markdownRendererStrongEmphasisPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{blockQuoteBegin}{%
+  \renewcommand\markdownRendererBlockQuoteBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{blockQuoteEnd}{%
+  \renewcommand\markdownRendererBlockQuoteEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeBlockBegin}{%
+  \renewcommand\markdownRendererCodeBlockBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{codeBlockEnd}{%
+  \renewcommand\markdownRendererCodeBlockEndPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{inputVerbatim}{%
+  \renewcommand\markdownRendererInputVerbatimPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingOne}{%
+  \renewcommand\markdownRendererHeadingOnePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingTwo}{%
+  \renewcommand\markdownRendererHeadingTwoPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingThree}{%
+  \renewcommand\markdownRendererHeadingThreePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingFour}{%
+  \renewcommand\markdownRendererHeadingFourPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingFive}{%
+  \renewcommand\markdownRendererHeadingFivePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{headingSix}{%
+  \renewcommand\markdownRendererHeadingSixPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{horizontalRule}{%
+  \renewcommand\markdownRendererHorizontalRulePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{footnote}{%
+  \renewcommand\markdownRendererFootnotePrototype[1]{#1}}%
+%    \end{macrocode}
+%
+% The following example \LaTeX{} code showcases a possible configuration of the
+% \m{markdownRendererImagePrototype} and \m{markdownRendererCodeSpanPrototype}
+% markdown token renderer prototypes.
+% \begin{verbatim}
+% \markdownSetup{
+%   renderers = {
+%     image = {\includegraphics[width=\paperwidth]{#2}},     % Render images.
+%     codeSpan = {\texttt{#1}},                   % Render inline code spans.
+%   }
+% }\end{verbatim}
 %
 % \iffalse
 %</latex>
@@ -1274,9 +1666,9 @@ M.writer = {}
 %    \end{macrocode}
 %
 % The \luamdef{writer.new} method creates and returns a new \TeX{} writer
-% object with the Lua options (see Section \ref{sec:luaoptions}) \t`options`.
-% When \t`options` are unspecified, it is assumed that an empty table was
-% passed to the method.
+% object with the Lua interface options (see Section \ref{sec:luaoptions})
+% \t`options`. When \t`options` are unspecified, it is assumed that an empty
+% table was passed to the method.
 %
 % The objects produced by the \luam{writer.new} method expose instance methods
 % and variables of their own. As a convention, I will refer to these
@@ -1331,7 +1723,7 @@ function M.writer.new(options)
 %
 % Define \luamdef{writer->ellipsis} as the output format of an ellipsis.
 %  \begin{macrocode}
-  self.ellipsis = "\\markdownRendererEllipsis "
+  self.ellipsis = "\\markdownRendererEllipsis{}"
 %    \end{macrocode}
 %
 % Define \luamdef{writer->hrule} as the output format of a horizontal rule.
@@ -1434,7 +1826,7 @@ function M.writer.new(options)
 %  \begin{macrocode}
   local function olitem(s,num)
     if num ~= nil then
-      return {"\\markdownRendererOlItemWithNumber{",num,"} ",s}
+      return {"\\markdownRendererOlItemWithNumber{",num,"}",s}
     else
       return {"\\markdownRendererOlItem ",s}
     end
@@ -1852,7 +2244,7 @@ function M.reader.new(writer, options)
 
   local NoteBlock
 
-  if options.notes then
+  if options.footnotes then
     NoteBlock = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
               / register_note
   else
@@ -2247,7 +2639,7 @@ function M.reader.new(writer, options)
     syntax.DefinitionList = fail
   end
 
-  if not options.notes then
+  if not options.footnotes then
     syntax.NoteRef = fail
   end
 
@@ -2316,17 +2708,56 @@ return M
 % the macros. Their first argument specifies the text of the info, warning, or
 % error message.
 %  \begin{macrocode}
-\def\markdownInfo#1{%
-  \message{(l.\the\inputlineno) markdown.tex info: #1.}}%
-\def\markdownWarning#1{%
-  \message{(l.\the\inputlineno) markdown.tex warning: #1}}%
+\def\markdownInfo#1{}%
+\def\markdownWarning#1{}%
 %    \end{macrocode}
 % The \m{markdownError} macro receives a second argument that provides a help
 % text suggesting a remedy to the error.
 %  \begin{macrocode}
-\def\markdownError#1#2{%
-  \errhelp{#2.}%
-  \errmessage{(l.\the\inputlineno) markdown.tex error: #1}}%
+\def\markdownError#1{}%
+%    \end{macrocode}
+% You may redefine these macros to redirect and process the info, warning, and
+% error messages.
+%
+% \subsubsection{Options}
+% The following definitions should be considered placeholder.
+%  \begin{macrocode}
+\def\markdownRendererLineBreakPrototype{\hfil\break}%
+\let\markdownRendererEllipsisPrototype\dots
+\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
+\def\markdownRendererLinkPrototype#1#2#3{#1}%
+\def\markdownRendererImagePrototype#1#2#3{#1}%
+\def\markdownRendererUlBeginPrototype{}%
+\def\markdownRendererUlBeginTightPrototype{}%
+\def\markdownRendererUlItemPrototype{}%
+\def\markdownRendererUlEndPrototype{}%
+\def\markdownRendererUlEndTightPrototype{}%
+\def\markdownRendererOlBeginPrototype{}%
+\def\markdownRendererOlBeginTightPrototype{}%
+\def\markdownRendererOlItemPrototype{}%
+\def\markdownRendererOlItemWithNumberPrototype#1{}%
+\def\markdownRendererOlEndPrototype{}%
+\def\markdownRendererOlEndTightPrototype{}%
+\def\markdownRendererDlBeginPrototype{}%
+\def\markdownRendererDlBeginTightPrototype{}%
+\def\markdownRendererDlItemPrototype#1{#1}%
+\def\markdownRendererDlEndPrototype{}%
+\def\markdownRendererDlEndTightPrototype{}%
+\def\markdownRendererEmphasisPrototype#1{{\it#1}}%
+\def\markdownRendererStrongEmphasisPrototype#1{{\it#1}}%
+\def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}%
+\def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}%
+\def\markdownRendererCodeBlockBeginPrototype{\par\begingroup\tt}%
+\def\markdownRendererCodeBlockEndPrototype{\endgroup\par}%
+\def\markdownRendererInputVerbatimPrototype#1{\par{\tt\input{#1}}\par}%
+\def\markdownRendererHeadingOnePrototype#1{#1}%
+\def\markdownRendererHeadingTwoPrototype#1{#1}%
+\def\markdownRendererHeadingThreePrototype#1{#1}%
+\def\markdownRendererHeadingFourPrototype#1{#1}%
+\def\markdownRendererHeadingFivePrototype#1{#1}%
+\def\markdownRendererHeadingSixPrototype#1{#1}%
+\def\markdownRendererHorizontalRulePrototype{}%
+\def\markdownRendererFootnotePrototype#1{#1}%
 %    \end{macrocode}
 %
 % \subsubsection{Lua Snippets}
@@ -2349,26 +2780,26 @@ return M
   \ifx\markdownOptionDefinitionLists\undefined\else
     definitionLists = \markdownOptionDefinitionLists,
   \fi
-  \ifx\markdownOptionHashEnumerator\undefined\else
-    hashEnumerator = \markdownOptionHashEnumerator,
+  \ifx\markdownOptionHashEnumerators\undefined\else
+    hashEnumerators = \markdownOptionHashEnumerators,
   \fi
   \ifx\markdownOptionHybrid\undefined\else
     hybrid = \markdownOptionHybrid,
   \fi
-  \ifx\markdownOptionNotes\undefined\else
-    notes = \markdownOptionNotes,
+  \ifx\markdownOptionFootnotes\undefined\else
+    footnotes = \markdownOptionFootnotes,
   \fi
-  \ifx\markdownPreserveTabs\undefined\else
-    preserveTabs = \markdownPreserveTabs,
+  \ifx\markdownOptionPreserveTabs\undefined\else
+    preserveTabs = \markdownOptionPreserveTabs,
   \fi
-  \ifx\markdownSmartEllipses\undefined\else
-    smartEllipses = \markdownSmartEllipses,
+  \ifx\markdownOptionSmartEllipses\undefined\else
+    smartEllipses = \markdownOptionSmartEllipses,
   \fi
-  \ifx\markdownStartNumber\undefined\else
-    startNumber = \markdownStartNumber,
+  \ifx\markdownOptionStartNumber\undefined\else
+    startNumber = \markdownOptionStartNumber,
   \fi
-  \ifx\markdownVerbatim\undefined\else
-    verbatim = \markdownVerbatim,
+  \ifx\markdownOptionVerbatim\undefined\else
+    verbatim = \markdownOptionVerbatim,
   \fi}
 }%
 %    \end{macrocode}
@@ -2535,8 +2966,8 @@ return M
 %  \begin{macrocode}
       |def|markdownReadAndConvertProcessLine##1#1##2#1##3|relax{%
 %    \end{macrocode}
-% When the ending token sequence does not appear in the line, store it in the
-% \m{markdownOptionInputTempFileName} file.
+% When the ending token sequence does not appear in the line, store the line in
+% the \m{markdownOptionInputTempFileName} file.
 %  \begin{macrocode}
         |ifx|relax##3|relax%
           |immediate|write|markdownLuaExecuteFileStream{##1}%
@@ -2551,6 +2982,7 @@ return M
 %  \begin{macrocode}
           |def^^M{%
             |markdownInfo{The ending token sequence was found}%
+            |immediate|write|markdownLuaExecuteFileStream{}%
             |immediate|closeout|markdownLuaExecuteFileStream%
             |endgroup%
             |markdownInput|markdownOptionInputTempFileName%
@@ -2666,7 +3098,7 @@ return M
 %  \begin{macrocode}
           if line:match(ending_sequence) then
             |markdownLuaUnregisterIBCallback{process_line}
-            local input = table.concat(buffer, "\n")
+            local input = table.concat(buffer, "\n") .. "\n\n"
             local output = convert(input)
             return [[\markdownInfo{The ending token sequence was found}]] ..
               output .. [[\markdownReadAndConvertAfter]]
@@ -2692,7 +3124,7 @@ return M
 \fi
 %    \end{macrocode}
 %
-% \subsubsection{Conversion from Markdown to Plain \TeX{}}
+% \subsubsection{Typesetting Markdown}
 % The \m{markdownInput} macro uses an implementation of the
 % \m{markdownLuaExecute} macro to convert the contents of the file whose
 % filename it has received as its single argument from markdown to plain
@@ -2710,232 +3142,43 @@ return M
 %</tex>
 %<*latex>
 % \fi\subsection{\LaTeX{} Implementation}\label{sec:lateximplementation}
-% \blindtext
-%
+% The \LaTeX{} implemenation makes use of the fact that, apart from some subtle
+% differences, \LaTeX{} implements the majority of the plain \TeX{} format
+% (see \cite[Section~9]{latex16}). As a consequence, we can directly reuse the
+% existing plain \TeX{} implementation.
 %  \begin{macrocode}
-\input markdown.tex
-
-\RequirePackage{keyval}
-\define@key{markdownOptions}{helperScriptFileName}{%
-  \def\markdownOptionHelperScriptFileName{#1}}%
-\define@key{markdownOptions}{inputTempFileName}{%
-  \def\markdownOptionInputTempFileName{#1}}%
-\define@key{markdownOptions}{outputTempFileName}{%
-  \def\markdownOptionOutputTempFileName{#1}}%
-\define@key{markdownOptions}{blankBeforeBlockquote}[true]{%
-  \def\markdownOptionBlankBeforeBlockquote{#1}}%
-\define@key{markdownOptions}{blankBeforeHeading}[true]{%
-  \def\markdownOptionBlankBeforeHeading{#1}}%
-\define@key{markdownOptions}{cacheDir}{%
-  \def\markdownOptionCacheDir{#1}}%
-\define@key{markdownOptions}{definitionLists}[true]{%
-  \def\markdownOptionDefinitionLists{#1}}%
-\define@key{markdownOptions}{hashEnumerator}[true]{%
-  \def\markdownOptionHashEnumerator{#1}}%
-\define@key{markdownOptions}{hybrid}[true]{%
-  \def\markdownOptionHybrid{#1}}%
-\define@key{markdownOptions}{notes}[true]{%
-  \def\markdownOptionNotes{#1}}%
-\define@key{markdownOptions}{preserveTabs}[true]{%
-  \def\markdownOptionPreserveTabs{#1}}%
-\define@key{markdownOptions}{smartEllipses}[true]{%
-  \def\markdownOptionSmartEllipses{#1}}%
-\define@key{markdownOptions}{startNumber}[true]{%
-  \def\markdownOptionStartNumber{#1}}%
-\define@key{markdownOptions}{verbatim}[true]{%
-  \def\markdownOptionVerbatim{#1}}%
-\define@key{markdownOptions}{renderers}{%
-  \setkeys{markdownRenderers}{#1}}%
-\define@key{markdownOptions}{rendererPrototypes}{%
-  \setkeys{markdownRendererPrototypes}{#1}}%
-
-\define@key{markdownRenderers}{lineBreak}{%
-  \renewcommand\markdownRendererLineBreak{#1}}%
-\define@key{markdownRenderers}{ellipsis}{%
-  \renewcommand\markdownRendererEllipsis{#1}}%
-\define@key{markdownRenderers}{codeSpan}{%
-  \renewcommand\markdownRendererCodeSpan[1]{#1}}%
-\define@key{markdownRenderers}{link}{%
-  \renewcommand\markdownRendererLink[3]{#1}}%
-\define@key{markdownRenderers}{image}{%
-  \renewcommand\markdownRendererImage[3]{#1}}%
-\define@key{markdownRenderers}{ulBegin}{%
-  \renewcommand\markdownRendererUlBegin{#1}}%
-\define@key{markdownRenderers}{ulBeginTight}{%
-  \renewcommand\markdownRendererUlBeginTight{#1}}%
-\define@key{markdownRenderers}{ulItem}{%
-  \renewcommand\markdownRendererUlItem{#1}}%
-\define@key{markdownRenderers}{ulEnd}{%
-  \renewcommand\markdownRendererUlEnd{#1}}%
-\define@key{markdownRenderers}{ulEndTight}{%
-  \renewcommand\markdownRendererUlEndTight{#1}}%
-\define@key{markdownRenderers}{olBegin}{%
-  \renewcommand\markdownRendererOlBegin{#1}}%
-\define@key{markdownRenderers}{olBeginTight}{%
-  \renewcommand\markdownRendererOlBeginTight{#1}}%
-\define@key{markdownRenderers}{olItem}{%
-  \renewcommand\markdownRendererOlItem{#1}}%
-\define@key{markdownRenderers}{olItemWithNumber}{%
-  \renewcommand\markdownRendererOlItemWithNumber[1]{#1}}%
-\define@key{markdownRenderers}{olEnd}{%
-  \renewcommand\markdownRendererOlEnd{#1}}%
-\define@key{markdownRenderers}{olEndTight}{%
-  \renewcommand\markdownRendererOlEndTight{#1}}%
-\define@key{markdownRenderers}{dlBegin}{%
-  \renewcommand\markdownRendererDlBegin{#1}}%
-\define@key{markdownRenderers}{dlBeginTight}{%
-  \renewcommand\markdownRendererDlBeginTight{#1}}%
-\define@key{markdownRenderers}{dlItem}{%
-  \renewcommand\markdownRendererDlItem[1]{#1}}%
-\define@key{markdownRenderers}{dlEnd}{%
-  \renewcommand\markdownRendererDlEnd{#1}}%
-\define@key{markdownRenderers}{dlEndTight}{%
-  \renewcommand\markdownRendererDlEndTight{#1}}%
-\define@key{markdownRenderers}{emphasis}{%
-  \renewcommand\markdownRendererEmphasis[1]{#1}}%
-\define@key{markdownRenderers}{strongEmphasis}{%
-  \renewcommand\markdownRendererStrongEmphasis[1]{#1}}%
-\define@key{markdownRenderers}{blockQuoteBegin}{%
-  \renewcommand\markdownRendererBlockQuoteBegin{#1}}%
-\define@key{markdownRenderers}{blockQuoteEnd}{%
-  \renewcommand\markdownRendererBlockQuoteEnd{#1}}%
-\define@key{markdownRenderers}{codeBlockBegin}{%
-  \renewcommand\markdownRendererCodeBlockBegin{#1}}%
-\define@key{markdownRenderers}{codeBlockEnd}{%
-  \renewcommand\markdownRendererCodeBlockEnd{#1}}%
-\define@key{markdownRenderers}{inputVerbatim}{%
-  \renewcommand\markdownRendererInputVerbatim[1]{#1}}%
-\define@key{markdownRenderers}{headingOne}{%
-  \renewcommand\markdownRendererHeadingOne[1]{#1}}%
-\define@key{markdownRenderers}{headingTwo}{%
-  \renewcommand\markdownRendererHeadingTwo[1]{#1}}%
-\define@key{markdownRenderers}{headingThree}{%
-  \renewcommand\markdownRendererHeadingThree[1]{#1}}%
-\define@key{markdownRenderers}{headingFour}{%
-  \renewcommand\markdownRendererHeadingFour[1]{#1}}%
-\define@key{markdownRenderers}{headingFive}{%
-  \renewcommand\markdownRendererHeadingFive[1]{#1}}%
-\define@key{markdownRenderers}{headingSix}{%
-  \renewcommand\markdownRendererHeadingSix[1]{#1}}%
-\define@key{markdownRenderers}{horizontalRule}{%
-  \renewcommand\markdownRendererHorizontalRule{#1}}%
-\define@key{markdownRenderers}{footnote}{%
-  \renewcommand\markdownRendererFootnote[1]{#1}}%
-
-\define@key{markdownRendererPrototypes}{lineBreak}{%
-  \renewcommand\markdownRendererLineBreakPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{ellipsis}{%
-  \renewcommand\markdownRendererEllipsisPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{codeSpan}{%
-  \renewcommand\markdownRendererCodeSpanPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{link}{%
-  \renewcommand\markdownRendererLink[3]{#1}}%
-\define@key{markdownRendererPrototypes}{image}{%
-  \renewcommand\markdownRendererImage[3]{#1}}%
-\define@key{markdownRendererPrototypes}{ulBegin}{%
-  \renewcommand\markdownRendererUlBeginPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{ulBeginTight}{%
-  \renewcommand\markdownRendererUlBeginTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{ulItem}{%
-  \renewcommand\markdownRendererUlItemPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{ulEnd}{%
-  \renewcommand\markdownRendererUlEndPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{ulEndTight}{%
-  \renewcommand\markdownRendererUlEndTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{olBegin}{%
-  \renewcommand\markdownRendererOlBeginPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{olBeginTight}{%
-  \renewcommand\markdownRendererOlBeginTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{olItem}{%
-  \renewcommand\markdownRendererOlItemPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{olItemWithNumber}{%
-  \renewcommand\markdownRendererOlItemWithNumberPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{olEnd}{%
-  \renewcommand\markdownRendererOlEndPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{olEndTight}{%
-  \renewcommand\markdownRendererOlEndTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{dlBegin}{%
-  \renewcommand\markdownRendererDlBeginPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{dlBeginTight}{%
-  \renewcommand\markdownRendererDlBeginTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{dlItem}{%
-  \renewcommand\markdownRendererDlItemPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{dlEnd}{%
-  \renewcommand\markdownRendererDlEndPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{dlEndTight}{%
-  \renewcommand\markdownRendererDlEndTightPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{emphasis}{%
-  \renewcommand\markdownRendererEmphasisPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{strongEmphasis}{%
-  \renewcommand\markdownRendererStrongEmphasisPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{blockQuoteBegin}{%
-  \renewcommand\markdownRendererBlockQuoteBeginPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{blockQuoteEnd}{%
-  \renewcommand\markdownRendererBlockQuoteEndPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{codeBlockBegin}{%
-  \renewcommand\markdownRendererCodeBlockBeginPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{codeBlockEnd}{%
-  \renewcommand\markdownRendererCodeBlockEndPrototype{#1}}%
-\define@key{markdownRendererPrototypes}{inputVerbatim}{%
-  \renewcommand\markdownRendererInputVerbatimPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingOne}{%
-  \renewcommand\markdownRendererHeadingOnePrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingTwo}{%
-  \renewcommand\markdownRendererHeadingTwoPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingThree}{%
-  \renewcommand\markdownRendererHeadingThreePrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingFour}{%
-  \renewcommand\markdownRendererHeadingFourPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingFive}{%
-  \renewcommand\markdownRendererHeadingFivePrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{headingSix}{%
-  \renewcommand\markdownRendererHeadingSixPrototype[1]{#1}}%
-\define@key{markdownRendererPrototypes}{horizontalRule}{%
-  \renewcommand\markdownRendererHorizontalRulePrototype{#1}}%
-\define@key{markdownRendererPrototypes}{footnote}{%
-  \renewcommand\markdownRendererFootnotePrototype[1]{#1}}%
-
-\newcommand\markdownSetup[1]{%
-  \setkeys{markdownOptions}{#1}}%
-
-\DeclareOption*{%
-  \expandafter\markdownSetup\expandafter{\CurrentOption}}%
-\ProcessOptions\relax
-
+\input markdown
+%    \end{macrocode}
+%
+% \subsubsection{Logging Facilities}
+% The \LaTeX{} implementation redefines the plain \TeX{} logging macros (see
+% Section \ref{sec:texinterfacelogging}) to use the \LaTeX{} \m{PackageInfo},
+% \m{PackageWarning}, and \m{PackageError} macros.
+%  \begin{macrocode}
 \renewcommand\markdownInfo[1]{\PackageInfo{markdown}{#1}}
 \renewcommand\markdownWarning[1]{\PackageWarning{markdown}{#1}}
 \renewcommand\markdownError[2]{\PackageError{markdown}{#1}{#2.}}
-
-\renewcommand\markdownLuaRegisterIBCallback[1]{%
-  luatexbase.add_to_callback("process_input_buffer", #1, %
-    "The markdown input processor")}
-\renewcommand\markdownLuaUnregisterIBCallback[1]{%
-  luatexbase.remove_from_callback("process_input_buffer",%
-    "The markdown input processor")}
- 
-\newenvironment{markdown}{%
-  \begingroup
-  \markdownReadAndConvert@markdown{}}\relax
-\newenvironment{markdown*}[1]{%
-  \begingroup
-  \markdownSetup{#1}%
-  \markdownReadAndConvert@markdown*}\relax
-\begingroup
-  \catcode`\|=0\catcode`\<=1\catcode`\>=2%
-  \catcode`\\=12|catcode`|{=12|catcode`|}=12%
-  |gdef|markdownReadAndConvert@markdown#1<%
-    |markdownReadAndConvert<\end{markdown#1}>%
-                           <|end<markdown#1>%
-                            |endgroup>>%
-|endgroup
-
-\newenvironment{markdownDocument}{%
+%    \end{macrocode}
+%
+% \subsubsection{Typesetting Markdown}
+% The \envm{markdownDocument}, \envm{markdownDocument*}, \env{markdown}, and
+% \env{markdown*} \LaTeX{} environments are implemented using the
+% \m{markdownReadAndConvert} macro.
+%  \begin{macrocode}
+\renewenvironment{markdownDocument}{%
   \begin{document}%
   \markdownReadAndConvert@markdownDocument{}}\relax
-\newenvironment{markdownDocument*}[1]{%
+\renewenvironment{markdownDocument*}[1]{%
   \begin{document}%
   \markdownSetup{#1}%
   \markdownReadAndConvert@markdownDocument*}\relax
+\renewenvironment{markdown}{%
+  \begingroup
+  \markdownReadAndConvert@markdown{}}\relax
+\renewenvironment{markdown*}[1]{%
+  \begingroup
+  \markdownSetup{#1}%
+  \markdownReadAndConvert@markdown*}\relax
 \begingroup
   \catcode`\|=0\catcode`\<=1\catcode`\>=2%
   \catcode`\\=12|catcode`|{=12|catcode`|}=12%
@@ -2943,8 +3186,113 @@ return M
     |markdownReadAndConvert<\end{markdownDocument#1}>%
                            <|end<markdownDocument#1>%
                             |end<document>>>%
+  |gdef|markdownReadAndConvert@markdown#1<%
+    |markdownReadAndConvert<\end{markdown#1}>%
+                           <|end<markdown#1>%
+                            |endgroup>>%
 |endgroup
+%    \end{macrocode}
+%
+% \subsubsection{Options}
+% The supplied package options are processed using the \m{markdownSetup} macro.
+%  \begin{macrocode}
+\DeclareOption*{%
+  \expandafter\markdownSetup\expandafter{\CurrentOption}}%
+\ProcessOptions\relax
+%    \end{macrocode}
+%
+% The following configuration should be considered placeholder.
+%  \begin{macrocode}
+\RequirePackage{url}
+\RequirePackage{graphicx}
+\RequirePackage{paralist}
+\RequirePackage{fancyvrb}
+\markdownSetup{rendererPrototypes={
+  lineBreak = {\\},
+  codeSpan = {\texttt{#1}},
+  link = {#1\footnote{\ifx\empty#3\empty\else#3:
+    \fi\texttt<\url{#2}\texttt>}},
+  image = {\begin{figure}
+      \begin{center}%
+        \includegraphics{#2}%
+      \end{center}%
+      \ifx\empty#3\empty\else
+        \caption{#3}%
+      \fi
+      \label{fig:#1}%
+    \end{figure}\figurename{} \ref{fig:#1}},
+  ulBegin = {\begin{itemize}},
+  ulBeginTight = {\begin{compactitem}},
+  ulItem = {\item},
+  ulEnd = {\end{itemize}},
+  ulEndTight = {\end{compactitem}},
+  olBegin = {\begin{enumerate}},
+  olBeginTight = {\begin{compactenum}},
+  olItem = {\item},
+  olItemWithNumber = {\item[#1.]},
+  olEnd = {\end{enumerate}},
+  olEndTight = {\end{compactenum}},
+  dlBegin = {\begin{description}},
+  dlBeginTight = {\begin{compactdesc}},
+  dlItem = {\item[#1]},
+  dlEnd = {\end{description}},
+  dlEndTight = {\end{compactdesc}},
+  emphasis = {\emph{#1}},
+  strongEmphasis = {%
+    \ifx\alert\undefined
+      \textbf{\emph{#1}}%
+    \else % Beamer support
+      \alert{\emph{#1}}
+    \fi},
+  blockQuoteBegin = {\begin{quotation}},
+  blockQuoteEnd = {\end{quotation}},
+  inputVerbatim = {\VerbatimInput{#1}},
+  horizontalRule = {\noindent\rule{\textwidth}{0.4pt}},
+  footnote = {\footnote{#1}}}}
 
+\ifx\chapter\undefined
+  \markdownSetup{rendererPrototypes={
+    headingOne = {\section{#1}},
+    headingTwo = {\subsection{#1}},
+    headingThree = {\subsubsection{#1}},
+    headingFour = {\paragraph{#1}},
+    headingFive = {\subparagraph{#1}}}}
+\else
+  \markdownSetup{rendererPrototypes={
+    headingOne = {\chapter{#1}},
+    headingTwo = {\section{#1}},
+    headingThree = {\subsection{#1}},
+    headingFour = {\subsubsection{#1}},
+    headingFive = {\paragraph{#1}},
+    headingSix = {\subparagraph{#1}}}}
+\fi
+%    \end{macrocode}
+%
+% \subsubsection{Miscellanea}
+% Unlike base Lua\TeX{}, which only allows for a single registered function per
+% a callback (see \cite[Section~8.1]{luatex16}), the \Hologo{LaTeX2e} format
+% disables the \luam{callback.register} method and exposes the
+% \luam{luatexbase.add_to_callback} and \luam{luatexbase.remove_from_callback}
+% methods that enable the user code to hook several functions on a single
+% callback (see \cite[Section~73.4]{latex16}).
+%
+% To make our code function with the \Hologo{LaTeX2e} format, we need to
+% redefine the \m{markdownLuaRegisterIBCallback} and
+% \m{markdownLuaUnregisterIBCallback} macros accordingly.
+%  \begin{macrocode}
+\renewcommand\markdownLuaRegisterIBCallback[1]{%
+  luatexbase.add_to_callback("process_input_buffer", #1, %
+    "The markdown input processor")}
+\renewcommand\markdownLuaUnregisterIBCallback[1]{%
+  luatexbase.remove_from_callback("process_input_buffer",%
+    "The markdown input processor")}
+%    \end{macrocode}
+%
+% When buffering user input, we should disable the bytes with the high bit set,
+% since these are made active by the \pkg{inputenc} package. We will do this by
+% redefining the \m{markdownMakeOther} macro accordingly. The code is courtesy
+% of Scott Pakin, the creator of the \pkg{filecontents} package.
+%  \begin{macrocode}
 \newcommand\markdownMakeOther{%
   \count0=128\relax
   \loop
