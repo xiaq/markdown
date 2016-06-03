@@ -7,10 +7,7 @@
 \usepackage[american]{babel}
 \usepackage{microtype}
 \usepackage{amsmath}
-\usepackage{blindtext}
 \usepackage{fancyvrb}
-\let\blindtext\relax % TODO: Remove these.
-\let\Blindtext\relax
 \usepackage{hologo}
 \usepackage{xcolor}
 \usepackage{doc}
@@ -134,9 +131,9 @@
 % users.
 %
 % \subsection{About \pkg{Markdown}}
-% The \pkg{Markdown} package provides facilities the conversion of markdown
+% The \pkg{Markdown} package enables the conversion of markdown
 % markup to plain \TeX{}. These are provided both in form of a Lua module and
-% in form of a plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that
+% in form of plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that
 % enable the direct inclusion of markdown documents inside \TeX{} documents.
 %
 % Architecturally, the package consists of the \pkg{Lunamark} Lua module by
@@ -150,7 +147,7 @@
 %<*lua>
 % \fi
 %  \begin{macrocode}
-if not modules then modules = { } end modules ['markdown-lunamark'] = {
+if not modules then modules = { } end modules ['markdown'] = {
     version   = "0.4.0",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
@@ -250,8 +247,8 @@ local md5 = require("md5")
 % \begin{description}
 %   \item[\pkg{keyval}] A package that enables the creation of parameter sets.
 %     This package is used to provide the \m{markdownSetup} macro, the package
-%     options processing, as well as the parameters of the \envm{markdown*} and
-%     \envm{markdownDocument*} environments.
+%     options processing, as well as the parameters of the \envm{markdown*}
+%     \LaTeX{} environment.
 %   \item[\pkg{url}] A package that provides the \m{url} macro for the
 %     typesetting of \acro{url}s. It is used to provide the default token renderer
 %     prototype (see Section \ref{sec:texrendererprototypes}) for links.
@@ -487,6 +484,9 @@ defaultOptions.startNumber = true
 % from within plain \TeX{}, for setting the Lua interface options (see Section
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
+%  \begin{macrocode}
+\def\markdownVersion{2016/06/03}%
+%    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
 % can be loaded as follows:
@@ -1042,9 +1042,6 @@ defaultOptions.startNumber = true
 % options (see Section \ref{sec:luaoptions}) used during the conversion from
 % markdown to plain \TeX{}, and facilities for changing the way markdown tokens
 % are rendered.
-%  \begin{macrocode}
-\ProvidesPackage{markdown}[2016/06/02]%
-%    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.sty` file, which
 % can be loaded from the \LaTeX{} document preamble as follows:
@@ -1055,45 +1052,14 @@ defaultOptions.startNumber = true
 % \ref{sec:latexoptions}).
 %
 % \subsubsection{Typesetting Markdown}
-% The interface exposes the \envmdef{markdownDocument},
-% \envmdef{markdownDocument*}, \envmdef{markdown}, and \envmdef{markdown*}
+% The interface exposes the \envmdef{markdown}, and \envmdef{markdown*}
 % \LaTeX{} environments.
 %
-% The \envm{markdownDocument} and \envm{markdownDocument*} \LaTeX{}
-% environments are used to typeset an entire markdown document. These
-% envirnoments act as a replacement for the standard \LaTeX{} \envm{document}
-% environment. The starred version of the \envm{markdownDocument} environment
-% accepts a list of \LaTeX{} interface options (see Section
-% \ref{sec:latexoptions}) as its only argument. These options will influence
-% the entire document.
-%  \begin{macrocode}
-\newenvironment{markdownDocument}\relax\relax
-\newenvironment{markdownDocument*}[1]\relax\relax
-%    \end{macrocode}
-% You may prepend your own code to the \m{markdownDocument} macro and append
-% your own code to the \m{endmarkdownDocument} macro to produce special effects
-% before and after the \envm{markdownDocument} \LaTeX{} environment (and
-% likewise for the starred version).
-%
-% Note that the \envm{markdownDocument} and \envm{markdownDocument*} \LaTeX{}
-% environments are subject to the same limitations as the \m{markdownBegin} and
-% \m{markdownEnd} macros exposed by the plain \TeX{} interface.
-%
-% The following example \LaTeX{} code showcases the usage of the
-% \envm{markdownDocument} and \envm{markdownDocument*} environments:
-% \begin{Verbatim}
-% \documentclass{article}     \documentclass{article}
-% \usepackage{markdown}       \usepackage{markdown}
-% \begin{markdownDocument}    \begin{markdownDocument*}{smartEllipses}
-% _Hello_ **world** ...       _Hello_ **world** ...
-% \end{markdownDocument}      \end{markdownDocument*}
-% \end{Verbatim}
-%
-% The \envm{markdown} and \envm{markdown*} \LaTeX{}
-% environments are used to typeset markdown document fragments. The starred
-% version of the \envm{markdown} environment accepts a list of \LaTeX{}
-% interface options (see Section \ref{sec:latexoptions}) as its only argument.
-% These options will only influnce this markdown document fragment.
+% The \envm{markdown} and \envm{markdown*} \LaTeX{} environments are used to
+% typeset markdown document fragments. The starred version of the
+% \envm{markdown} environment accepts a list of \LaTeX{} interface options (see
+% Section \ref{sec:latexoptions}) as its only argument.  These options will
+% only influnce this markdown document fragment.
 %  \begin{macrocode}
 \newenvironment{markdown}\relax\relax
 \newenvironment{markdown*}[1]\relax\relax
@@ -1133,10 +1099,9 @@ defaultOptions.startNumber = true
 % Sections \ref{sec:texrenderersuser} and \ref{sec:texrendererprototypes}).
 %
 % The \LaTeX{} options may be specified when loading the \LaTeX{} package (see
-% Section \ref{sec:latexinterface}), when using the \envm{markdownDocument*} and
-% \envm{markdown*} \LaTeX{} environments, or via the \mdef{markdownSetup} macro.
-% The \m{markdownSetup} macro receives the options to set up as its only
-% argument.
+% Section \ref{sec:latexinterface}), when using the \envm{markdown*} \LaTeX{}
+% environment, or via the \mdef{markdownSetup} macro.  The \m{markdownSetup}
+% macro receives the options to set up as its only argument.
 %  \begin{macrocode}
 \newcommand\markdownSetup[1]{%
   \setkeys{markdownOptions}{#1}}%
@@ -1177,7 +1142,7 @@ defaultOptions.startNumber = true
 %
 % The following example \LaTeX{} code showcases a possible configuration of
 % plain \TeX{} interface options \m{markdownOptionHybrid},
-% \m{markdownOptionSmartEllipses}, and \m{mardownOptionsCacheDir}.
+% \m{markdownOptionSmartEllipses}, and \m{markdownOptionCacheDir}.
 % \begin{Verbatim}
 % \markdownSetup{
 %   hybrid,
@@ -1403,7 +1368,7 @@ defaultOptions.startNumber = true
 % \m{markdownEnd} macros exposed by the plain \TeX{} interface.
 %
 % The following example \Hologo{ConTeXt} code showcases the usage of the
-% \envm{startmarkdown} and \envm{stopmarkdown} macros:
+% \m{startmarkdown} and \m{stopmarkdown} macros:
 % \begin{Verbatim}
 % \usemodule[markdown]
 % \starttext
@@ -1678,10 +1643,10 @@ function util.pathname(dir, file)
 end
 %    \end{macrocode}
 % \subsubsection{Plain \TeX{} Writer}\label{sec:texwriter}
-% This section documents the \luam{writer} object, which produces implements
-% the routines for producing the \TeX{} output. The object is an amalgamate
-% of the abstract writer, the \TeX{} writer, and the \LaTeX{} writer that were
-% located in the \t`lunamark/writer.lua`, \t`lunamark/writer/tex.lua`, and
+% This section documents the \luam{writer} object, which implements the
+% routines for producing the \TeX{} output. The object is an amalgamate of the
+% generic, \TeX{}, \LaTeX{} writer objects that were located in the
+% \t`lunamark/writer/generic.lua`, \t`lunamark/writer/tex.lua`, and
 % \t`lunamark/writer/latex.lua` files in the Lunamark Lua module.
 %
 % Although not specified in the Lua interface (see Section
@@ -1694,9 +1659,9 @@ M.writer = {}
 %    \end{macrocode}
 %
 % The \luamdef{writer.new} method creates and returns a new \TeX{} writer
-% object with the Lua interface options (see Section \ref{sec:luaoptions})
-% \t`options`. When \t`options` are unspecified, it is assumed that an empty
-% table was passed to the method.
+% object associated with the Lua interface options (see Section
+% \ref{sec:luaoptions}) \t`options`. When \t`options` are unspecified, it is
+% assumed that an empty table was passed to the method.
 %
 % The objects produced by the \luam{writer.new} method expose instance methods
 % and variables of their own. As a convention, I will refer to these
@@ -1739,8 +1704,9 @@ function M.writer.new(options)
   end
 %    \end{macrocode}
 %
-% Define \luamdef{writer->pack} as a function that will take the filename of
-% the output file prepared by the reader and transform it to the output format.
+% Define \luamdef{writer->pack} as a function that will take the filename
+% \t`name` of the output file prepared by the reader and transform it to the
+% output format.
 %  \begin{macrocode}
   function self.pack(name)
     return [[\input"]] .. name .. [["\relax]]
@@ -1753,7 +1719,7 @@ function M.writer.new(options)
   self.interblocksep = "\n\n"
 %    \end{macrocode}
 %
-% Define \luamdef{writer->interblocksep} as the output format of a container
+% Define \luamdef{writer->containersep} as the output format of a container
 % separator.
 %  \begin{macrocode}
   self.containersep = "\n\n"
@@ -1997,33 +1963,53 @@ end
 %    \end{macrocode}
 % 
 % \subsubsection{Markdown Reader}\label{sec:markdownreader}
-% \blindtext
-% 
-% Normalizes a markdown reference tag. (Turns it lowercase, and collapses any
-% adjacent whitespace characters.)
-%  \begin{macrocode}
-local function normalize_tag(tag)
-  return unicode.utf8.lower(gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
-end
-%    \end{macrocode}
-% Creates a new markdown parser, where \t`writer` is a writer and where
-% \t`options` is a table with options. The return value is a converter function
-% that converts a markdown string using \t`writer`, returning the parsed
-% document.  The converter assumes that the input has unix line endings
-% (newline).
+% This section documents the \luam{reader} object, which implements the
+% routines for parsing the markdown input. The object corresponds to the
+% markdown reader object that was located in the
+% \t`lunamark/reader/markdown.lua` file in the Lunamark Lua module.
+%
+% Although not specified in the Lua interface (see Section
+% \ref{sec:luainterface}), the \luam{reader} object is exported, so that the
+% curious user could easily tinker with the methods of the objects produced by
+% the \luam{reader.new} method described below. The user should be aware,
+% however, that the implementation may change in a future revision.
+%
+% The \luamdef{reader.new} method creates and returns a new \TeX{} reader
+% object associated with the Lua interface options (see Section
+% \ref{sec:luaoptions}) \t`options` and with a writer object \t`writer`. When
+% \t`options` are unspecified, it is assumed that an empty table was passed to
+% the method.
+%
+% The objects produced by the \luam{reader.new} method expose instance methods
+% and variables of their own. As a convention, I will refer to these
+% \meta{member}s as \t`reader->`\meta{member}.
 %  \begin{macrocode}
 M.reader = {}
 function M.reader.new(writer, options)
   local self = {}
   options = options or {}
 %    \end{macrocode}
-% Inherit options from the \t`defaultOptions` table.
+%
+% Make the \t`options` table inherit from the \luam{defaultOptions} table.
 %  \begin{macrocode}
   setmetatable(options, { __index = function (_, key)
     return defaultOptions[key] end })
 %    \end{macrocode}
-% This function expands into spaces, unless it is prohibited by the options
-% (see section \ref{sec:luaoptions}).
+%
+% \paragraph{Top Level Helper Functions}
+% Define \luamdef{normalize_tag} as a function that normalizes a markdown
+% reference tag by lowercasing it, and by collapsing any adjacent whitespace
+% characters.
+%  \begin{macrocode}
+  local function normalize_tag(tag)
+    return unicode.utf8.lower(
+      gsub(util.rope_to_string(tag), "[ \n\r\t]+", " "))
+  end
+%    \end{macrocode}
+% 
+% Define \luamdef{expandtabs} either as an identity function, when the
+% \Opt{preserveTabs} Lua inrerface option is \t`true`, or to a function that
+% expands tabs into spaces otherwise.
 %  \begin{macrocode}
   local expandtabs
   if options.preserveTabs then
@@ -2038,7 +2024,7 @@ function M.reader.new(writer, options)
                  end
   end
 %    \end{macrocode}
-% These are the top level parsing functions.
+% \paragraph{Top Level Parsing Functions}
 %  \begin{macrocode}
   local syntax
   local blocks
@@ -2047,31 +2033,36 @@ function M.reader.new(writer, options)
   local parse_blocks =
     function(str)
       local res = lpeg.match(blocks, str)
-      if res == nil
-        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
+      if res == nil then
+        error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+      else
+        return res
+      end
     end
 
   local parse_inlines =
     function(str)
       local res = lpeg.match(inlines, str)
-      if res == nil
-        then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
+      if res == nil then
+        error(format("parse_inlines failed on:\n%s",
+        str:sub(1,20)))
+      else
+        return res
+      end
     end
 
   local parse_inlines_no_link =
     function(str)
       local res = lpeg.match(inlines_no_link, str)
-      if res == nil
-        then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
+      if res == nil then
+        error(format("parse_inlines_no_link failed on:\n%s",
+        str:sub(1,20)))
+      else
+        return res
+      end
     end
 %    \end{macrocode}
-% \paragraph{Generic Parsers}
+% \paragraph{Generic \acro{peg} Patterns}
 %  \begin{macrocode}
   local percent                = P("%")
   local asterisk               = P("*")
@@ -2161,7 +2152,7 @@ function M.reader.new(writer, options)
              * blankline^1 )
   end
 %    \end{macrocode}
-% \paragraph{List Parsers}
+% \paragraph{List \acro{peg} Patterns}
 %  \begin{macrocode}
   local bulletchar = C(plus + asterisk + dash)
 
@@ -2184,7 +2175,7 @@ function M.reader.new(writer, options)
                    + space * C(dig * period) * #spacing * (tab + space^-1)
                    + space * space * C(dig^1 * period) * #spacing
 %    \end{macrocode}
-% \paragraph{Code Span Parsers}
+% \paragraph{Code Span \acro{peg} Patterns}
 %  \begin{macrocode}
   local openticks   = Cg(backtick^1, "ticks")
 
@@ -2202,7 +2193,7 @@ function M.reader.new(writer, options)
 
   local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
 %    \end{macrocode}
-% \paragraph{Tag and Link Parsers}
+% \paragraph{Tag \acro{peg} Patterns}
 %  \begin{macrocode}
   local leader        = space^-3
 
@@ -2240,9 +2231,11 @@ function M.reader.new(writer, options)
                       + Cs((inparens + (anyescaped-spacing-rparent))^1)
 
   -- quoted text possibly with nested quotes:
-  local title_s       = squote  * Cs(((anyescaped-squote) + squoted)^0) * squote
+  local title_s       = squote * Cs(((anyescaped-squote) + squoted)^0) *
+                        squote
 
-  local title_d       = dquote  * Cs(((anyescaped-dquote) + dquoted)^0) * dquote
+  local title_d       = dquote * Cs(((anyescaped-dquote) + dquoted)^0) *
+                        dquote
 
   local title_p       = lparent
                       * Cs((inparens + (anyescaped-rparent))^0)
@@ -2253,7 +2246,7 @@ function M.reader.new(writer, options)
   local optionaltitle = spnl * title * spacechar^0
                       + Cc("")
 %    \end{macrocode}
-% \paragraph{Footnotes}
+% \paragraph{Footnote \acro{peg} Patterns}
 %  \begin{macrocode}
   local rawnotes = {}
 
@@ -2285,13 +2278,13 @@ function M.reader.new(writer, options)
   local NoteBlock
 
   if options.footnotes then
-    NoteBlock = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
-              / register_note
+    NoteBlock = leader * RawNoteRef * colon * spnl *
+                indented_blocks(chunk) / register_note
   else
     NoteBlock = fail
   end
 %    \end{macrocode}
-% \paragraph{Links and References Helpers}
+% \paragraph{Link and Image \acro{peg} Patterns}
 %  \begin{macrocode}
   -- List of references defined in the document
   local references
@@ -2356,7 +2349,7 @@ function M.reader.new(writer, options)
     end
   end
 %    \end{macrocode}
-% \paragraph{Inline Elements}
+% \paragraph{Inline Element \acro{peg} Patterns}
 %  \begin{macrocode}
   local Inline    = V("Inline")
 
@@ -2419,13 +2412,17 @@ function M.reader.new(writer, options)
   local AutoLinkUrl   = less
                       * C(alphanumeric^1 * P("://") * urlchar^1)
                       * more
-                      / function(url) return writer.link(writer.string(url),url) end
+                      / function(url)
+                        return writer.link(writer.string(url), url)
+                      end
 
   local AutoLinkEmail = less
                       * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
                       * more
                       / function(email)
-                        return writer.link(writer.string(email),"mailto:"..email) end
+                        return writer.link(writer.string(email),
+                                           "mailto:"..email)
+                      end
 
   local DirectLink    = (tag / parse_inlines_no_link)  -- no links inside links
                       * spnl
@@ -2449,7 +2446,8 @@ function M.reader.new(writer, options)
                       * rparent
                       / writer.image
 
-  local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 / indirect_image
+  local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 /
+                         indirect_image
 
   local Image         = DirectImage + IndirectImage
 
@@ -2458,7 +2456,7 @@ function M.reader.new(writer, options)
 
   local EscapedChar   = S("\\") * C(escapable) / writer.string
 %    \end{macrocode}
-% \paragraph{Block Elements}
+% \paragraph{Block Element \acro{peg} Patterns}
 %  \begin{macrocode}
   local Block          = V("Block")
 
@@ -2493,7 +2491,7 @@ function M.reader.new(writer, options)
 
   local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
 %    \end{macrocode}
-% \paragraph{Lists}
+% \paragraph{List \acro{peg} Patterns}
 %  \begin{macrocode}
   local starter = bullet + enumerator
 
@@ -2511,7 +2509,8 @@ function M.reader.new(writer, options)
 
   local function TightListItem(starter)
       return -HorizontalRule
-             * (Cs(starter / "" * ListBlock * NestedList^-1) / parse_blocks)
+             * (Cs(starter / "" * ListBlock * NestedList^-1) /
+                parse_blocks)
              * -(blanklines * indent)
   end
 
@@ -2526,7 +2525,8 @@ function M.reader.new(writer, options)
   local BulletList = ( Ct(TightListItem(bullet)^1)
                        * Cc(true) * skipblanklines * -bullet
                      + Ct(LooseListItem(bullet)^1)
-                       * Cc(false) * skipblanklines ) / writer.bulletlist
+                       * Cc(false) * skipblanklines ) /
+                         writer.bulletlist
 
   local function orderedlist(items,tight,startNumber)
     if options.startNumber then
@@ -2538,16 +2538,19 @@ function M.reader.new(writer, options)
   end
 
   local OrderedList = Cg(enumerator, "listtype") *
-                      ( Ct(TightListItem(Cb("listtype")) * TightListItem(enumerator)^0)
+                      ( Ct(TightListItem(Cb("listtype")) *
+                           TightListItem(enumerator)^0)
                         * Cc(true) * skipblanklines * -enumerator
-                      + Ct(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
+                      + Ct(LooseListItem(Cb("listtype")) *
+                           LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
                       ) * Cb("listtype") / orderedlist
 
   local defstartchar = S("~:")
   local defstart     = ( defstartchar * #spacing * (tab + space^-3)
                      + space * defstartchar * #spacing * (tab + space^-2)
-                     + space * space * defstartchar * #spacing * (tab + space^-1)
+                     + space * space * defstartchar * #spacing *
+                       (tab + space^-1)
                      + space * space * space * defstartchar * #spacing
                      )
 
@@ -2558,28 +2561,32 @@ function M.reader.new(writer, options)
   end
 
   local DefinitionListItemLoose = C(line) * skipblanklines
-                           * Ct((defstart * indented_blocks(dlchunk) / parse_blocks)^1)
+                           * Ct((defstart *
+                                 indented_blocks(dlchunk) /
+                                 parse_blocks)^1)
                            * Cc(false)
                            / definition_list_item
 
   local DefinitionListItemTight = C(line)
-                           * Ct((defstart * dlchunk / parse_blocks)^1)
+                           * Ct((defstart * dlchunk /
+                                            parse_blocks)^1)
                            * Cc(true)
                            / definition_list_item
 
   local DefinitionList =  ( Ct(DefinitionListItemLoose^1) * Cc(false)
                           +  Ct(DefinitionListItemTight^1)
-                             * (skipblanklines * -DefinitionListItemLoose * Cc(true))
+                             * (skipblanklines *
+                                -DefinitionListItemLoose * Cc(true))
                           ) / writer.definitionlist
 %    \end{macrocode}
-% \paragraph{Blanks}
+% \paragraph{Blank \acro{peg} Patterns}
 %  \begin{macrocode}
   local Blank          = blankline / ""
                        + NoteBlock
                        + Reference
                        + (tightblocksep / "\n")
 %    \end{macrocode}
-% \paragraph{Headings}
+% \paragraph{Heading \acro{peg} Patterns}
 %  \begin{macrocode}
   -- parse Atx heading start and return level
   local HeadingStart = #hash * C(hash^-6) * -hash / length
@@ -2605,7 +2612,7 @@ function M.reader.new(writer, options)
                      * optionalspace * newline
                      / writer.heading
 %    \end{macrocode}
-% \paragraph{Syntax Specification}
+% \paragraph{Top Level \acro{peg} Specification}
 %  \begin{macrocode}
   syntax =
     { "Blocks",
@@ -2613,7 +2620,8 @@ function M.reader.new(writer, options)
       Blocks                = Blank^0 *
                               Block^-1 *
                               (Blank^0 / function()
-                                return writer.interblocksep end * Block)^0 *
+                                return writer.interblocksep
+                               end * Block)^0 *
                               Blank^0 *
                               eof,
 
@@ -2698,30 +2706,45 @@ function M.reader.new(writer, options)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
 %    \end{macrocode}
+%
 % \paragraph{Exported Conversion Function}
+% Define \luamdef{reader->convert} as a function that converts markdown string
+% \t`input` into a plain \TeX{} output and returns it. Note that the converter
+% assumes that the input has \acro{unix} line endings.
 %  \begin{macrocode}
   function self.convert(input)
     references = {}
+%    \end{macrocode}
+% When determining the name of the cache file, create salt for the hashing
+% function out of the passed options recognized by the Lua interface (see
+% Section \ref{sec:luaoptions}). The \Opt{cacheDir} option is disregarded.
+%  \begin{macrocode}
     local opt_string = {}
-    for k,_ in pairs(defaultOptions) do -- Create salt out of boolean options.
+    for k,_ in pairs(defaultOptions) do
       local v = options[k]
-      if type(v) == "boolean" then
+      if k ~= "cacheDir" then
         opt_string[#opt_string+1] = k .. "=" .. tostring(v)
       end
     end
     table.sort(opt_string)
-    local name = util.cache(options.cacheDir, input,
-      table.concat(opt_string, ","), function(input)
+    local salt = table.concat(opt_string, ",")
+%    \end{macrocode}
+% Produce the cache file, transform its filename via the \luam{writer->pack}
+% method, and return the result.
+%  \begin{macrocode}
+    local name = util.cache(options.cacheDir, input, salt, function(input)
         return util.rope_to_string(parse_blocks(input)) .. writer.eof
       end, ".md" .. writer.suffix)
     return writer.pack(name)
   end
   return self
 end
-
 %    \end{macrocode}
 % \subsubsection{Conversion from Markdown to Plain \TeX{}}
-% \blindtext
+% The \luam{new} method returns the \luam{reader->convert} function of a reader
+% object associated with the Lua interface options (see Section
+% \ref{sec:luaoptions}) \t`options` and with a writer object associated with
+% \t`options`.
 %  \begin{macrocode}
 function M.new(options)
   local writer = M.writer.new(options)
@@ -2731,7 +2754,6 @@ end
 
 return M
 %    \end{macrocode}
-% \blindtext
 %
 % \iffalse
 %</lua>
@@ -2991,7 +3013,7 @@ return M
       |catcode`| =12%
       |markdownMakeOther%
 %    \end{macrocode}
-% The \m{markdownReadAndConvertProcessLine} macro will process the individual
+% The \mdef{markdownReadAndConvertProcessLine} macro will process the individual
 % lines of output. Note the use of the comments to ensure that the entire macro
 % is at a single line and therefore no (active) newline symbols are produced.
 %  \begin{macrocode}
@@ -3173,7 +3195,11 @@ return M
     |markdownLuaExecute{%
       |markdownPrepare
       local input = assert(io.open("#1","r")):read("*a") .. "\n\n"
-      print(convert(input))}}%
+%    \end{macrocode}
+% Since the Lua converter expects \acro{unix} line endings, normalize the
+% input.
+%  \begin{macrocode}
+      print(convert(input:gsub("\r\n?", "\n")))}}%
 |endgroup
 %    \end{macrocode}
 %
@@ -3187,6 +3213,7 @@ return M
 % existing plain \TeX{} implementation.
 %  \begin{macrocode}
 \input markdown
+\ProvidesPackage{markdown}[\markdownVersion]%
 %    \end{macrocode}
 %
 % \subsubsection{Logging Facilities}
@@ -3200,22 +3227,12 @@ return M
 %    \end{macrocode}
 %
 % \subsubsection{Typesetting Markdown}
-% The \envm{markdownDocument}, \envm{markdownDocument*}, \env{markdown}, and
-% \env{markdown*} \LaTeX{} environments are implemented using the
-% \m{markdownReadAndConvert} macro.
+% The \env{markdown}, and \env{markdown*} \LaTeX{} environments are implemented
+% using the \m{markdownReadAndConvert} macro.
 %  \begin{macrocode}
-\renewenvironment{markdownDocument}{%
-  \begin{document}%
-  \markdownReadAndConvert@markdownDocument{}}\relax
-\renewenvironment{markdownDocument*}[1]{%
-  \begin{document}%
-  \markdownSetup{#1}%
-  \markdownReadAndConvert@markdownDocument*}\relax
 \renewenvironment{markdown}{%
-  \begingroup
   \markdownReadAndConvert@markdown{}}\relax
 \renewenvironment{markdown*}[1]{%
-  \begingroup
   \markdownSetup{#1}%
   \markdownReadAndConvert@markdown*}\relax
 \begingroup
@@ -3228,14 +3245,9 @@ return M
 %  \begin{macrocode}
   \catcode`\|=0\catcode`\<=1\catcode`\>=2%
   \catcode`\\=12|catcode`|{=12|catcode`|}=12%
-  |gdef|markdownReadAndConvert@markdownDocument#1<%
-    |markdownReadAndConvert<\end{markdownDocument#1}>%
-                           <|end<markdownDocument#1>%
-                            |end<document>>>%
   |gdef|markdownReadAndConvert@markdown#1<%
     |markdownReadAndConvert<\end{markdown#1}>%
-                           <|end<markdown#1>%
-                            |endgroup>>%
+                           <|end<markdown#1>>>%
 |endgroup
 %    \end{macrocode}
 %
@@ -3355,8 +3367,8 @@ return M
 % The \Hologo{ConTeXt} implementation makes use of the fact that, apart from
 % some subtle differences, the Mark II and Mark IV \Hologo{ConTeXt} formats
 % \emph{seem} to implement (the documentation is scarce) the majority of the
-% parts of plain \TeX{} format required by the plain \TeX{} implementation.  As
-% a consequence, we can directly reuse the existing plain \TeX{} implementation
+% plain \TeX{} format required by the plain \TeX{} implementation.  As a
+% consequence, we can directly reuse the existing plain \TeX{} implementation
 % after supplying the missing plain \TeX{} macros.
 %  \begin{macrocode}
 \def\dospecials{\do\ \do\\\do\{\do\}\do\$\do\&%
