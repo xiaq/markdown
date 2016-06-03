@@ -258,7 +258,7 @@ local md5 = require("md5")
 %     \ref{sec:texrendererprototypes}).
 %   \item[\pkg{paralist}] A package that provides the \envm{compactitem},
 %     \envm{compactenum}, and \envm{compactdesc} macros for the
-%     typesetting of tight bullet lists, ordered lists, and definition lists.
+%     typesetting of tight bulleted lists, ordered lists, and definition lists.
 %     It is used to provide the corresponding default token renderer prototypes
 %     (see Section \ref{sec:texrendererprototypes}).
 %   \item[\pkg{fancyvrb}] A package that provides the \m{VerbatimInput} macros
@@ -683,30 +683,31 @@ defaultOptions.startNumber = true
 %    \end{macrocode}
 %
 % \paragraph{Bullet List Renderers}
-% The \mdef{markdownRendererUlBegin} macro represents the beginning of a bullet
-% list that contains an item with several paragraphs of text (the list is not
-% tight). The macro receives no arguments.
+% The \mdef{markdownRendererUlBegin} macro represents the beginning of a
+% bulleted list that contains an item with several paragraphs of text (the
+% list is not tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlBegin{%
   \markdownRendererUlBeginPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlBeginTight} macro represents the beginning of a
-% bullet list that contains no item with several paragraphs of text (the list
+% bulleted list that contains no item with several paragraphs of text (the list
 % is tight). The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlBeginTight{%
   \markdownRendererUlBeginTightPrototype}%
 %    \end{macrocode}
 %
-% The \mdef{markdownRendererUlItem} macro represents an item in a bullet list.
+% The \mdef{markdownRendererUlItem} macro represents an item in a bulleted
+% list.
 % The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlItem{%
   \markdownRendererUlItemPrototype}%
 %    \end{macrocode}
 %
-% The \mdef{markdownRendererUlEnd} macro represents the end of a bullet list
+% The \mdef{markdownRendererUlEnd} macro represents the end of a bulleted list
 % that contains an item with several paragraphs of text (the list is not
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
@@ -714,7 +715,7 @@ defaultOptions.startNumber = true
   \markdownRendererUlEndPrototype}%
 %    \end{macrocode}
 %
-% The \mdef{markdownRendererUlEndTight} macro represents the end of a bullet
+% The \mdef{markdownRendererUlEndTight} macro represents the end of a bulleted
 % list that contains no item with several paragraphs of text (the list is
 % tight). The macro receives no arguments.
 %  \begin{macrocode}
@@ -987,13 +988,20 @@ defaultOptions.startNumber = true
 % \mdef{markdownLuaUnregisterIBCallback} macros specify the Lua code for
 % registering and unregistering a callback for changing the contents of the
 % line input buffer before a \TeX{} engine that supports direct Lua access via
-% the \m{directlua} macro starts looking at it.  The argument of the macros
-% corresponds to the callback function being registered or unregistered.
+% the \m{directlua} macro starts looking at it. The first argument of the
+% \m{markdownLuaRegisterIBCallback} macro corresponds to the callback function
+% being registered.
+%
+% Local members defined within \m{markdownLuaRegisterIBCallback} are guaranteed
+% to be visible from \m{markdownLuaUnregisterIBCallback} and the execution of
+% the two macros alternates, so it is not necessary to consider the case, when
+% one of the macros is called twice in a row.
 %  \begin{macrocode}
 \def\markdownLuaRegisterIBCallback#1{%
+  local old_callback = callback.find("process_input_buffer")
   callback.register("process_input_buffer", #1)}%
-\def\markdownLuaUnregisterIBCallback#1{%
-  \markdownLuaRegisterIBCallback{nil}}%
+\def\markdownLuaUnregisterIBCallback{%
+  callback.register("process_input_buffer", old_callback)}%
 %    \end{macrocode}
 %
 % The \mdef{markdownMakeOther} macro is used by the package, when a \TeX{}
@@ -1830,7 +1838,7 @@ function M.writer.new(options)
 %    \end{macrocode}
 %
 % Define \luamdef{writer->bulletlist} as a function that will transform an input
-% bullet list to the output format, where \t`items` is an array of the list
+% bulleted list to the output format, where \t`items` is an array of the list
 % items and \t`tight` specifies, whether the list is tight or not.
 %  \begin{macrocode}
   local function ulitem(s)
@@ -3160,14 +3168,14 @@ return M
 %    \end{macrocode}
 % Register a callback that will notify you about new lines of input.
 %  \begin{macrocode}
-        local function process_line(line)
+        |markdownLuaRegisterIBCallback{function(line)
 %    \end{macrocode}
 % When the ending token sequence appears on a line, unregister the callback,
 % convert the contents of our buffer from markdown to plain \TeX{}, and insert
 % the result into the input line buffer of \TeX{}.
 %  \begin{macrocode}
           if line:match(ending_sequence) then
-            |markdownLuaUnregisterIBCallback{process_line}
+            |markdownLuaUnregisterIBCallback
             local input = table.concat(buffer, "\n") .. "\n\n"
             local output = convert(input)
             return [[\markdownInfo{The ending token sequence was found}]] ..
@@ -3181,7 +3189,7 @@ return M
             buffer[#buffer+1] = line
             return [[\]] .. (#buffer == 1 and "fi" or "relax")
           end
-        end |markdownLuaRegisterIBCallback{process_line}}@
+        end}}@
 %    \end{macrocode}
 % Insert \m{iffalse} after the \m{markdownReadAndConvert} macro in order to
 % consume the rest of the first line of input.
@@ -3371,7 +3379,7 @@ return M
 \renewcommand\markdownLuaRegisterIBCallback[1]{%
   luatexbase.add_to_callback("process_input_buffer", #1, %
     "The markdown input processor")}
-\renewcommand\markdownLuaUnregisterIBCallback[1]{%
+\renewcommand\markdownLuaUnregisterIBCallback{%
   luatexbase.remove_from_callback("process_input_buffer",%
     "The markdown input processor")}
 %    \end{macrocode}
@@ -3414,12 +3422,11 @@ return M
 % Lua\TeX{} callback.
 %  \begin{macrocode}
   \directlua{%
+    local function unescape(str)
+      return (str:gsub("|", string.char(92))) end
     local old_callback = callback.find("process_input_buffer")
     callback.register("process_input_buffer", function() end)
     local new_callback = callback.find("process_input_buffer")
-    local function unescape(str)
-      return (str:gsub("|", string.char(92)))
-    end
 %    \end{macrocode}
 %
 % If we can not, we are probably using ConTeXt Mark IV. In ConTeXt Mark IV, the
@@ -3427,8 +3434,7 @@ return M
 % user code) and, due to the lack of available documentation, it is unclear to
 % me how to emulate it. Therefore, we will just force the plain \TeX{}
 % implementation to use the \m{write18} bridge (see Section
-% \ref{sec:luabridge}) by undefining the \m{directlua} primitive for the time
-% being.
+% \ref{sec:luabridge}) by locally undefining the \m{directlua} primitive.
 %  \begin{macrocode}
     if new_callback == false then
       tex.print(unescape([[|let|markdownDirectLua|directlua

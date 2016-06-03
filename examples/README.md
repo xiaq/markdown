@@ -5,7 +5,7 @@ that your TeX installation contains the `pdflatex`, `xelatex`, `lualatex`,
 
 When typesetting the ConTeXt Mark II example, you may receive an insufficient
 permissions error. In that case, you will need to enable shell escape inside
-the `texmf.cnf`, as explained by the help message.
+the `texmf.cnf` file, as explained by the help message.
 
 The file `tux.pdf` contains Tux, the Linux Mascot, by Larry Ewing
 <lewing@isc.tamu.edu> (created in GIMP). As stated on the [author's
