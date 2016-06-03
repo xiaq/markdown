@@ -1,4 +1,6 @@
 .PHONY: all clean implode
+AUXFILES=markdown.bbl markdown.cb markdown.cb2 markdown.glo markdown.bbl \
+				 markdown.run.xml markdown.bib
 AUXDIRS=_minted-markdown
 DTXARCHIVE=markdown.dtx
 INSTALLER=markdown.ins
@@ -17,9 +19,10 @@ $(INSTALLABLES): $(INSTALLER) $(DTXARCHIVE)
 %.pdf: %.dtx
 	latexmk -pdf $<
 
-# This pseudo-target removes any existing auxiliary files.
+# This pseudo-target removes any existing auxiliary files and directories.
 clean:
 	latexmk -c
+	rm -f $(AUXFILES)
 	rm -rf ${AUXDIRS}
 
 # This pseudo-target removes any makeable files.
