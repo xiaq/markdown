@@ -2930,16 +2930,12 @@ return M
 % either the \m{pdfshellescape} (Lua\TeX{}, \Hologo{pdfTeX}) or the
 % \m{shellescape} (\Hologo{XeTeX}) commands. This value indicates, whether the
 % shell access is enabled (\t`1`), disabled (\t`0`), or restricted (\t`2`).  If
-% neither of these commands is defined, announce that the \TeX{} engine
-% is unsupported.
+% neither of these commands is defined, act as if the shell access were enabled.
 %  \begin{macrocode}
   \csname newcount\endcsname\markdownLuaExecuteShellEscape
   \ifx\pdfshellescape\undefined
     \ifx\shellescape\undefined
-      \markdownError{You are using a TeX engine that supports neither
-        Lua nor shell access via the file stream 18. At the moment, the
-        Markdown package does not work with your engine}{Use a supported
-        engine, such as LuaTeX, pdfTeX, or XeTeX}%
+      \markdownLuaExecuteShellEscape=1%
     \else
       \markdownLuaExecuteShellEscape=\shellescape
     \fi
@@ -3407,7 +3403,48 @@ return M
 %  \begin{macrocode}
 \def\dospecials{\do\ \do\\\do\{\do\}\do\$\do\&%
   \do\#\do\^\do\_\do\%\do\~}%
-\input markdown
+%    \end{macrocode}
+% When there is no Lua support, then just load the plain \TeX{} implementation.
+%  \begin{macrocode}
+\ifx\directlua\undefined
+  \input markdown
+\else
+%    \end{macrocode}
+% When there is Lua support, check if we can set the \t`process_input_buffer`
+% Lua\TeX{} callback.
+%  \begin{macrocode}
+  \directlua{%
+    local old_callback = callback.find("process_input_buffer")
+    callback.register("process_input_buffer", function() end)
+    local new_callback = callback.find("process_input_buffer")
+    local function unescape(str)
+      return (str:gsub("|", string.char(92)))
+    end
+%    \end{macrocode}
+%
+% If we can not, we are probably using ConTeXt Mark IV. In ConTeXt Mark IV, the
+% \t`process_input_buffer` callback is currently frozen (inaccessible from the
+% user code) and, due to the lack of available documentation, it is unclear to
+% me how to emulate it. Therefore, we will just force the plain \TeX{}
+% implementation to use the \m{write18} bridge (see Section
+% \ref{sec:luabridge}) by undefining the \m{directlua} primitive for the time
+% being.
+%  \begin{macrocode}
+    if new_callback == false then
+      tex.print(unescape([[|let|markdownDirectLua|directlua
+                           |let|directlua|undefined
+                           |input markdown
+                           |let|directlua|markdownDirectLua
+                           |let|markdownDirectLua|undefined]]))
+%    \end{macrocode}
+%
+% If we can, then just load the plain \TeX{} implementation.
+%  \begin{macrocode}
+    else
+      callback.register("process_input_buffer", old_callback)
+      tex.print(unescape("|input markdown"))
+    end}%
+\fi
 %    \end{macrocode}
 %
 % \subsubsection{Logging Facilities}
