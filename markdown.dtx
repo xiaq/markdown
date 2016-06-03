@@ -65,7 +65,7 @@
   url={https://github.com/witiko/markdown},
   author={Vít Novotný (based on the work of John MacFarlane and Hans Hagen)},
   email={witiko@mail.muni.cz},
-  revision={1.0.0},
+  revision={\input VERSION},
   date={\today}}
 \CodelineIndex
 
@@ -126,22 +126,20 @@
 % background of the package and outlines its prerequisites. Section
 % \ref{sec:interfaces} describes the interfaces exposed by the package along
 % with usage notes and examples. It is aimed at the user of the package.
-% Section \ref{sec:implementation} then describes the implementation of the
-% package and is aimed at the developer of the package, as well as the curious
-% users.
+% Section \ref{sec:implementation} describes the implementation of the package.
+% It is aimed at the developer of the package and the curious user.
 %
 % \subsection{About \pkg{Markdown}}
-% The \pkg{Markdown} package enables the conversion of markdown
-% markup to plain \TeX{}. These are provided both in form of a Lua module and
-% in form of plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro packages that
-% enable the direct inclusion of markdown documents inside \TeX{} documents.
+% The \pkg{Markdown} package provides facilities for the conversion of markdown
+% markup to plain \TeX{}. These are provided both in the form of a Lua module
+% and in the form of plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt} macro
+% packages that enable the direct inclusion of markdown documents inside \TeX{}
+% documents.
 %
 % Architecturally, the package consists of the \pkg{Lunamark} Lua module by
 % John MacFarlane, which was slimmed down and rewritten for the needs of the
-% package. \pkg{Lunamark} provides speedy markdown parsing for the rest of the
-% package and is stored inside the \t`markdown.lua` file. On top of
-% \pkg{Lunamark} sits code for the plain \TeX{}, \LaTeX{}, and \Hologo{ConTeXt}
-% formats by Vít Novotný.
+% package. On top of \pkg{Lunamark} sits code for the plain \TeX{}, \LaTeX{},
+% and \Hologo{ConTeXt} formats by Vít Novotný.
 %
 % \iffalse
 %<*lua>
