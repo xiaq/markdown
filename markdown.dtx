@@ -1038,12 +1038,13 @@ defaultOptions.startNumber = true
 %<*latex>
 % \fi\subsection{\LaTeX{} Interface}\label{sec:latexinterface}
 % The \LaTeX{} interface provides \LaTeX{} environments for the typesetting of
-% markdown input from within \LaTeX{}, facilities for setting the Lua interface
+% markdown input from within \LaTeX{}, facilities for setting Lua interface
 % options (see Section \ref{sec:luaoptions}) used during the conversion from
 % markdown to plain \TeX{}, and facilities for changing the way markdown tokens
-% are rendered.
+% are rendered. The rest of the interface is inherited from the plain \TeX{}
+% interface (see Section \ref{sec:texinterface}).
 %
-% The plain \TeX{} interface is implemented by the \t`markdown.sty` file, which
+% The \LaTeX{} interface is implemented by the \t`markdown.sty` file, which
 % can be loaded from the \LaTeX{} document preamble as follows:
 % \begin{Verbatim}[commandchars=\\\{\}]
 % \textbackslash{}usepackage[\textrm{\meta{options}}]\{markdown\}
@@ -1052,13 +1053,13 @@ defaultOptions.startNumber = true
 % \ref{sec:latexoptions}).
 %
 % \subsubsection{Typesetting Markdown}
-% The interface exposes the \envmdef{markdown}, and \envmdef{markdown*}
-% \LaTeX{} environments.
+% The interface exposes the \envmdef{markdown} and \envmdef{markdown*}
+% \LaTeX{} environments, and redefines the \m{markdownInput} command.
 %
 % The \envm{markdown} and \envm{markdown*} \LaTeX{} environments are used to
 % typeset markdown document fragments. The starred version of the
-% \envm{markdown} environment accepts a list of \LaTeX{} interface options (see
-% Section \ref{sec:latexoptions}) as its only argument.  These options will
+% \envm{markdown} environment accepts \LaTeX{} interface options (see
+% Section \ref{sec:latexoptions}) as its only argument. These options will
 % only influnce this markdown document fragment.
 %  \begin{macrocode}
 \newenvironment{markdown}\relax\relax
@@ -1085,6 +1086,26 @@ defaultOptions.startNumber = true
 % \end{markdown}                     \end{markdown*}
 % % ...                              % ...
 % \end{document}                     \end{document}
+% \end{Verbatim}
+%
+% The \m{markdownInput} macro accepts a single mandatory parameter containing
+% the filename of a markdown document and expands to the result of the
+% conversion of the input markdown document to plain \TeX{}.  Unlike the
+% \m{markdownInput} macro provided by the plain \TeX{} interface, this macro
+% also accepts \LaTeX{} interface options (see Section \ref{sec:latexoptions})
+% as its optional argument. These options will only influnce this markdown
+% document.
+%
+% The following example \LaTeX{} code showcases the usage of the
+% \m{markdownInput} macro:
+% \begin{Verbatim}
+% \documentclass{article}
+% \usepackage{markdown}
+% \begin{document}
+% % ...
+% \markdownInput[smartEllipses]{hello.md}
+% % ...
+% \end{document}
 % \end{Verbatim}
 %
 % \subsubsection{Options}\label{sec:latexoptions}
@@ -3227,6 +3248,19 @@ return M
 %    \end{macrocode}
 %
 % \subsubsection{Typesetting Markdown}
+% The \mdef{markdownInputPlainTeX} macro is used to store the original plain
+% \TeX{} implementation of the \m{markdownInput} macro. The \m{markdownInput}
+% is then redefined to accept an optional argument with options recognized by
+% the \LaTeX{} interface (see Section \ref{sec:latexoptions}).
+%  \begin{macrocode}
+\let\markdownInputPlainTeX\markdownInput
+\renewcommand\markdownInput[2][]{%
+  \begingroup
+    \markdownSetup{#1}%
+    \markdownInputPlainTeX{#2}%
+  \endgroup}%
+%    \end{macrocode}
+%
 % The \env{markdown}, and \env{markdown*} \LaTeX{} environments are implemented
 % using the \m{markdownReadAndConvert} macro.
 %  \begin{macrocode}
