@@ -146,7 +146,7 @@
 % \fi
 %  \begin{macrocode}
 if not modules then modules = { } end modules ['markdown'] = {
-    version   = "0.4.0",
+    version   = "1.0.1",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -259,6 +259,9 @@ local md5 = require("md5")
 %     typesetting of tight bulleted lists, ordered lists, and definition lists.
 %     It is used to provide the corresponding default token renderer prototypes
 %     (see Section \ref{sec:texrendererprototypes}).
+%   \item[\pkg{ifthen}] A package that provides a concise syntax for the
+%     inspection of macro values. It is used to determine whether or not the
+%     \pkg{paralist} package should be loaded based on the user options.
 %   \item[\pkg{fancyvrb}] A package that provides the \m{VerbatimInput} macros
 %     for the verbatim inclusion of files containing code.  It is used to
 %     provide the corresponding default token renderer prototype (see Section
@@ -472,6 +475,21 @@ defaultOptions.smartEllipses = false
 %  \begin{macrocode}
 defaultOptions.startNumber = true
 %    \end{macrocode}
+%
+%   \Optitem[true]{tightLists}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Lists whose bullets do not consist of multiple paragraphs
+%         will be detected and passed to the 
+%         \m{markdownRendererOlBeginTight}, \m{markdownRendererOlEndTight},
+%         \m{markdownRendererUlBeginTight}, \m{markdownRendererUlEndTight},
+%         \m{markdownRendererDlBeginTight}, and \m{markdownRendererDlEndTight}
+%         macros.
+%       \item[false] Lists whose bullets do not consist of multiple paragraphs
+%         will be treated the same way as lists that do.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.tightLists = true
+%    \end{macrocode}
 % \end{optionlist}
 % 
 % \iffalse
@@ -627,7 +645,7 @@ defaultOptions.startNumber = true
 \let\markdownOptionPreserveTabs\undefined
 \let\markdownOptionSmartEllipses\undefined
 \let\markdownOptionStartNumber\undefined
-\let\markdownOptionVerbatim\undefined
+\let\markdownOptionTightLists\undefined
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
@@ -691,7 +709,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererUlBeginTight} macro represents the beginning of a
 % bulleted list that contains no item with several paragraphs of text (the list
-% is tight). The macro receives no arguments.
+% is tight). This macro will only be produced, when the \Opt{tightLists} option
+% is \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlBeginTight{%
   \markdownRendererUlBeginTightPrototype}%
@@ -715,7 +734,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererUlEndTight} macro represents the end of a bulleted
 % list that contains no item with several paragraphs of text (the list is
-% tight). The macro receives no arguments.
+% tight). This macro will only be produced, when the \Opt{tightLists} option is
+% \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlEndTight{%
   \markdownRendererUlEndTightPrototype}%
@@ -732,7 +752,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererOlBeginTight} macro represents the beginning of an
 % ordered list that contains no item with several paragraphs of text (the
-% list is tight). The macro receives no arguments.
+% list is tight). This macro will only be produced, when the \Opt{tightLists}
+% option is \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlBeginTight{%
   \markdownRendererOlBeginTightPrototype}%
@@ -764,7 +785,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererOlEndTight} macro represents the end of an ordered
 % list that contains no item with several paragraphs of text (the list is
-% tight). The macro receives no arguments.
+% tight). This macro will only be produced, when the \Opt{tightLists} option is
+% \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererOlEndTight{%
   \markdownRendererOlEndTightPrototype}%
@@ -784,7 +806,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererDlBeginTight} macro represents the beginning of a
 % definition list that contains an item with several paragraphs of text (the
-% list is not tight). The macro receives no arguments.
+% list is not tight). This macro will only be produced, when the
+% \Opt{tightLists} option is \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlBeginTight{%
   \markdownRendererDlBeginTightPrototype}%
@@ -808,7 +831,8 @@ defaultOptions.startNumber = true
 %
 % The \mdef{markdownRendererDlEndTight} macro represents the end of a
 % definition list that contains no item with several paragraphs of text (the
-% list is tight). The macro receives no arguments.
+% list is tight). This macro will only be produced, when the \Opt{tightLists}
+% option is \t`false`. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererDlEndTight{%
   \markdownRendererDlEndTightPrototype}%
@@ -1165,6 +1189,15 @@ defaultOptions.startNumber = true
   \def\markdownOptionSmartEllipses{#1}}%
 \define@key{markdownOptions}{startNumber}[true]{%
   \def\markdownOptionStartNumber{#1}}%
+%    \end{macrocode}
+% If the \t`tightLists=false` option is specified, when loading the package,
+% then the \pkg{paralist} package for typesetting tight lists will not be
+% automatically loaded. This precaution is meant to minimize the footprint of
+% this package, since some documentclasses (\pkg{beamer}) do not play nice
+% with the \pkg{paralist} package.
+%  \begin{macrocode}
+\define@key{markdownOptions}{tightLists}[true]{%
+  \def\markdownOptionTightLists{#1}}%
 %    \end{macrocode}
 %
 % The following example \LaTeX{} code showcases a possible configuration of
@@ -1849,7 +1882,7 @@ function M.writer.new(options)
       buffer[#buffer + 1] = ulitem(item)
     end
     local contents = util.intersperse(buffer,"\n")
-    if tight then
+    if tight and options.tightLists then
       return {"\\markdownRendererUlBeginTight\n",contents,
         "\n\\markdownRendererUlEndTight "}
     else
@@ -1883,7 +1916,7 @@ function M.writer.new(options)
       end
     end
     local contents = util.intersperse(buffer,"\n")
-    if tight then
+    if tight and options.tightLists then
       return {"\\markdownRendererOlBeginTight\n",contents,
         "\n\\markdownRendererOlEndTight "}
     else
@@ -1910,7 +1943,7 @@ function M.writer.new(options)
         util.intersperse(item.definitions, self.interblocksep))
     end
     local contents = util.intersperse(buffer, self.containersep)
-    if tight then
+    if tight and options.tightLists then
       return {"\\markdownRendererDlBeginTight\n\n", contents,
         "\n\n\\markdownRendererDlEndTight\n"}
     else
@@ -2879,6 +2912,9 @@ return M
   \fi
   \ifx\markdownOptionStartNumber\undefined\else
     startNumber = \markdownOptionStartNumber,
+  \fi
+  \ifx\markdownOptionTightLists\undefined\else
+    tightLists = \markdownOptionTightLists,
   \fi}
 }%
 %    \end{macrocode}
@@ -3299,7 +3335,17 @@ return M
 %  \begin{macrocode}
 \RequirePackage{url}
 \RequirePackage{graphicx}
-\RequirePackage{paralist}
+%    \end{macrocode}
+% If the \m{markdownOptionTightLists} macro expands to \t`false`, do not load
+% the \pkg{paralist} package.
+%  \begin{macrocode}
+\RequirePackage{ifthen}
+\ifx\markdownOptionTightLists\undefined
+  \RequirePackage{paralist}
+\else
+  \ifthenelse{\equal{\markdownOptionTightLists}{false}}{}{
+    \RequirePackage{paralist}}
+\fi
 \RequirePackage{fancyvrb}
 \markdownSetup{rendererPrototypes={
   lineBreak = {\\},
