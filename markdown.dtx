@@ -303,12 +303,12 @@ local M = {}
 %
 % \subsubsection{Conversion from Markdown to Plain \TeX{}}
 % \label{sec:luaconversion}
-% The Lua interface exposes the \luamdef{new}\t`(\meta{options}`\t`)` method.
-% This method creates converter functions that perform the conversion from
-% markdown to plain \TeX{} according to the table \t`options` that contains Lua
-% options (see Section \ref{sec:luaoptions}). The \t`options` parameter is
-% optional; when unspecified, the behaviour will be the same as if \t`options`
-% were an empty table.
+% The Lua interface exposes the \luamdef{new}\t`(options)` method.  This
+% method creates converter functions that perform the conversion from markdown
+% to plain \TeX{} according to the table \t`options` that contains options
+% recognized by the Lua interface.  (see Section \ref{sec:luaoptions}). The
+% \t`options` parameter is optional; when unspecified, the behaviour will be
+% the same as if \t`options` were an empty table.
 %  \begin{macrocode}
 M.new = {}
 %    \end{macrocode}
