@@ -4,8 +4,9 @@ AUXFILES=markdown.bbl markdown.cb markdown.cb2 markdown.glo markdown.bbl \
 				 markdown.run.xml markdown.bib
 AUXDIRS=_minted-markdown
 TDSARCHIVE=markdown.tds.zip
+CTANARCHIVE=markdown.ctan.zip
 DISTARCHIVE=markdown.zip
-ARCHIVES=$(TDSARCHIVE) $(DISTARCHIVE)
+ARCHIVES=$(TDSARCHIVE) $(CTANARCHIVE) $(DISTARCHIVE)
 EXAMPLES_SOURCES=examples/context.tex examples/latex.tex examples/tux.pdf \
 								 examples/example.md
 EXAMPLES=examples/context.pdf examples/latex-luatex.pdf \
@@ -17,8 +18,9 @@ INSTALLER=markdown.ins docstrip.cfg
 MANUAL=markdown.pdf
 INSTALLABLES=markdown.lua markdown.tex markdown.sty t-markdown.tex
 MAKEABLES=$(MANUAL) $(INSTALLABLES) $(EXAMPLES)
-EVERYTHING=$(INSTALLABLES) $(MANUAL) $(EXAMPLES_SOURCES) $(EXAMPLES) \
-					 $(MAKES) $(READMES) $(INSTALLER) $(DTXARCHIVE)
+RESOURCES=$(MANUAL) $(EXAMPLES_SOURCES) $(EXAMPLES) $(MAKES) $(READMES) \
+				 	$(INSTALLER) $(DTXARCHIVE)
+EVERYTHING=$(RESOURCES) $(INSTALLABLES)
 
 # This is the default pseudo-target. It typesets the manual,
 # the examples, and extracts the package files.
@@ -56,10 +58,16 @@ $(TDSARCHIVE): $(DTXARCHIVE) $(INSTALLABLES) $(MANUAL)
 	zip -r -v -nw $@ tex source doc 
 	rm -rf tex source doc
 
-# This target produces the CTAN archive.
+# This target produces the distribution archive.
 $(DISTARCHIVE): $(EVERYTHING) $(TDSARCHIVE)
 	ln -s . markdown
 	zip -r -v -nw $@ $(addprefix markdown/,$(EVERYTHING)) $(TDSARCHIVE)
+	rm markdown
+
+# This target produces the CTAN archive.
+$(CTANARCHIVE): $(RESOURCES) $(TDSARCHIVE)
+	ln -s . markdown
+	zip -r -v -nw $@ $(addprefix markdown/,$(RESOURCES)) $(TDSARCHIVE)
 	rm markdown
 
 # This pseudo-target removes any existing auxiliary files and directories.
