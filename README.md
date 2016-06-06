@@ -1,9 +1,9 @@
 # About #
 
-The Markdown package enables the conversion of markdown markup to plain TeX.
-These are provided both in the form of a Lua module and in the form of plain
-TeX, LaTeX, and ConTeXt macro packages that enable the direct inclusion of
-markdown documents inside TeX documents.
+The Markdown package provides facilities for the conversion of markdown markup
+to plain TeX. These are provided both in the form of a Lua module and in the
+form of plain TeX, LateX, and ConTeXt macro packages that enable the direct
+inclusion of markdown documents inside TeX documents.
 
 This material is subject to the LaTeX Project Public License.
 
