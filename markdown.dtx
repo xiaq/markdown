@@ -312,9 +312,6 @@ local M = {}
 % recognized by the Lua interface.  (see Section \ref{sec:luaoptions}). The
 % \t`options` parameter is optional; when unspecified, the behaviour will be
 % the same as if \t`options` were an empty table.
-%  \begin{macrocode}
-M.new = {}
-%    \end{macrocode}
 %
 % The following example Lua code converts the markdown string \t`_Hello
 % world!_` to a \TeX{} output using the default options and prints the \TeX{}
@@ -2945,7 +2942,7 @@ return M
 % \subsubsection{Lua \t`\textbackslash write18` Bridge}\label{sec:luabridge}
 % The following \TeX{} code is intended for \TeX{} engines that do not provide
 % direct access to Lua, but expose the shell of the operating system through
-% the output file stream 18 (\Hologo{XeTeX}, \hologo{pdfLaTeX}).
+% the output file stream 18 (\Hologo{XeTeX}, \hologo{pdfTeX}).
 % The \m{markdownLuaExecute} and \m{markdownReadAndConvert} macros defined here
 % and in Section \ref{sec:directlua} are meant to be transparent to the
 % remaining code.
@@ -3337,7 +3334,8 @@ return M
 \RequirePackage{graphicx}
 %    \end{macrocode}
 % If the \m{markdownOptionTightLists} macro expands to \t`false`, do not load
-% the \pkg{paralist} package.
+% the \pkg{paralist} package. This is necessary for \Hologo{LaTeX2e} document
+% classes that do not play nice with \pkg{paralist}, such as \pkg{beamer}.
 %  \begin{macrocode}
 \RequirePackage{ifthen}
 \ifx\markdownOptionTightLists\undefined
@@ -3382,7 +3380,7 @@ return M
     \ifx\alert\undefined
       \textbf{\emph{#1}}%
     \else % Beamer support
-      \alert{\emph{#1}}
+      \alert{\emph{#1}}%
     \fi},
   blockQuoteBegin = {\begin{quotation}},
   blockQuoteEnd = {\end{quotation}},
