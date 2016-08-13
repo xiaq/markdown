@@ -811,12 +811,28 @@ defaultOptions.tightLists = true
   \markdownRendererDlBeginTightPrototype}%
 %    \end{macrocode}
 %
-% The \mdef{markdownRendererDlItem} macro represents an item in a definition
-% list. The macro receives a single argument that corresponds to the term being
-% defined.
+% The \mdef{markdownRendererDlItem} macro represents a term in a definition
+% list. The macro receives a single argument that corresponds to the term
+% being defined.
 %  \begin{macrocode}
 \def\markdownRendererDlItem{%
   \markdownRendererDlItemPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererDlDefinitionBegin} macro represents the beginning
+% of a definition in a definition list. There can be several definitions for
+% a single term.
+%  \begin{macrocode}
+\def\markdownRendererDlDefinitionBegin{%
+  \markdownRendererDlDefinitionBeginPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererDlDefinitionEnd} macro represents the end of a
+% definition in a definition list. There can be several definitions for a
+% single term.
+%  \begin{macrocode}
+\def\markdownRendererDlDefinitionEnd{%
+  \markdownRendererDlDefinitionEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlEnd} macro represents the end of a definition
@@ -969,6 +985,8 @@ defaultOptions.tightLists = true
 \def\markdownRendererDlBeginPrototype{}%
 \def\markdownRendererDlBeginTightPrototype{}%
 \long\def\markdownRendererDlItemPrototype#1{}%
+\def\markdownRendererDlDefinitionBeginPrototype{}%
+\def\markdownRendererDlDefinitionEndPrototype{}%
 \def\markdownRendererDlEndPrototype{}%
 \def\markdownRendererDlEndTightPrototype{}%
 \long\def\markdownRendererEmphasisPrototype#1{}%
@@ -1279,6 +1297,10 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererDlBeginTight{#1}}%
 \define@key{markdownRenderers}{dlItem}{%
   \renewcommand\markdownRendererDlItem[1]{#1}}%
+\define@key{markdownRenderers}{dlDefinitionBegin}{%
+  \renewcommand\markdownRendererDlDefinitionBegin{#1}}%
+\define@key{markdownRenderers}{dlDefinitionEnd}{%
+  \renewcommand\markdownRendererDlDefinitionEnd{#1}}%
 \define@key{markdownRenderers}{dlEnd}{%
   \renewcommand\markdownRendererDlEnd{#1}}%
 \define@key{markdownRenderers}{dlEndTight}{%
@@ -1369,6 +1391,10 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererDlBeginTightPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlItem}{%
   \renewcommand\markdownRendererDlItemPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{dlDefinitionBegin}{%
+  \renewcommand\markdownRendererDlDefinitionBeginPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dlDefinitionEnd}{%
+  \renewcommand\markdownRendererDlDefinitionEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlEnd}{%
   \renewcommand\markdownRendererDlEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlEndTight}{%
@@ -1954,15 +1980,19 @@ function M.writer.new(options)
 % is a term and \t`defs` is an array of definitions. \t`tight` specifies,
 % whether the list is tight or not.
 %  \begin{macrocode}
-  local function dlitem(term,defs)
-      return {"\\markdownRendererDlItem{",term,"}\n",defs}
+  local function dlitem(term, defs)
+    local retVal = {"\\markdownRendererDlItem{",term,"}"}
+    for _, def in ipairs(defs) do
+      retVal[#retVal+1] = {"\\markdownRendererDlDefinitionBegin ",def,
+                           "\\markdownRendererDlDefinitionEnd "}
+    end
+    return retVal
   end
 
   function self.definitionlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = dlitem(item.term,
-        util.intersperse(item.definitions, self.interblocksep))
+      buffer[#buffer + 1] = dlitem(item.term, item.definitions)
     end
     local contents = util.intersperse(buffer, self.containersep)
     if tight and options.tightLists then
@@ -2857,7 +2887,7 @@ return M
   \errmessage{(l.\the\inputlineno) markdown.tex error: #1}}%
 %    \end{macrocode}
 %
-% \subsubsection{Options}
+% \subsubsection{Token Renderers}
 % The following definitions should be considered placeholder.
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
@@ -2879,6 +2909,8 @@ return M
 \def\markdownRendererDlBeginPrototype{}%
 \def\markdownRendererDlBeginTightPrototype{}%
 \long\def\markdownRendererDlItemPrototype#1{#1}%
+\def\markdownRendererDlDefinitionBeginPrototype{}%
+\def\markdownRendererDlDefinitionEndPrototype{\par}%
 \def\markdownRendererDlEndPrototype{}%
 \def\markdownRendererDlEndTightPrototype{}%
 \long\def\markdownRendererEmphasisPrototype#1{{\it#1}}%
@@ -3622,7 +3654,7 @@ return M
   \startMarkdownConTeXtDlPrototype}%
 \def\markdownRendererDlBeginTightPrototype{%
   \startMarkdownConTeXtDlTightPrototype}%
-\long\long\def\markdownRendererDlItemPrototype#1{%
+\long\def\markdownRendererDlItemPrototype#1{%
   \markdownConTeXtDlItemPrototype{#1}}%
 \def\markdownRendererDlEndPrototype{%
   \stopMarkdownConTeXtDlPrototype}%
