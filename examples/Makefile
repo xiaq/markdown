@@ -12,7 +12,7 @@ all: $(OUTPUT) clean
 # This target typesets the ConTeXt example using the Mark II format.
 context-mkii.pdf: context.tex
 	cp context.tex context-mkii.tex
-	texexec --passon="--shell-escape" context-mkii.tex
+	texexec --passon="--shell-escape --8bit" context-mkii.tex
 
 # This target typesets the ConTeXt example using the Mark IV format.
 context-mkiv.pdf: context.tex
@@ -28,8 +28,8 @@ latex-pdftex.pdf: latex.tex
 # This target typesets the LaTeX example using the XeTeX engine.
 latex-xetex.pdf: latex.tex
 	cp latex.tex latex-xetex.tex
-	xelatex --shell-escape latex-xetex
-	xelatex --shell-escape latex-xetex
+	xelatex --shell-escape --8bit latex-xetex
+	xelatex --shell-escape --8bit latex-xetex
 
 # This target typesets the LaTeX example using the LuaTeX engine.
 latex-luatex.pdf: latex.tex
