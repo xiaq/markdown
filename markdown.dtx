@@ -1895,13 +1895,13 @@ function M.writer.new(options)
 %    \end{macrocode}
 %
 % Define \luamdef{writer->link} as a function that will transform an input
-% hyperlink to the output format, where \t`lab` corresponds to thelabel,
+% hyperlink to the output format, where \t`lab` corresponds to the label,
 % \t`src` to \acro{uri}, and \t`tit` to the title of the link.
 %  \begin{macrocode}
   function self.link(lab,src,tit)
     return {"\\markdownRendererLink{",lab,"}",
                           "{",self.string(src),"}",
-                          "{",self.string(tit),"}"}
+                          "{",self.string(tit or ""),"}"}
   end
 %    \end{macrocode}
 %
@@ -1912,7 +1912,7 @@ function M.writer.new(options)
   function self.image(lab,src,tit)
     return {"\\markdownRendererImage{",lab,"}",
                            "{",self.string(src),"}",
-                           "{",self.string(tit),"}"}
+                           "{",self.string(tit or ""),"}"}
   end
 %    \end{macrocode}
 %
@@ -2228,9 +2228,9 @@ function M.reader.new(writer, options)
 
   local specialchar
   if options.smartEllipses then
-    specialchar                = S("*_`&[]!\\.")
+    specialchar                = S("*_`&[]<!\\.")
   else
-    specialchar                = S("*_`&[]!\\")
+    specialchar                = S("*_`&[]<!\\")
   end
 
   local normalchar             = any -
