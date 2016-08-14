@@ -1,10 +1,8 @@
-\long\def\LONGTYPEOUT#1{%
+\long\def\TYPE#1{%
   \begingroup
     \long\def\TYPE##1{(##1)}%
     \immediate\write128{TEST INPUT BEGIN}%
     \immediate\write128{#1}%
     \immediate\write128{TEST INPUT END}%
-  \endgroup
-}%
-\let\TYPE\LONGTYPEOUT
+  \endgroup}%
 \def\GOBBLE#1{}%

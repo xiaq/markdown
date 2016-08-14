@@ -1,25 +1,29 @@
-.PHONY: all clean implode dist
+.PHONY: all clean implode dist test
 SUBDIRECTORIES=examples
 AUXFILES=markdown.bbl markdown.cb markdown.cb2 markdown.glo markdown.bbl \
-				 markdown.run.xml markdown.bib
+	markdown.run.xml markdown.bib
 AUXDIRS=_minted-markdown
 TDSARCHIVE=markdown.tds.zip
 CTANARCHIVE=markdown.ctan.zip
 DISTARCHIVE=markdown.zip
 ARCHIVES=$(TDSARCHIVE) $(CTANARCHIVE) $(DISTARCHIVE)
 EXAMPLES_SOURCES=examples/context.tex examples/latex.tex examples/tux.pdf \
-								 examples/example.md
+	examples/example.md
 EXAMPLES=examples/context.pdf examples/latex-luatex.pdf \
-				 examples/latex-pdftex.pdf
+	examples/latex-pdftex.pdf
+TESTS=tests/test.sh tests/support/*.tex tests/templates/*/*.tex \
+	tests/templates/*/COMMANDS tests/testfiles/*/*.test
 MAKES=Makefile $(addsuffix /Makefile, $(SUBDIRECTORIES))
-READMES=README.md LICENSE VERSION examples/README.md
+READMES=README.md LICENSE VERSION examples/README.md tests/README.md \
+	tests/support/README.md tests/templates/README.md tests/testfiles/README.md \
+	tests/templates/*/README.md tests/testfiles/*/README.md
 DTXARCHIVE=markdown.dtx
 INSTALLER=markdown.ins docstrip.cfg
 MANUAL=markdown.pdf
 INSTALLABLES=markdown.lua markdown.tex markdown.sty t-markdown.tex
 MAKEABLES=$(MANUAL) $(INSTALLABLES) $(EXAMPLES)
 RESOURCES=$(MANUAL) $(EXAMPLES_SOURCES) $(EXAMPLES) $(MAKES) $(READMES) \
-				 	$(INSTALLER) $(DTXARCHIVE)
+	$(INSTALLER) $(DTXARCHIVE) $(TESTS)
 EVERYTHING=$(RESOURCES) $(INSTALLABLES)
 
 # This is the default pseudo-target. It typesets the manual,
@@ -39,6 +43,10 @@ $(MANUAL): $(DTXARCHIVE)
 # This target typesets the examples.
 $(EXAMPLES): $(EXAMPLE_SOURCES) $(INSTALLABLES)
 	make -C examples
+
+# This pseudo-target runs all the tests in the `tests/` directory.
+test:
+	make -C tests
 
 # This pseudo-target produces the distribution archives.
 dist: implode
