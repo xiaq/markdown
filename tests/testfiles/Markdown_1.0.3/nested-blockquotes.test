@@ -1,0 +1,12 @@
+<<<
+> foo
+>
+> > bar
+>
+> foo
+
+>>>
+blockQuoteBegin
+blockQuoteBegin
+blockQuoteEnd
+blockQuoteEnd

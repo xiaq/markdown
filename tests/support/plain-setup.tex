@@ -1,45 +1,43 @@
 \def\markdownRendererLineBreak{%
   \TYPE{line break}}%
-\def\markdownRendererEllipsis{%
+\def\markdownRendererEllipsis#1{%
   \TYPE{ellipsis}}%
-\def\markdownRendererLeftBrace{%
+\def\markdownRendererLeftBrace#1{%
   \TYPE{leftBrace}}%
-\def\markdownRendererRightBrace{%
+\def\markdownRendererRightBrace#1{%
   \TYPE{rightBrace}}%
-\def\markdownRendererDollarSign{%
+\def\markdownRendererDollarSign#1{%
   \TYPE{dollarSign}}%
-\def\markdownRendererPercentSign{%
+\def\markdownRendererPercentSign#1{%
   \TYPE{percentSign}}%
-\def\markdownRendererAmpersand{%
+\def\markdownRendererAmpersand#1{%
   \TYPE{ampersand}}%
-\def\markdownRendererUnderscore{%
+\def\markdownRendererUnderscore#1{%
   \TYPE{underscore}}%
-\def\markdownRendererHash{%
+\def\markdownRendererHash#1{%
   \TYPE{hash}}%
-\def\markdownRendererCircumflex{%
+\def\markdownRendererCircumflex#1{%
   \TYPE{circumflex}}%
-\def\markdownRendererBackslash{%
+\def\markdownRendererBackslash#1{%
   \TYPE{backslash}}%
-\def\markdownRendererTilde{%
+\def\markdownRendererTilde#1{%
   \TYPE{tilde}}%
-\def\markdownRendererPipe{%
+\def\markdownRendererPipe#1{%
   \TYPE{pipe}}%
 \long\def\markdownRendererCodeSpan#1{%
   \TYPE{code span:        #1}}%
 \long\def\markdownRendererLink#1#2#3#4{%
-  \TYPE{====================}
-  \TYPE{link label:       #1}%
-  \TYPE{link URI:         #2}%
-  \TYPE{link raw URI:     #3}%
-  \TYPE{link title:       #4}%
-  \TYPE{====================}}%
+  \TYPE{BEGIN link}%
+  \TYPE{- label:          #1}%
+  \TYPE{- URI:            #2}%
+  \TYPE{- title:          #4}%
+  \TYPE{END link}}%
 \long\def\markdownRendererImage#1#2#3#4{%
-  \TYPE{====================}
-  \TYPE{image label:      #1}%
-  \TYPE{image URI:        #2}%
-  \TYPE{image raw URI:    #3}%
-  \TYPE{image title:      #4}%
-  \TYPE{====================}}%
+  \TYPE{BEGIN image}%
+  \TYPE{- label:          #1}%
+  \TYPE{- URI:            #2}%
+  \TYPE{- title:          #4}%
+  \TYPE{END image}}%
 \def\markdownRendererUlBegin{%
   \TYPE{ulBegin}}%
 \def\markdownRendererUlBeginTight{%

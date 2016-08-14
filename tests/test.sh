@@ -49,7 +49,9 @@ for TESTFILE; do
         fi &&
 
         # Compare the expected outcome against the actual outcome.
-        diff test-expected.log test-actual.log &&        
+        diff test-expected.log test-actual.log &&
+#         || (sed -n '1,/^\s*>>>\s*$/p' <${TESTFILE##*/} && 
+#             cat test-actual.log) >../$TESTFILE &&
 
         # Clean up the testing directory.
         cd .. && rm -rf build/ || { printf 'ERROR\n'; exit 1; }

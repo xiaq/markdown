@@ -8,15 +8,13 @@ Foo [bar](/url/ "Title with "quotes" inside").
 
 
 >>>
-====================
-link label: bar
-link URI: /url/
-link raw URI: /url/
-link title: Title with "quotes" inside
-====================
-====================
-link label: bar
-link URI: /url/
-link raw URI: /url/
-link title: Title with "quotes" inside
-====================
+BEGIN link
+- label: bar
+- URI: /url/
+- title: Title with "quotes" inside
+END link
+BEGIN link
+- label: bar
+- URI: /url/
+- title: Title with "quotes" inside
+END link

@@ -2,45 +2,55 @@ renderers = {%
   lineBreak = {%
     \TYPE{line break}},
   ellipsis = {%
-    \TYPE{ellipsis}},
+    \TYPE{ellipsis}%
+    \GOBBLE},
   leftBrace = {%
-    \TYPE{leftBrace}},
+    \TYPE{leftBrace}%
+    \GOBBLE},
   rightBrace = {%
-    \TYPE{rightBrace}},
+    \TYPE{rightBrace}%
+    \GOBBLE},
   dollarSign = {%
-    \TYPE{dollarSign}},
+    \TYPE{dollarSign}%
+    \GOBBLE},
   percentSign = {%
-    \TYPE{percentSign}},
+    \TYPE{percentSign}%
+    \GOBBLE},
   ampersand = {%
-    \TYPE{ampersand}},
+    \TYPE{ampersand}%
+    \GOBBLE},
   underscore = {%
-    \TYPE{underscore}},
+    \TYPE{underscore}%
+    \GOBBLE},
   hash = {%
-    \TYPE{hash}},
+    \TYPE{hash}%
+    \GOBBLE},
   circumflex = {%
-    \TYPE{circumflex}},
+    \TYPE{circumflex}%
+    \GOBBLE},
   backslash = {%
-    \TYPE{backslash}},
+    \TYPE{backslash}%
+    \GOBBLE},
   tilde = {%
-    \TYPE{tilde}},
+    \TYPE{tilde}%
+    \GOBBLE},
   pipe = {%
-    \TYPE{pipe}},
+    \TYPE{pipe}%
+    \GOBBLE},
   codeSpan = {%
     \TYPE{code span:        #1}},
   link = {%
-    \TYPE{====================}
-    \TYPE{link label:       #1}%
-    \TYPE{link URI:         #2}%
-    \TYPE{link raw URI:     #3}%
-    \TYPE{link title:       #4}%
-    \TYPE{====================}},
+    \TYPE{BEGIN link}%
+    \TYPE{- label:          #1}%
+    \TYPE{- URI:            #2}%
+    \TYPE{- title:          #4}%
+    \TYPE{END link}},
   image = {%
-    \TYPE{====================}
-    \TYPE{image label:      #1}%
-    \TYPE{image URI:        #2}%
-    \TYPE{image raw URI:    #3}%
-    \TYPE{image title:      #4}%
-    \TYPE{====================}},
+    \TYPE{BEGIN image}%
+    \TYPE{- label:          #1}%
+    \TYPE{- URI:            #2}%
+    \TYPE{- title:          #4}%
+    \TYPE{END image}},
   ulBegin = {%
     \TYPE{ulBegin}},
   ulBeginTight = {%

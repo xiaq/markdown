@@ -882,193 +882,167 @@ Markdown provides backslash escapes for the following characters:
 headingOne: Markdown: Syntax
 ulBeginTight
 ulItem
-====================
-link label: Overview
-link URI: (hash){}overview
-link raw URI: ##overview
-link title: 
-====================
+BEGIN link
+- label: Overview
+- URI: (hash)overview
+- title: 
+END link
 ulBeginTight
 ulItem
-====================
-link label: Philosophy
-link URI: (hash){}philosophy
-link raw URI: ##philosophy
-link title: 
-====================
+BEGIN link
+- label: Philosophy
+- URI: (hash)philosophy
+- title: 
+END link
 ulItem
-====================
-link label: Inline HTML
-link URI: (hash){}html
-link raw URI: ##html
-link title: 
-====================
+BEGIN link
+- label: Inline HTML
+- URI: (hash)html
+- title: 
+END link
 ulItem
-====================
-link label: Automatic Escaping for Special Characters
-link URI: (hash){}autoescape
-link raw URI: ##autoescape
-link title: 
-====================
+BEGIN link
+- label: Automatic Escaping for Special Characters
+- URI: (hash)autoescape
+- title: 
+END link
 ulEndTight
 ulItem
-====================
-link label: Block Elements
-link URI: (hash){}block
-link raw URI: ##block
-link title: 
-====================
+BEGIN link
+- label: Block Elements
+- URI: (hash)block
+- title: 
+END link
 ulBeginTight
 ulItem
-====================
-link label: Paragraphs and Line Breaks
-link URI: (hash){}p
-link raw URI: ##p
-link title: 
-====================
+BEGIN link
+- label: Paragraphs and Line Breaks
+- URI: (hash)p
+- title: 
+END link
 ulItem
-====================
-link label: Headers
-link URI: (hash){}header
-link raw URI: ##header
-link title: 
-====================
+BEGIN link
+- label: Headers
+- URI: (hash)header
+- title: 
+END link
 ulItem
-====================
-link label: Blockquotes
-link URI: (hash){}blockquote
-link raw URI: ##blockquote
-link title: 
-====================
+BEGIN link
+- label: Blockquotes
+- URI: (hash)blockquote
+- title: 
+END link
 ulItem
-====================
-link label: Lists
-link URI: (hash){}list
-link raw URI: ##list
-link title: 
-====================
+BEGIN link
+- label: Lists
+- URI: (hash)list
+- title: 
+END link
 ulItem
-====================
-link label: Code Blocks
-link URI: (hash){}precode
-link raw URI: ##precode
-link title: 
-====================
+BEGIN link
+- label: Code Blocks
+- URI: (hash)precode
+- title: 
+END link
 ulItem
-====================
-link label: Horizontal Rules
-link URI: (hash){}hr
-link raw URI: ##hr
-link title: 
-====================
+BEGIN link
+- label: Horizontal Rules
+- URI: (hash)hr
+- title: 
+END link
 ulEndTight
 ulItem
-====================
-link label: Span Elements
-link URI: (hash){}span
-link raw URI: ##span
-link title: 
-====================
+BEGIN link
+- label: Span Elements
+- URI: (hash)span
+- title: 
+END link
 ulBeginTight
 ulItem
-====================
-link label: Links
-link URI: (hash){}link
-link raw URI: ##link
-link title: 
-====================
+BEGIN link
+- label: Links
+- URI: (hash)link
+- title: 
+END link
 ulItem
-====================
-link label: Emphasis
-link URI: (hash){}em
-link raw URI: ##em
-link title: 
-====================
+BEGIN link
+- label: Emphasis
+- URI: (hash)em
+- title: 
+END link
 ulItem
-====================
-link label: Code
-link URI: (hash){}code
-link raw URI: ##code
-link title: 
-====================
+BEGIN link
+- label: Code
+- URI: (hash)code
+- title: 
+END link
 ulItem
-====================
-link label: Images
-link URI: (hash){}img
-link raw URI: ##img
-link title: 
-====================
+BEGIN link
+- label: Images
+- URI: (hash)img
+- title: 
+END link
 ulEndTight
 ulItem
-====================
-link label: Miscellaneous
-link URI: (hash){}misc
-link raw URI: ##misc
-link title: 
-====================
+BEGIN link
+- label: Miscellaneous
+- URI: (hash)misc
+- title: 
+END link
 ulBeginTight
 ulItem
-====================
-link label: Backslash Escapes
-link URI: (hash){}backslash
-link raw URI: ##backslash
-link title: 
-====================
+BEGIN link
+- label: Backslash Escapes
+- URI: (hash)backslash
+- title: 
+END link
 ulItem
-====================
-link label: Automatic Links
-link URI: (hash){}autolink
-link raw URI: ##autolink
-link title: 
-====================
+BEGIN link
+- label: Automatic Links
+- URI: (hash)autolink
+- title: 
+END link
 ulEndTight
 ulEndTight
 strongEmphasis: Note:
-====================
-link label: see the source for it by adding '.text' to the URL
-link URI: /projects/markdown/syntax.text
-link raw URI: /projects/markdown/syntax.text
-link title: 
-====================
+BEGIN link
+- label: see the source for it by adding '.text' to the URL
+- URI: /projects/markdown/syntax.text
+- title: 
+END link
 horizontalRule
 headingTwo: Overview
 headingThree: Philosophy
-====================
-link label: Setext
-link URI: http://docutils.sourceforge.net/mirror/setext.html
-link raw URI: http://docutils.sourceforge.net/mirror/setext.html
-link title: 
-====================
-====================
-link label: atx
-link URI: http://www.aaronsw.com/2002/atx/
-link raw URI: http://www.aaronsw.com/2002/atx/
-link title: 
-====================
-====================
-link label: Textile
-link URI: http://textism.com/tools/textile/
-link raw URI: http://textism.com/tools/textile/
-link title: 
-====================
-====================
-link label: reStructuredText
-link URI: http://docutils.sourceforge.net/rst.html
-link raw URI: http://docutils.sourceforge.net/rst.html
-link title: 
-====================
-====================
-link label: Grutatext
-link URI: http://www.triptico.com/software/grutatxt.html
-link raw URI: http://www.triptico.com/software/grutatxt.html
-link title: 
-====================
-====================
-link label: EtText
-link URI: http://ettext.taint.org/doc/
-link raw URI: http://ettext.taint.org/doc/
-link title: 
-====================
+BEGIN link
+- label: Setext
+- URI: http://docutils.sourceforge.net/mirror/setext.html
+- title: 
+END link
+BEGIN link
+- label: atx
+- URI: http://www.aaronsw.com/2002/atx/
+- title: 
+END link
+BEGIN link
+- label: Textile
+- URI: http://textism.com/tools/textile/
+- title: 
+END link
+BEGIN link
+- label: reStructuredText
+- URI: http://docutils.sourceforge.net/rst.html
+- title: 
+END link
+BEGIN link
+- label: Grutatext
+- URI: http://www.triptico.com/software/grutatxt.html
+- title: 
+END link
+BEGIN link
+- label: EtText
+- URI: http://ettext.taint.org/doc/
+- title: 
+END link
 headingThree: Inline HTML
 emphasis: writing
 emphasis: not
@@ -1089,29 +1063,28 @@ code span: <img>
 emphasis: is
 headingThree: Automatic Escaping for Special Characters
 code span: <
-code span: (ampersand){}
-code span: (ampersand){}lt;
-code span: (ampersand){}amp;
+code span: (ampersand)
+code span: (ampersand)lt;
+code span: (ampersand)amp;
 ampersand
-code span: AT(ampersand){}amp;T
+code span: AT(ampersand)amp;T
 inputVerbatim: _markdown-test/01abe6d069cf62de251cf21f8df1d11f.verbatim
 inputVerbatim: _markdown-test/3bb5e0b18bdd7c9688b9f5df139967f3.verbatim
 code span: href
-code span: (ampersand){}amp;
+code span: (ampersand)amp;
 inputVerbatim: _markdown-test/9f3cb292eb01028cce569a08ef6f975b.verbatim
 inputVerbatim: _markdown-test/7cdba89e6cc34bd4841c7c6a41bb4156.verbatim
 inputVerbatim: _markdown-test/c79c1d6af747ea457d80ff723101137a.verbatim
-====================
-link label: inline HTML
-link URI: (hash){}html
-link raw URI: ##html
-link title: 
-====================
+BEGIN link
+- label: inline HTML
+- URI: (hash)html
+- title: 
+END link
 inputVerbatim: _markdown-test/e76bfed335c678dbe01b3982b9b46fdc.verbatim
 inputVerbatim: _markdown-test/cc7bb6b7c24a66c62c969328036e8f7b.verbatim
 emphasis: always
 code span: <
-code span: (ampersand){}
+code span: (ampersand)
 horizontalRule
 headingTwo: Block Elements
 headingThree: Paragraphs and Line Breaks
@@ -1120,31 +1093,27 @@ emphasis: do
 code span: <br />
 code span: <br />
 code span: <br />
-====================
-link label: blockquoting
-link URI: (hash){}blockquote
-link raw URI: ##blockquote
-link title: 
-====================
-====================
-link label: list items
-link URI: (hash){}list
-link raw URI: ##list
-link title: 
-====================
+BEGIN link
+- label: blockquoting
+- URI: (hash)blockquote
+- title: 
+END link
+BEGIN link
+- label: list items
+- URI: (hash)list
+- title: 
+END link
 headingThree: Headers
-====================
-link label: Setext
-link URI: http://docutils.sourceforge.net/mirror/setext.html
-link raw URI: http://docutils.sourceforge.net/mirror/setext.html
-link title: 
-====================
-====================
-link label: atx
-link URI: http://www.aaronsw.com/2002/atx/
-link raw URI: http://www.aaronsw.com/2002/atx/
-link title: 
-====================
+BEGIN link
+- label: Setext
+- URI: http://docutils.sourceforge.net/mirror/setext.html
+- title: 
+END link
+BEGIN link
+- label: atx
+- URI: http://www.aaronsw.com/2002/atx/
+- title: 
+END link
 inputVerbatim: _markdown-test/4f59d4e23ef758fd94bd2324643e2f2b.verbatim
 code span: =
 code span: -
@@ -1190,7 +1159,7 @@ inputVerbatim: _markdown-test/80158a498770adf4d0617503ae558414.verbatim
 inputVerbatim: _markdown-test/35dd5e3b1d316dec464fafbedf53439e.verbatim
 inputVerbatim: _markdown-test/992aa3a21cc79d1a6a7b273173e1cc48.verbatim
 inputVerbatim: _markdown-test/d37edcee91241df6034067902bf7ff5f.verbatim
-code span: (ampersand){}
+code span: (ampersand)
 code span: <
 code span: >
 inputVerbatim: _markdown-test/bfd3b2e8e47a22fe0914d55781a73b7c.verbatim
@@ -1232,18 +1201,18 @@ inputVerbatim: _markdown-test/28d0c5764a38e6b58409f9967ef91bcc.verbatim
 inputVerbatim: _markdown-test/f39ac74789b190c9c1460bd06b2e5f66.verbatim
 headingThree: Emphasis
 code span: *
-code span: (underscore){}
+code span: (underscore)
 code span: *
-code span: (underscore){}
+code span: (underscore)
 code span: <em>
 code span: *
-code span: (underscore){}
+code span: (underscore)
 code span: <strong>
 inputVerbatim: _markdown-test/ad2981010cf94e370ccb06c7233f0989.verbatim
 inputVerbatim: _markdown-test/451a1d0edf74505402610a4bae7997d0.verbatim
 inputVerbatim: _markdown-test/3f3996b979db4e11ec6fd9b0232b3d83.verbatim
 code span: *
-code span: (underscore){}
+code span: (underscore)
 inputVerbatim: _markdown-test/85d79dd13f594a1dc7dc5b2be403366a.verbatim
 headingThree: Code
 code span: `

@@ -1,9 +1,8 @@
 <<<
 [hi `there] bud`](/url)
 >>>
-====================
-link label: hi (code span: there] bud)
-link URI: /url
-link raw URI: /url
-link title: 
-====================
+BEGIN link
+- label: hi (code span: there] bud)
+- URI: /url
+- title: 
+END link

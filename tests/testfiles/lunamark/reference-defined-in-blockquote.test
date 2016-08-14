@@ -4,10 +4,9 @@
 > [foo]: /bar
 >>>
 blockQuoteBegin
-====================
-link label: foo
-link URI: /bar
-link raw URI: /bar
-link title: 
-====================
+BEGIN link
+- label: foo
+- URI: /bar
+- title: 
+END link
 blockQuoteEnd

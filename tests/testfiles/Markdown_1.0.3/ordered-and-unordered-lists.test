@@ -1,0 +1,233 @@
+<<<
+## Unordered
+
+Asterisks tight:
+
+*	asterisk 1
+*	asterisk 2
+*	asterisk 3
+
+
+Asterisks loose:
+
+*	asterisk 1
+
+*	asterisk 2
+
+*	asterisk 3
+
+* * *
+
+Pluses tight:
+
++	Plus 1
++	Plus 2
++	Plus 3
+
+
+Pluses loose:
+
++	Plus 1
+
++	Plus 2
+
++	Plus 3
+
+* * *
+
+
+Minuses tight:
+
+-	Minus 1
+-	Minus 2
+-	Minus 3
+
+
+Minuses loose:
+
+-	Minus 1
+
+-	Minus 2
+
+-	Minus 3
+
+
+## Ordered
+
+Tight:
+
+1.	First
+2.	Second
+3.	Third
+
+and:
+
+1. One
+2. Two
+3. Three
+
+
+Loose using tabs:
+
+1.	First
+
+2.	Second
+
+3.	Third
+
+and using spaces:
+
+1. One
+
+2. Two
+
+3. Three
+
+Multiple paragraphs:
+
+1.	Item 1, graf one.
+
+	Item 2. graf two. The quick brown fox jumped over the lazy dog&#39;s
+	back.
+	
+2.	Item 2.
+
+3.	Item 3.
+
+
+
+## Nested
+
+*	Tab
+	*	Tab
+		*	Tab
+
+Here&#39;s another:
+
+1. First
+2. Second:
+	* Fee
+	* Fie
+	* Foe
+3. Third
+
+Same thing but with paragraphs:
+
+1. First
+
+2. Second:
+	* Fee
+	* Fie
+	* Foe
+
+3. Third
+
+
+This was an error in Markdown 1.0.1:
+
+*	this
+
+	*	sub
+
+	that
+
+>>>
+headingTwo: Unordered
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+ulBegin
+ulItem
+ulItem
+ulItem
+ulEnd
+horizontalRule
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+ulBegin
+ulItem
+ulItem
+ulItem
+ulEnd
+horizontalRule
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+ulBegin
+ulItem
+ulItem
+ulItem
+ulEnd
+headingTwo: Ordered
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olItemWithNumber: 3
+olEndTight
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olItemWithNumber: 3
+olEndTight
+olBegin
+olItemWithNumber: 1
+olItemWithNumber: 2
+olItemWithNumber: 3
+olEnd
+olBegin
+olItemWithNumber: 1
+olItemWithNumber: 2
+olItemWithNumber: 3
+olEnd
+olBegin
+olItemWithNumber: 1
+ampersand
+hash
+olItemWithNumber: 2
+olItemWithNumber: 3
+olEnd
+headingTwo: Nested
+ulBeginTight
+ulItem
+ulBeginTight
+ulItem
+ulBeginTight
+ulItem
+ulEndTight
+ulEndTight
+ulEndTight
+ampersand
+hash
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+olItemWithNumber: 3
+olEndTight
+olBegin
+olItemWithNumber: 1
+olItemWithNumber: 2
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+olItemWithNumber: 3
+olEnd
+ulBegin
+ulItem
+ulBeginTight
+ulItem
+ulEndTight
+ulEnd

@@ -3,9 +3,8 @@
 
 [BEIß NICHT IN DIE HAND, DIE DICH FÜTTERT.]: http://en.wikiquote.org/wiki/German_proverbs
 >>>
-====================
-link label: Beiß nicht in die Hand, die dich füttert.
-link URI: http://en.wikiquote.org/wiki/German(underscore){}proverbs
-link raw URI: http://en.wikiquote.org/wiki/German_proverbs
-link title: 
-====================
+BEGIN link
+- label: Beiß nicht in die Hand, die dich füttert.
+- URI: http://en.wikiquote.org/wiki/German(underscore)proverbs
+- title: 
+END link
