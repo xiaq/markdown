@@ -498,7 +498,7 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/13}%
+\def\markdownLastModified{2016/08/14}%
 \def\markdownVersion{1.0.2}%
 %    \end{macrocode}
 %
@@ -682,15 +682,19 @@ defaultOptions.tightLists = true
 %
 % \paragraph{Link Renderer}
 % The \mdef{markdownRendererLink} macro represents a hyperlink. It receives
-% three arguments: the label, the \acro{uri}, and the title of the link.
+% four arguments: the label, the fully escaped \acro{uri} that can be directly
+% typeset, the raw \acro{uri} that can be used outside typesetting, and the
+% title of the link.
 %  \begin{macrocode}
 \def\markdownRendererLink{%
   \markdownRendererLinkPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Image Renderer}
-% The \mdef{markdownRendererImage} macro represents an image. It receives three
-% arguments: the label, the \acro{url}, and the title of the image.
+% The \mdef{markdownRendererImage} macro represents an image. It receives four
+% four arguments: the label, the fully escaped \acro{uri} that can be directly
+% typeset, the raw \acro{uri} that can be used outside typesetting, and the
+% title of the link.
 %  \begin{macrocode}
 \def\markdownRendererImage{%
   \markdownRendererImagePrototype}%
@@ -969,8 +973,8 @@ defaultOptions.tightLists = true
 \def\markdownRendererLineBreakPrototype{}%
 \def\markdownRendererEllipsisPrototype{}%
 \long\def\markdownRendererCodeSpanPrototype#1{}%
-\long\def\markdownRendererLinkPrototype#1#2#3{}%
-\long\def\markdownRendererImagePrototype#1#2#3{}%
+\long\def\markdownRendererLinkPrototype#1#2#3#4{}%
+\long\def\markdownRendererImagePrototype#1#2#3#4{}%
 \def\markdownRendererUlBeginPrototype{}%
 \def\markdownRendererUlBeginTightPrototype{}%
 \def\markdownRendererUlItemPrototype{}%
@@ -1266,9 +1270,9 @@ defaultOptions.tightLists = true
 \define@key{markdownRenderers}{codeSpan}{%
   \renewcommand\markdownRendererCodeSpan[1]{#1}}%
 \define@key{markdownRenderers}{link}{%
-  \renewcommand\markdownRendererLink[3]{#1}}%
+  \renewcommand\markdownRendererLink[4]{#1}}%
 \define@key{markdownRenderers}{image}{%
-  \renewcommand\markdownRendererImage[3]{#1}}%
+  \renewcommand\markdownRendererImage[4]{#1}}%
 \define@key{markdownRenderers}{ulBegin}{%
   \renewcommand\markdownRendererUlBegin{#1}}%
 \define@key{markdownRenderers}{ulBeginTight}{%
@@ -1339,7 +1343,7 @@ defaultOptions.tightLists = true
 % \begin{Verbatim}
 % \markdownSetup{
 %   renderers = {
-%     link = {#3},                   % Render links as the link title.
+%     link = {#4},                   % Render links as the link title.
 %     emphasis = {\emph{#1}},    % Render emphasized text via `\emph`.
 %   }
 % }
@@ -1360,9 +1364,9 @@ defaultOptions.tightLists = true
 \define@key{markdownRendererPrototypes}{codeSpan}{%
   \renewcommand\markdownRendererCodeSpanPrototype[1]{#1}}%
 \define@key{markdownRendererPrototypes}{link}{%
-  \renewcommand\markdownRendererLink[3]{#1}}%
+  \renewcommand\markdownRendererLink[4]{#1}}%
 \define@key{markdownRendererPrototypes}{image}{%
-  \renewcommand\markdownRendererImage[3]{#1}}%
+  \renewcommand\markdownRendererImage[4]{#1}}%
 \define@key{markdownRendererPrototypes}{ulBegin}{%
   \renewcommand\markdownRendererUlBeginPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ulBeginTight}{%
@@ -1854,7 +1858,10 @@ function M.writer.new(options)
 %    \end{macrocode}
 %
 % Define a table \luamdef{escaped} containing the mapping from special plain
-% \TeX{} characters to their escaped variants.
+% \TeX{} characters to their escaped variants. Define tables
+% \luamdef{escaped_minimal_chars} and \luamdef{escaped_minimal_strings}
+% containing the mapping from special plain characters and character strings
+% that need to be escaped even in content that will not be typeset.
 %  \begin{macrocode}
   local escaped = {
      ["{"] = "\\{",
@@ -1868,21 +1875,35 @@ function M.writer.new(options)
      ["\\"] = "\\char92{}",
      ["~"] = "\\char126{}",
      ["|"] = "\\char124{}", }
+   local escaped_minimal_chars = {
+     ["{"] = "\\{",
+     ["}"] = "\\}",
+     ["%"] = "\\%",
+     ["\\"] = "\\\\", }
+   local escaped_minimal_strings = {
+     ["^^"] = "\\^{}\\^{}", }
 %    \end{macrocode}
-% Use the \luam{escaped} table to create an escaper function \luamdef{escape}.
+% Use the \luam{escaped} table to create an escaper function \luamdef{escape}
+% and the \luam{escaped_minimal_chars} and \luam{escaped_minimal_strings}
+% tables to create an escaper function \luamdef{escape_minimal}.
 %  \begin{macrocode}
   local escape = util.escaper(escaped)
+  local escape_minimal = util.escaper(escaped_minimal_chars,
+    escaped_minimal_strings)
 %    \end{macrocode}
 %
 % Define \luamdef{writer->string} as a function that will transform an input
-% plain text span \t`s` to the output format. If the \Opt{hybrid} option is
-% \t`true`, use an identity function. Otherwise, use the \luam{escape}
-% function.
+% plain text span \t`s` to the output format and \luamdef{writer->uri} as a
+% function that will transform an input \acro{uri} \t`u` to the output format.
+% If the \Opt{hybrid} option is \t`true`, use identity functions. Otherwise,
+% use the \luam{escape} and \luam{escape_minimal} functions.
 %  \begin{macrocode}
   if options.hybrid then
     self.string = function(s) return s end
+    self.uri = function(u) return u end
   else
     self.string = escape
+    self.uri = escape_minimal
   end
 %    \end{macrocode}
 %
@@ -1901,6 +1922,7 @@ function M.writer.new(options)
   function self.link(lab,src,tit)
     return {"\\markdownRendererLink{",lab,"}",
                           "{",self.string(src),"}",
+                          "{",self.uri(src),"}",
                           "{",self.string(tit or ""),"}"}
   end
 %    \end{macrocode}
@@ -1912,6 +1934,7 @@ function M.writer.new(options)
   function self.image(lab,src,tit)
     return {"\\markdownRendererImage{",lab,"}",
                            "{",self.string(src),"}",
+                           "{",self.uri(src),"}",
                            "{",self.string(tit or ""),"}"}
   end
 %    \end{macrocode}
@@ -2893,8 +2916,8 @@ return M
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
 \let\markdownRendererEllipsisPrototype\dots
 \long\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
-\long\def\markdownRendererLinkPrototype#1#2#3{#1}%
-\long\def\markdownRendererImagePrototype#1#2#3{#1}%
+\long\def\markdownRendererLinkPrototype#1#2#3#4{#2}%
+\long\def\markdownRendererImagePrototype#1#2#3#4{#2}%
 \def\markdownRendererUlBeginPrototype{}%
 \def\markdownRendererUlBeginTightPrototype{}%
 \def\markdownRendererUlItemPrototype{}%
@@ -3444,14 +3467,14 @@ return M
 \markdownSetup{rendererPrototypes={
   lineBreak = {\\},
   codeSpan = {\texttt{#1}},
-  link = {#1\footnote{\ifx\empty#3\empty\else#3:
-    \fi\texttt<\url{#2}\texttt>}},
+  link = {#1\footnote{\ifx\empty#4\empty\else#4:
+    \fi\texttt<\url{#3}\texttt>}},
   image = {\begin{figure}
       \begin{center}%
-        \includegraphics{#2}%
+        \includegraphics{#3}%
       \end{center}%
-      \ifx\empty#3\empty\else
-        \caption{#3}%
+      \ifx\empty#4\empty\else
+        \caption{#4}%
       \fi
       \label{fig:#1}%
     \end{figure}},
@@ -3621,11 +3644,11 @@ return M
 % The following configuration should be considered placeholder.
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\blank}%
-\long\def\markdownRendererLinkPrototype#1#2#3{%
-  \useURL[#1][#2][][#3]#1\footnote[#1]{\ifx\empty#3\empty\else#3:
-  \fi\tt<\hyphenatedurl{#2}>}}%
-\long\def\markdownRendererImagePrototype#1#2#3{%
-  \placefigure[][fig:#1]{#3}{\externalfigure[#2]}}%
+\long\def\markdownRendererLinkPrototype#1#2#3#4{%
+  \useURL[#1][#3][][#4]#1\footnote[#1]{\ifx\empty#4\empty\else#4:
+  \fi\tt<\hyphenatedurl{#3}>}}%
+\long\def\markdownRendererImagePrototype#1#2#3#4{%
+  \placefigure[][fig:#1]{#4}{\externalfigure[#3]}}%
 \def\markdownRendererUlBeginPrototype{\startitemize}%
 \def\markdownRendererUlBeginTightPrototype{\startitemize[packed]}%
 \def\markdownRendererUlItemPrototype{\item}%
