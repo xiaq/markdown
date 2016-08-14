@@ -293,19 +293,25 @@ Output:
 >>>
 headingOne: Markdown: Basics
 headingTwo: Getting the Gist of Markdown's Formatting Syntax
+====================
 link label: syntax page
 link URI: /projects/markdown/syntax
 link raw URI: /projects/markdown/syntax
 link title: Markdown Syntax
+====================
+====================
 link label: Dingus
 link URI: /projects/markdown/dingus
 link raw URI: /projects/markdown/dingus
 link title: Markdown Dingus
+====================
 strongEmphasis: Note:
+====================
 link label: see the source for it by adding '.text' to the URL
 link URI: /projects/markdown/basics.text
 link raw URI: /projects/markdown/basics.text
 link title: 
+====================
 headingTwo: Paragraphs, Headers, Blockquotes
 emphasis: Setext
 emphasis: atx
@@ -313,7 +319,7 @@ code span: <h1>
 code span: <h2>
 code span: =
 code span: -
-code span: \#
+code span: (hash){}
 code span: >
 inputVerbatim: _markdown-test/5ebdf3631f626dba5ee92ee773e97a8f.verbatim
 inputVerbatim: _markdown-test/9347d3cfacf328e3d73c4fe1b4f76524.verbatim
@@ -350,12 +356,12 @@ inputVerbatim: _markdown-test/602bb0e325271b2b4dce9175eaed15b1.verbatim
 inputVerbatim: _markdown-test/e5b369214c819b9d9b476b7bb1f5aa53.verbatim
 inputVerbatim: _markdown-test/885cbee5cc0e1fac9ce25c3a9d30034e.verbatim
 headingThree: Code
-code span: \&
+code span: (ampersand){}
 code span: <
 code span: >
 inputVerbatim: _markdown-test/fbcaafb68ad6405619da77e413788d6e.verbatim
 inputVerbatim: _markdown-test/cfc57312a789ed7b4e14f3f56c88381a.verbatim
-code span: \&
+code span: (ampersand){}
 code span: <
 code span: >
 inputVerbatim: _markdown-test/fe59314852dc8de3165464ab451f44a0.verbatim

@@ -2,18 +2,44 @@
   \TYPE{line break}}%
 \def\markdownRendererEllipsis{%
   \TYPE{ellipsis}}%
+\def\markdownRendererLeftBrace{%
+  \TYPE{leftBrace}}%
+\def\markdownRendererRightBrace{%
+  \TYPE{rightBrace}}%
+\def\markdownRendererDollarSign{%
+  \TYPE{dollarSign}}%
+\def\markdownRendererPercentSign{%
+  \TYPE{percentSign}}%
+\def\markdownRendererAmpersand{%
+  \TYPE{ampersand}}%
+\def\markdownRendererUnderscore{%
+  \TYPE{underscore}}%
+\def\markdownRendererHash{%
+  \TYPE{hash}}%
+\def\markdownRendererCircumflex{%
+  \TYPE{circumflex}}%
+\def\markdownRendererBackslash{%
+  \TYPE{backslash}}%
+\def\markdownRendererTilde{%
+  \TYPE{tilde}}%
+\def\markdownRendererPipe{%
+  \TYPE{pipe}}%
 \long\def\markdownRendererCodeSpan#1{%
   \TYPE{code span:        #1}}%
 \long\def\markdownRendererLink#1#2#3#4{%
+  \TYPE{====================}
   \TYPE{link label:       #1}%
   \TYPE{link URI:         #2}%
   \TYPE{link raw URI:     #3}%
-  \TYPE{link title:       #4}}%
+  \TYPE{link title:       #4}%
+  \TYPE{====================}}%
 \long\def\markdownRendererImage#1#2#3#4{%
+  \TYPE{====================}
   \TYPE{image label:      #1}%
   \TYPE{image URI:        #2}%
   \TYPE{image raw URI:    #3}%
-  \TYPE{image title:      #4}}%
+  \TYPE{image title:      #4}%
+  \TYPE{====================}}%
 \def\markdownRendererUlBegin{%
   \TYPE{ulBegin}}%
 \def\markdownRendererUlBeginTight{%

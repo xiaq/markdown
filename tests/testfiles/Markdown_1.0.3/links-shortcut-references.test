@@ -18,19 +18,27 @@ break].
 [other]: /other
 
 >>>
+====================
 link label: simple case
 link URI: /simple
 link raw URI: /simple
 link title: 
+====================
+====================
 link label: line break
 link URI: /foo
 link raw URI: /foo
 link title: 
+====================
+====================
 link label: this
 link URI: /that
 link raw URI: /that
 link title: 
+====================
+====================
 link label: other
 link URI: /other
 link raw URI: /other
 link title: 
+====================

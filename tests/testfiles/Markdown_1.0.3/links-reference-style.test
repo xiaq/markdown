@@ -68,70 +68,102 @@ breaks] across lines.
 [link breaks]: /url/
 
 >>>
+====================
 link label: bar
 link URI: /url/
 link raw URI: /url/
 link title: Title
+====================
+====================
 link label: bar
 link URI: /url/
 link raw URI: /url/
 link title: Title
+====================
+====================
 link label: bar
 link URI: /url/
 link raw URI: /url/
 link title: Title
+====================
+====================
 link label: embedded [brackets]
 link URI: /url/
 link raw URI: /url/
 link title: 
+====================
+====================
 link label: once
 link URI: /url
 link raw URI: /url
 link title: 
+====================
+====================
 link label: twice
 link URI: /url
 link raw URI: /url
 link title: 
+====================
+====================
 link label: thrice
 link URI: /url
 link raw URI: /url
 link title: 
+====================
 inputVerbatim: _markdown-test/b0cba64633d2a9eac28ca9e3fa500018.verbatim
 horizontalRule
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: foo
 link raw URI: foo
 link title: 
+====================
+====================
 link label: this
 link URI: /somethingelse/
 link raw URI: /somethingelse/
 link title: 
+====================
 horizontalRule
+====================
 link label: link breaks
 link URI: /url/
 link raw URI: /url/
 link title: 
+====================

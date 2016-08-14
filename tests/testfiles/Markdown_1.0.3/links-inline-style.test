@@ -13,27 +13,39 @@ Just a [URL](/url/).
 [Empty]().
 
 >>>
+====================
 link label: URL
 link URI: /url/
 link raw URI: /url/
 link title: 
+====================
+====================
 link label: URL and title
 link URI: /url/
 link raw URI: /url/
 link title: title
+====================
+====================
 link label: URL and title
 link URI: /url/
 link raw URI: /url/
 link title: title preceded by two spaces
+====================
+====================
 link label: URL and title
 link URI: /url/
 link raw URI: /url/
 link title: title preceded by a tab
+====================
+====================
 link label: URL and title
 link URI: /url/
 link raw URI: /url/
 link title: title has spaces afterward
+====================
+====================
 link label: Empty
 link URI: 
 link raw URI: 
 link title: 
+====================

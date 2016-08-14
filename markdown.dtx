@@ -671,6 +671,36 @@ defaultOptions.tightLists = true
   \markdownRendererEllipsisPrototype}%
 %    \end{macrocode}
 %
+% \paragraph{Special Character Renderers}
+% The following macros replace any special plain \TeX{} characters (including
+% the active pipe character (\t`|`) of \Hologo{ConTeXt}) in the input text.
+% These macros will only be produced, when the \Opt{hybrid} option is
+% \t`false`.
+%  \begin{macrocode}
+\def\markdownRendererLeftBrace{%
+  \markdownRendererLeftBracePrototype}%
+\def\markdownRendererRightBrace{%
+  \markdownRendererRightBracePrototype}%
+\def\markdownRendererDollarSign{%
+  \markdownRendererDollarSignPrototype}%
+\def\markdownRendererPercentSign{%
+  \markdownRendererPercentSignPrototype}%
+\def\markdownRendererAmpersand{%
+  \markdownRendererAmpersandPrototype}%
+\def\markdownRendererUnderscore{%
+  \markdownRendererUnderscorePrototype}%
+\def\markdownRendererHash{%
+  \markdownRendererHashPrototype}%
+\def\markdownRendererCircumflex{%
+  \markdownRendererCircumflexPrototype}%
+\def\markdownRendererBackslash{%
+  \markdownRendererBackslashPrototype}%
+\def\markdownRendererTilde{%
+  \markdownRendererTildePrototype}%
+\def\markdownRendererPipe{%
+  \markdownRendererPipePrototype}%
+%    \end{macrocode}
+%
 % \paragraph{Code Span Renderer}
 % The \mdef{markdownRendererCodeSpan} macro represents inlined code span in the
 % input text. It receives a single argument that corresponds to the inlined
@@ -972,6 +1002,17 @@ defaultOptions.tightLists = true
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{}%
 \def\markdownRendererEllipsisPrototype{}%
+\def\markdownRendererLeftBracePrototype{}%
+\def\markdownRendererRightBracePrototype{}%
+\def\markdownRendererDollarSignPrototype{}%
+\def\markdownRendererPercentSignPrototype{}%
+\def\markdownRendererAmpersandPrototype{}%
+\def\markdownRendererUnderscorePrototype{}%
+\def\markdownRendererHashPrototype{}%
+\def\markdownRendererCircumflexPrototype{}%
+\def\markdownRendererBackslashPrototype{}%
+\def\markdownRendererTildePrototype{}%
+\def\markdownRendererPipePrototype{}%
 \long\def\markdownRendererCodeSpanPrototype#1{}%
 \long\def\markdownRendererLinkPrototype#1#2#3#4{}%
 \long\def\markdownRendererImagePrototype#1#2#3#4{}%
@@ -1267,6 +1308,28 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererLineBreak{#1}}%
 \define@key{markdownRenderers}{ellipsis}{%
   \renewcommand\markdownRendererEllipsis{#1}}%
+\define@key{markdownRenderers}{leftBrace}{%
+  \renewcommand\markdownRendererLeftBrace{#1}}%
+\define@key{markdownRenderers}{rightBrace}{%
+  \renewcommand\markdownRendererRightBrace{#1}}%
+\define@key{markdownRenderers}{dollarSign}{%
+  \renewcommand\markdownRendererDollarSign{#1}}%
+\define@key{markdownRenderers}{percentSign}{%
+  \renewcommand\markdownRendererPercentSign{#1}}%
+\define@key{markdownRenderers}{ampersand}{%
+  \renewcommand\markdownRendererAmpersand{#1}}%
+\define@key{markdownRenderers}{underscore}{%
+  \renewcommand\markdownRendererUnderscore{#1}}%
+\define@key{markdownRenderers}{hash}{%
+  \renewcommand\markdownRendererHash{#1}}%
+\define@key{markdownRenderers}{circumflex}{%
+  \renewcommand\markdownRendererCircumflex{#1}}%
+\define@key{markdownRenderers}{backslash}{%
+  \renewcommand\markdownRendererBackslash{#1}}%
+\define@key{markdownRenderers}{tilde}{%
+  \renewcommand\markdownRendererTilde{#1}}%
+\define@key{markdownRenderers}{pipe}{%
+  \renewcommand\markdownRendererPipe{#1}}%
 \define@key{markdownRenderers}{codeSpan}{%
   \renewcommand\markdownRendererCodeSpan[1]{#1}}%
 \define@key{markdownRenderers}{link}{%
@@ -1361,6 +1424,28 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererLineBreakPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ellipsis}{%
   \renewcommand\markdownRendererEllipsisPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{leftBrace}{%
+  \renewcommand\markdownRendererLeftBracePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{rightBrace}{%
+  \renewcommand\markdownRendererRightBracePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{dollarSign}{%
+  \renewcommand\markdownRendererDollarSignPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{percentSign}{%
+  \renewcommand\markdownRendererPercentSignPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ampersand}{%
+  \renewcommand\markdownRendererAmpersandPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{underscore}{%
+  \renewcommand\markdownRendererUnderscorePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{hash}{%
+  \renewcommand\markdownRendererHashPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{circumflex}{%
+  \renewcommand\markdownRendererCircumflexPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{backslash}{%
+  \renewcommand\markdownRendererBackslashPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{tilde}{%
+  \renewcommand\markdownRendererTildePrototype{#1}}%
+\define@key{markdownRendererPrototypes}{pipe}{%
+  \renewcommand\markdownRendererPipe{#1}}%
 \define@key{markdownRendererPrototypes}{codeSpan}{%
   \renewcommand\markdownRendererCodeSpanPrototype[1]{#1}}%
 \define@key{markdownRendererPrototypes}{link}{%
@@ -1857,37 +1942,39 @@ function M.writer.new(options)
   self.hrule = "\\markdownRendererHorizontalRule "
 %    \end{macrocode}
 %
-% Define a table \luamdef{escaped} containing the mapping from special plain
-% \TeX{} characters to their escaped variants. Define tables
+% Define a table \luamdef{escaped_chars} containing the mapping from special
+% plain \TeX{} characters (including the active pipe character (\t`|`) of
+% \Hologo{ConTeXt}) to their escaped variants. Define tables
 % \luamdef{escaped_minimal_chars} and \luamdef{escaped_minimal_strings}
 % containing the mapping from special plain characters and character strings
 % that need to be escaped even in content that will not be typeset.
 %  \begin{macrocode}
-  local escaped = {
-     ["{"] = "\\{",
-     ["}"] = "\\}",
-     ["$"] = "\\$",
-     ["%"] = "\\%",
-     ["&"] = "\\&",
-     ["_"] = "\\_",
-     ["#"] = "\\#",
-     ["^"] = "\\^{}",
-     ["\\"] = "\\char92{}",
-     ["~"] = "\\char126{}",
-     ["|"] = "\\char124{}", }
+  local escaped_chars = {
+     ["{"] = "\\markdownRendererLeftBrace{}",
+     ["}"] = "\\markdownRendererRightBrace{}",
+     ["$"] = "\\markdownRendererDollarSign{}",
+     ["%"] = "\\markdownRendererPercentSign{}",
+     ["&"] = "\\markdownRendererAmpersand{}",
+     ["_"] = "\\markdownRendererUnderscore{}",
+     ["#"] = "\\markdownRendererHash{}",
+     ["^"] = "\\markdownRendererCircumflex{}",
+     ["\\"] = "\\markdownRendererBackslash{}",
+     ["~"] = "\\markdownRendererTilde{}",
+     ["|"] = "\\markdownRendererPipe{}", }
    local escaped_minimal_chars = {
-     ["{"] = "\\{",
-     ["}"] = "\\}",
-     ["%"] = "\\%",
-     ["\\"] = "\\\\", }
+     ["{"] = "\\markdownRendererLeftBrace{}",
+     ["}"] = "\\markdownRendererRightBrace{}",
+     ["%"] = "\\markdownRendererPercentSign{}",
+     ["\\"] = "\\markdownRendererBackslash{}", }
    local escaped_minimal_strings = {
-     ["^^"] = "\\^{}\\^{}", }
+     ["^^"] = "\\markdownRendererCircumflex\\markdownRendererCircumflex ", }
 %    \end{macrocode}
-% Use the \luam{escaped} table to create an escaper function \luamdef{escape}
-% and the \luam{escaped_minimal_chars} and \luam{escaped_minimal_strings}
-% tables to create an escaper function \luamdef{escape_minimal}.
+% Use the \luam{escaped_chars} table to create an escaper function
+% \luamdef{escape} and the \luam{escaped_minimal_chars} and
+% \luam{escaped_minimal_strings} tables to create an escaper function
+% \luamdef{escape_minimal}.
 %  \begin{macrocode}
-  local escape = util.escaper(escaped)
+  local escape = util.escaper(escaped_chars)
   local escape_minimal = util.escaper(escaped_minimal_chars,
     escaped_minimal_strings)
 %    \end{macrocode}
@@ -2915,6 +3002,17 @@ return M
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
 \let\markdownRendererEllipsisPrototype\dots
+\def\markdownRendererLeftBracePrototype{\char`{}%
+\def\markdownRendererRightBracePrototype{\char`}}%
+\def\markdownRendererDollarSignPrototype{\char`$}%
+\def\markdownRendererPercentSignPrototype{\char`\%}%
+\def\markdownRendererAmpersandPrototype{\char`&}%
+\def\markdownRendererUnderscorePrototype{\char`_}%
+\def\markdownRendererHashPrototype{\char`\#}%
+\def\markdownRendererCircumflexPrototype{\char`^}%
+\def\markdownRendererBackslashPrototype{\char`\\}%
+\def\markdownRendererTildePrototype{\char`~}%
+\def\markdownRendererPipePrototype{|}%
 \long\def\markdownRendererCodeSpanPrototype#1{{\tt#1}}%
 \long\def\markdownRendererLinkPrototype#1#2#3#4{#2}%
 \long\def\markdownRendererImagePrototype#1#2#3#4{#2}%
@@ -2941,7 +3039,7 @@ return M
 \def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}%
 \def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}%
 \long\def\markdownRendererInputVerbatimPrototype#1{%
-  \par{\tt\input"#1"\relax}\par}%
+\par{\tt\input"#1"\relax}\par}%
 \long\def\markdownRendererHeadingOnePrototype#1{#1}%
 \long\def\markdownRendererHeadingTwoPrototype#1{#1}%
 \long\def\markdownRendererHeadingThreePrototype#1{#1}%
@@ -2960,39 +3058,39 @@ return M
 % to expand to either \t`true` or \t`false`.
 %  \begin{macrocode}
 \def\markdownLuaOptions{{%
-  \ifx\markdownOptionBlankBeforeBlockquote\undefined\else
-    blankBeforeBlockquote = \markdownOptionBlankBeforeBlockquote,
-  \fi
-  \ifx\markdownOptionBlankBeforeHeading\undefined\else
-    blankBeforeHeading = \markdownOptionBlankBeforeHeading,
-  \fi
-  \ifx\markdownOptionCacheDir\undefined\else
-    cacheDir = "\markdownOptionCacheDir",
-  \fi
-  \ifx\markdownOptionDefinitionLists\undefined\else
-    definitionLists = \markdownOptionDefinitionLists,
-  \fi
-  \ifx\markdownOptionHashEnumerators\undefined\else
-    hashEnumerators = \markdownOptionHashEnumerators,
-  \fi
-  \ifx\markdownOptionHybrid\undefined\else
-    hybrid = \markdownOptionHybrid,
-  \fi
-  \ifx\markdownOptionFootnotes\undefined\else
-    footnotes = \markdownOptionFootnotes,
-  \fi
-  \ifx\markdownOptionPreserveTabs\undefined\else
-    preserveTabs = \markdownOptionPreserveTabs,
-  \fi
-  \ifx\markdownOptionSmartEllipses\undefined\else
-    smartEllipses = \markdownOptionSmartEllipses,
-  \fi
-  \ifx\markdownOptionStartNumber\undefined\else
-    startNumber = \markdownOptionStartNumber,
-  \fi
-  \ifx\markdownOptionTightLists\undefined\else
-    tightLists = \markdownOptionTightLists,
-  \fi}
+\ifx\markdownOptionBlankBeforeBlockquote\undefined\else
+  blankBeforeBlockquote = \markdownOptionBlankBeforeBlockquote,
+\fi
+\ifx\markdownOptionBlankBeforeHeading\undefined\else
+  blankBeforeHeading = \markdownOptionBlankBeforeHeading,
+\fi
+\ifx\markdownOptionCacheDir\undefined\else
+  cacheDir = "\markdownOptionCacheDir",
+\fi
+\ifx\markdownOptionDefinitionLists\undefined\else
+  definitionLists = \markdownOptionDefinitionLists,
+\fi
+\ifx\markdownOptionHashEnumerators\undefined\else
+  hashEnumerators = \markdownOptionHashEnumerators,
+\fi
+\ifx\markdownOptionHybrid\undefined\else
+  hybrid = \markdownOptionHybrid,
+\fi
+\ifx\markdownOptionFootnotes\undefined\else
+  footnotes = \markdownOptionFootnotes,
+\fi
+\ifx\markdownOptionPreserveTabs\undefined\else
+  preserveTabs = \markdownOptionPreserveTabs,
+\fi
+\ifx\markdownOptionSmartEllipses\undefined\else
+  smartEllipses = \markdownOptionSmartEllipses,
+\fi
+\ifx\markdownOptionStartNumber\undefined\else
+  startNumber = \markdownOptionStartNumber,
+\fi
+\ifx\markdownOptionTightLists\undefined\else
+  tightLists = \markdownOptionTightLists,
+\fi}
 }%
 %    \end{macrocode}
 %
@@ -3004,18 +3102,18 @@ return M
 %    \end{macrocode}
 % First, ensure that the \m{markdownOptionCacheDir} directory exists.
 %  \begin{macrocode}
-  local lfs = require("lfs")
-  local cacheDir = "\markdownOptionCacheDir"
-  if lfs.isdir(cacheDir) == true then else
-    assert(lfs.mkdir(cacheDir))
-  end
+local lfs = require("lfs")
+local cacheDir = "\markdownOptionCacheDir"
+if lfs.isdir(cacheDir) == true then else
+  assert(lfs.mkdir(cacheDir))
+end
 %    \end{macrocode}
 % Next, load the \t`markdown` module and create a converter function using
 % the plain \TeX{} options, which were serialized to a Lua table via the
 % \m{markdownLuaOptions} macro.
 %  \begin{macrocode}
-  local md = require("markdown")
-  local convert = md.new(\markdownLuaOptions)
+local md = require("markdown")
+local convert = md.new(\markdownLuaOptions)
 }%
 %    \end{macrocode}
 %
@@ -3035,11 +3133,11 @@ return M
 %  \begin{macrocode}
 
 \ifnum\markdownMode<2\relax
-  \ifnum\markdownMode=0\relax
-    \markdownInfo{Using mode 0: Shell escape via write18}%
-  \else
-    \markdownInfo{Using mode 1: Shell escape via os.execute}%
-  \fi
+\ifnum\markdownMode=0\relax
+  \markdownInfo{Using mode 0: Shell escape via write18}%
+\else
+  \markdownInfo{Using mode 1: Shell escape via os.execute}%
+\fi
 %    \end{macrocode}
 %
 % The macro \mdef{markdownLuaExecuteFileStream} contains the number of the output
@@ -3049,7 +3147,7 @@ return M
 % named \m{markdownOptionInputTempFileName} during the expansion of the macro
 % \m{markdownReadAndConvert}.
 %  \begin{macrocode}
-  \csname newwrite\endcsname\markdownLuaExecuteFileStream
+\csname newwrite\endcsname\markdownLuaExecuteFileStream
 %    \end{macrocode}
 %
 % The \mdef{markdownExecuteShellEscape} macro contains the numeric value indicating
@@ -3061,36 +3159,36 @@ return M
 % commands. If neither of these commands is defined, act as if the shell access
 % were enabled.
 %  \begin{macrocode}
-  \ifnum\markdownMode=0\relax
-    \ifx\pdfshellescape\undefined
-      \ifx\shellescape\undefined
-        \def\markdownExecuteShellEscape{1}%
-      \else
-        \let\markdownExecuteShellEscape\shellescape
-      \fi
+\ifnum\markdownMode=0\relax
+  \ifx\pdfshellescape\undefined
+    \ifx\shellescape\undefined
+      \def\markdownExecuteShellEscape{1}%
     \else
-      \let\markdownExecuteShellEscape\pdfshellescape
+      \let\markdownExecuteShellEscape\shellescape
     \fi
+  \else
+    \let\markdownExecuteShellEscape\pdfshellescape
+  \fi
 %    \end{macrocode}
 % If Lua is available, inherit the value of the \t`status.shell_escape`
 % configuration item.
 %  \begin{macrocode}
-  \else
-    \def\markdownExecuteShellEscape{%
-      \directlua{tex.sprint(status.shell_escape)}}%
-  \fi
+\else
+  \def\markdownExecuteShellEscape{%
+    \directlua{tex.sprint(status.shell_escape)}}%
+\fi
 %    \end{macrocode}
 %
 % The \mdef{markdownExecuteDirect} macro executes the code it has received as
 % its first argument by writing it to the output file stream 18, if Lua is
 % unavailable, or by using the Lua \luam{markdown.execute} method otherwise.
 %  \begin{macrocode}
-  \ifnum\markdownMode=0\relax
-    \def\markdownExecuteDirect#1{\immediate\write18{#1}}%
-  \else
-    \def\markdownExecuteDirect#1{%
-      \directlua{os.execute("\luaescapestring{#1}")}}%
-  \fi
+\ifnum\markdownMode=0\relax
+  \def\markdownExecuteDirect#1{\immediate\write18{#1}}%
+\else
+  \def\markdownExecuteDirect#1{%
+    \directlua{os.execute("\luaescapestring{#1}")}}%
+\fi
 %    \end{macrocode}
 %
 % The \mdef{markdownExecute} macro is a wrapper on top of
@@ -3098,14 +3196,14 @@ return M
 % \m{markdownExecuteShellEscape} and prints an error message if the shell is
 % inaccessible.
 %  \begin{macrocode}
-  \def\markdownExecute#1{%
-    \ifnum\markdownExecuteShellEscape=1\relax
-      \markdownExecuteDirect{#1}%
-    \else
-      \markdownError{I can not access the shell}{Either run the TeX
-        compiler with the --shell-escape or the --enable-write18 flag,
-        or set shell_escape=t in the texmf.cnf file}%
-    \fi}%
+\def\markdownExecute#1{%
+  \ifnum\markdownExecuteShellEscape=1\relax
+    \markdownExecuteDirect{#1}%
+  \else
+    \markdownError{I can not access the shell}{Either run the TeX
+      compiler with the --shell-escape or the --enable-write18 flag,
+      or set shell_escape=t in the texmf.cnf file}%
+  \fi}%
 %    \end{macrocode}
 %
 % The \mdef{markdownLuaExecute} macro executes the Lua code it has received as
@@ -3113,89 +3211,89 @@ return M
 % engine, but it can use the \luam{print} function in the same manner it
 % would use the \luam{tex.print} method.
 %  \begin{macrocode}
-  \def\markdownLuaExecute#1{%
+\def\markdownLuaExecute#1{%
 %    \end{macrocode}
 % Create the file \m{markdownOptionHelperScriptFileName} and fill it with the
 % input Lua code prepended with \pkg{kpathsea} initialization, so that Lua
 % modules from the \TeX{} distribution are available.
 %  \begin{macrocode}
-    \immediate\openout\markdownLuaExecuteFileStream=%
-      \markdownOptionHelperScriptFileName
-    \markdownInfo{Writing a helper Lua script to the file
-      "\markdownOptionHelperScriptFileName"}%
-    \immediate\write\markdownLuaExecuteFileStream{%
-      local kpse = require('kpse')
-      kpse.set_program_name('luatex') #1}%
-    \immediate\closeout\markdownLuaExecuteFileStream
+  \immediate\openout\markdownLuaExecuteFileStream=%
+    \markdownOptionHelperScriptFileName
+  \markdownInfo{Writing a helper Lua script to the file
+    "\markdownOptionHelperScriptFileName"}%
+  \immediate\write\markdownLuaExecuteFileStream{%
+    local kpse = require('kpse')
+    kpse.set_program_name('luatex') #1}%
+  \immediate\closeout\markdownLuaExecuteFileStream
 %    \end{macrocode}
 % Execute the generated \m{markdownOptionHelperScriptFileName} Lua script using
 % the \TeX{}Lua binary and store the output in the
 % \m{markdownOptionOutputTempFileName} file.
 %  \begin{macrocode}
-    \markdownInfo{Executing a helper Lua script from the file
-      "\markdownOptionHelperScriptFileName" and storing the result in the
-      file "\markdownOptionOutputTempFileName"}%
-    \markdownExecute{texlua "\markdownOptionHelperScriptFileName" >
-      "\markdownOptionOutputTempFileName"}%
+  \markdownInfo{Executing a helper Lua script from the file
+    "\markdownOptionHelperScriptFileName" and storing the result in the
+    file "\markdownOptionOutputTempFileName"}%
+  \markdownExecute{texlua "\markdownOptionHelperScriptFileName" >
+    "\markdownOptionOutputTempFileName"}%
 %    \end{macrocode}
 % \m{input} the generated \m{markdownOptionOutputTempFileName} file.
 %  \begin{macrocode}
-    \input\markdownOptionOutputTempFileName\relax}%
+  \input\markdownOptionOutputTempFileName\relax}%
 %    \end{macrocode}
 %
 % The \mdef{markdownReadAndConvertTab} macro contains the tab character literal.
 %  \begin{macrocode}
-  \begingroup
-    \catcode`\^^I=12%
-    \gdef\markdownReadAndConvertTab{^^I}%
-  \endgroup
+\begingroup
+  \catcode`\^^I=12%
+  \gdef\markdownReadAndConvertTab{^^I}%
+\endgroup
 %    \end{macrocode}
 %
 % The \m{markdownReadAndConvert} macro is largely a rewrite of the
 % \Hologo{LaTeX2e} \m{filecontents} macro to plain \TeX{}.
 %  \begin{macrocode}
-  \begingroup
+\begingroup
 %    \end{macrocode}
 % Make the newline and tab characters active and swap the character codes of the
 % backslash symbol (\t`\textbackslash`) and the pipe symbol (\t`|`), so that
 % we can use the backslash as an ordinary character inside the macro definition.
 %  \begin{macrocode}
-    \catcode`\^^M=13%
-    \catcode`\^^I=13%
-    \catcode`|=0%
-    \catcode`\\=12%
-    |gdef|markdownReadAndConvert#1#2{%
-      |begingroup%
+  \catcode`\^^M=13%
+  \catcode`\^^I=13%
+  \catcode`|=0%
+  \catcode`\\=12%
+  |gdef|markdownReadAndConvert#1#2{%
+    |begingroup%
 %    \end{macrocode}
 % Open the \m{markdownOptionInputTempFileName} file for writing.
 %  \begin{macrocode}
-      |immediate|openout|markdownLuaExecuteFileStream%
-        |markdownOptionInputTempFileName%
-      |markdownInfo{Buffering markdown input into the temporary %
-        input file "|markdownOptionInputTempFileName" and scanning %
-        for the closing token sequence "#1"}%
+    |immediate|openout|markdownLuaExecuteFileStream%
+      |markdownOptionInputTempFileName%
+    |markdownInfo{Buffering markdown input into the temporary %
+      input file "|markdownOptionInputTempFileName" and scanning %
+      for the closing token sequence "#1"}%
 %    \end{macrocode}
 % Locally change the category of the special plain \TeX{} characters to
 % \emph{other} in order to prevent unwanted interpretation of the input.
 % Change also the category of the space character, so that we can retrieve it
 % unaltered.
 %  \begin{macrocode}
-      |def|do##1{|catcode`##1=12}|dospecials%
-      |catcode`| =12%
-      |markdownMakeOther%
+    |def|do##1{|catcode`##1=12}|dospecials%
+    |catcode`| =12%
+    |markdownMakeOther%
 %    \end{macrocode}
 % The \mdef{markdownReadAndConvertProcessLine} macro will process the individual
 % lines of output. Note the use of the comments to ensure that the entire macro
 % is at a single line and therefore no (active) newline symbols are produced.
 %  \begin{macrocode}
-      |def|markdownReadAndConvertProcessLine##1#1##2#1##3|relax{%
+    |def|markdownReadAndConvertProcessLine##1#1##2#1##3|relax{%
 %    \end{macrocode}
 % When the ending token sequence does not appear in the line, store the line in
 % the \m{markdownOptionInputTempFileName} file.
 %  \begin{macrocode}
-        |ifx|relax##3|relax%
-          |immediate|write|markdownLuaExecuteFileStream{##1}%
-        |else%
+      |ifx|relax##3|relax%
+        |immediate|write|markdownLuaExecuteFileStream{##1}%
+      |else%
 %    \end{macrocode}
 % When the ending token sequence appears in the line, make the next newline
 % character close the \m{markdownOptionInputTempFileName} file, return the
@@ -3204,39 +3302,39 @@ return M
 % \m{input} the result of the conversion, and expand the ending control
 % sequence.
 %  \begin{macrocode}
-          |def^^M{%
-            |markdownInfo{The ending token sequence was found}%
-            |immediate|write|markdownLuaExecuteFileStream{}%
-            |immediate|closeout|markdownLuaExecuteFileStream%
-            |endgroup%
-            |markdownInput|markdownOptionInputTempFileName%
-            #2}%
-        |fi%
+        |def^^M{%
+          |markdownInfo{The ending token sequence was found}%
+          |immediate|write|markdownLuaExecuteFileStream{}%
+          |immediate|closeout|markdownLuaExecuteFileStream%
+          |endgroup%
+          |markdownInput|markdownOptionInputTempFileName%
+          #2}%
+      |fi%
 %    \end{macrocode}
 % Repeat with the next line.
 %  \begin{macrocode}
-        ^^M}%
+      ^^M}%
 %    \end{macrocode}
 % Make the tab character active at expansion time and make it expand to a
 % literal tab character.
 %  \begin{macrocode}
-      |catcode`|^^I=13%
-      |def^^I{|markdownReadAndConvertTab}%
+    |catcode`|^^I=13%
+    |def^^I{|markdownReadAndConvertTab}%
 %    \end{macrocode}
 % Make the newline character active at expansion time and make it consume the
 % rest of the line on expansion. Throw away the rest of the first line and
 % pass the second line to the \m{markdownReadAndConvertProcessLine} macro.
 %  \begin{macrocode}
-      |catcode`|^^M=13%
-      |def^^M##1^^M{%
-        |def^^M####1^^M{%
-          |markdownReadAndConvertProcessLine####1#1#1|relax}%
-        ^^M}%
+    |catcode`|^^M=13%
+    |def^^M##1^^M{%
+      |def^^M####1^^M{%
+        |markdownReadAndConvertProcessLine####1#1#1|relax}%
       ^^M}%
+    ^^M}%
 %    \end{macrocode}
 % Reset the character categories back to the former state.
 %  \begin{macrocode}
-  |endgroup
+|endgroup
 %    \end{macrocode}
 %
 % \subsubsection{Direct Lua Access}\label{sec:directlua}
@@ -3247,27 +3345,27 @@ return M
 % \m{markdownMode} value of \t`2`.
 %  \begin{macrocode}
 \else
-  \markdownInfo{Using mode 2: Direct Lua access}%
+\markdownInfo{Using mode 2: Direct Lua access}%
 %    \end{macrocode}
 % The direct Lua access version of the \m{markdownLuaExecute} macro is defined
 % in terms of the \m{directlua} primitive. The \luam{print} function is set as
 % an alias to the \m{tex.print} method in order to mimic the behaviour of the
 % \m{markdownLuaExecute} definition from Section \ref{sec:luabridge},
 %  \begin{macrocode}
-  \def\markdownLuaExecute#1{\directlua{local print = tex.print #1}}%
+\def\markdownLuaExecute#1{\directlua{local print = tex.print #1}}%
 %    \end{macrocode}
 %
 % In the definition of the direct Lua access version of the
 % \m{markdownReadAndConvert} macro, we will be using the hash symbol
-% (\t`\#`), the underscore symbol (\t`_`), the caret symbol (\t`\^`), the
+% (\t`\#`), the underscore symbol (\t`_`), the circumflex symbol (\t`\^`), the
 % dollar sign (\t`\$`), the backslash symbol (\t`\textbackslash`), the percent
 % sign (\t`\%`), and the braces (\t`\{\}`) as a part of the Lua syntax.
 %  \begin{macrocode}
-  \begingroup
+\begingroup
 %    \end{macrocode}
 %
-% To this end, we will make the underscore symbol, the dollar sign, and caret
-% symbols ordinary characters,
+% To this end, we will make the underscore symbol, the dollar sign, and
+% circumflex symbols ordinary characters,
 %  \begin{macrocode}
     \catcode`\_=12%
     \catcode`\$=12%
@@ -3466,6 +3564,14 @@ return M
 \RequirePackage{fancyvrb}
 \markdownSetup{rendererPrototypes={
   lineBreak = {\\},
+  leftBrace = {\textbraceleft},
+  rightBrace = {\textbraceright},
+  dollarSign = {\textdollar},
+  underscore = {\textunderscore},
+  circumflex = {\textasciicircum},
+  backslash = {\textbackslash},
+  tilde = {\textasciitilde},
+  pipe = {\textbar},
   codeSpan = {\texttt{#1}},
   link = {#1\footnote{\ifx\empty#4\empty\else#4:
     \fi\texttt<\url{#3}\texttt>}},
@@ -3654,6 +3760,15 @@ return M
 % The following configuration should be considered placeholder.
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\blank}%
+\def\markdownRendererLeftBracePrototype{\textbraceleft}%
+\def\markdownRendererRightBracePrototype{\textbraceright}%
+\def\markdownRendererDollarSignPrototype{\textdollar}%
+\def\markdownRendererPercentSignPrototype{\percent}%
+\def\markdownRendererUnderscorePrototype{\textunderscore}%
+\def\markdownRendererCircumflexPrototype{\textcircumflex}%
+\def\markdownRendererBackslashPrototype{\textbackslash}%
+\def\markdownRendererTildePrototype{\textasciitilde}%
+\def\markdownRendererPipePrototype{\char`|}%
 \long\def\markdownRendererLinkPrototype#1#2#3#4{%
   \useURL[#1][#3][][#4]#1\footnote[#1]{\ifx\empty#4\empty\else#4:
   \fi\tt<\hyphenatedurl{#3}>}}%

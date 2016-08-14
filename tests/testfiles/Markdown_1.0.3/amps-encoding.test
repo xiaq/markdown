@@ -11,19 +11,27 @@ Here's an inline [link](</script?foo=1&bar=2>).
 [1]: http://example.com/?foo=1&bar=2
 [2]: http://att.com/  "AT&T"
 >>>
+====================
 link label: link
-link URI: http://example.com/?foo=1\&bar=2
+link URI: http://example.com/?foo=1(ampersand){}bar=2
 link raw URI: http://example.com/?foo=1&bar=2
 link title: 
-link label: AT\&T
+====================
+====================
+link label: AT(ampersand){}T
 link URI: http://att.com/
 link raw URI: http://att.com/
-link title: AT\&T
+link title: AT(ampersand){}T
+====================
+====================
 link label: link
-link URI: /script?foo=1\&bar=2
+link URI: /script?foo=1(ampersand){}bar=2
 link raw URI: /script?foo=1&bar=2
 link title: 
+====================
+====================
 link label: link
-link URI: /script?foo=1\&bar=2
+link URI: /script?foo=1(ampersand){}bar=2
 link raw URI: /script?foo=1&bar=2
 link title: 
+====================

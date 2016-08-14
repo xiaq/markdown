@@ -13,28 +13,36 @@ Auto-links should not occur here: `<http://example.com/>`
 
 	or here: <http://example.com/>
 >>>
+====================
 link label: http://example.com/
 link URI: http://example.com/
 link raw URI: http://example.com/
 link title: 
-link label: http://example.com/?foo=1\&bar=2
-link URI: http://example.com/?foo=1\&bar=2
+====================
+====================
+link label: http://example.com/?foo=1(ampersand){}bar=2
+link URI: http://example.com/?foo=1(ampersand){}bar=2
 link raw URI: http://example.com/?foo=1&bar=2
 link title: 
+====================
 ulBeginTight
 ulItem
 ulItem
+====================
 link label: http://example.com/
 link URI: http://example.com/
 link raw URI: http://example.com/
 link title: 
+====================
 ulItem
 ulEndTight
 blockQuoteBegin
+====================
 link label: http://example.com/
 link URI: http://example.com/
 link raw URI: http://example.com/
 link title: 
+====================
 blockQuoteEnd
 code span: <http://example.com/>
 inputVerbatim: _markdown-test/d65b41d110c17fbc771809f553258ff5.verbatim
