@@ -1,0 +1,18 @@
+<<<
+> Example:
+> 
+>     sub status {
+>         print "working";
+>     }
+> 
+> Or:
+> 
+>     sub status {
+>         return "working";
+>     }
+
+>>>
+blockQuoteBegin
+inputVerbatim: _markdown-test/702e5d3a17f709c02cee3a2b5e106619.verbatim
+inputVerbatim: _markdown-test/9d7d6b4bdbb0a57a705dc70e6c7f5612.verbatim
+blockQuoteEnd
