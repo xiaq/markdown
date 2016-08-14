@@ -1,0 +1,36 @@
+<<<
+This is the [simple case].
+
+[simple case]: /simple
+
+
+
+This one has a [line
+break].
+
+[line break]: /foo
+
+
+[this] [that] and the [other]
+
+[this]: /this
+[that]: /that
+[other]: /other
+
+>>>
+link label: simple case
+link URI: /simple
+link raw URI: /simple
+link title: 
+link label: line break
+link URI: /foo
+link raw URI: /foo
+link title: 
+link label: this
+link URI: /that
+link raw URI: /that
+link title: 
+link label: other
+link URI: /other
+link raw URI: /other
+link title: 

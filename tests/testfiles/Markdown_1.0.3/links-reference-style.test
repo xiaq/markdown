@@ -1,0 +1,137 @@
+<<<
+Foo [bar] [1].
+
+Foo [bar][1].
+
+Foo [bar]
+[1].
+
+[1]: /url/  "Title"
+
+
+With [embedded [brackets]] [b].
+
+
+Indented [once][].
+
+Indented [twice][].
+
+Indented [thrice][].
+
+Indented [four][] times.
+
+ [once]: /url
+
+  [twice]: /url
+
+   [thrice]: /url
+
+    [four]: /url
+
+
+[b]: /url/
+
+* * *
+
+[this] [this] should work
+
+So should [this][this].
+
+And [this] [].
+
+And [this][].
+
+And [this].
+
+But not [that] [].
+
+Nor [that][].
+
+Nor [that].
+
+[Something in brackets like [this][] should work]
+
+[Same with [this].]
+
+In this case, [this](/somethingelse/) points to something else.
+
+Backslashing should suppress \[this] and [this\].
+
+[this]: foo
+
+
+* * *
+
+Here's one where the [link
+breaks] across lines.
+
+[link breaks]: /url/
+
+>>>
+link label: bar
+link URI: /url/
+link raw URI: /url/
+link title: Title
+link label: bar
+link URI: /url/
+link raw URI: /url/
+link title: Title
+link label: bar
+link URI: /url/
+link raw URI: /url/
+link title: Title
+link label: embedded [brackets]
+link URI: /url/
+link raw URI: /url/
+link title: 
+link label: once
+link URI: /url
+link raw URI: /url
+link title: 
+link label: twice
+link URI: /url
+link raw URI: /url
+link title: 
+link label: thrice
+link URI: /url
+link raw URI: /url
+link title: 
+inputVerbatim: _markdown-test/b0cba64633d2a9eac28ca9e3fa500018.verbatim
+horizontalRule
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: foo
+link raw URI: foo
+link title: 
+link label: this
+link URI: /somethingelse/
+link raw URI: /somethingelse/
+link title: 
+horizontalRule
+link label: link breaks
+link URI: /url/
+link raw URI: /url/
+link title: 
