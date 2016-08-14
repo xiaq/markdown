@@ -1,0 +1,18 @@
+<<<
+Foo [bar][].
+
+Foo [bar](/url/ "Title with "quotes" inside").
+
+
+  [bar]: /url/ "Title with "quotes" inside"
+
+
+>>>
+link label: bar
+link URI: /url/
+link raw URI: /url/
+link title: Title with "quotes" inside
+link label: bar
+link URI: /url/
+link raw URI: /url/
+link title: Title with "quotes" inside
