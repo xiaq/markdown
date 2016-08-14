@@ -3177,8 +3177,8 @@ return M
 %    \end{macrocode}
 % Locally change the category of the special plain \TeX{} characters to
 % \emph{other} in order to prevent unwanted interpretation of the input.
-% Change also the category of the space and tab characters, so that we
-% can retrieve them unaltered.
+% Change also the category of the space character, so that we can retrieve it
+% unaltered.
 %  \begin{macrocode}
       |def|do##1{|catcode`##1=12}|dospecials%
       |catcode`| =12%
@@ -3612,6 +3612,16 @@ return M
 \fi
 %    \end{macrocode}
 %
+% If the shell escape bridge is being used, define the \m{markdownMakeOther}
+% macro, so that the pipe character (\t`|`) is inactive during the scanning.
+% This is necessary, since the character is active in \Hologo{ConTeXt}.
+%  \begin{macrocode}
+\ifnum\markdownMode<2
+  \def\markdownMakeOther{%
+    \catcode`|=12}%
+\fi
+%    \end{macrocode}
+% 
 % \subsubsection{Logging Facilities}
 % The \Hologo{ConTeXt} implementation redefines the plain \TeX{} logging macros (see
 % Section \ref{sec:texinterfacelogging}) to use the \Hologo{ConTeXt}
