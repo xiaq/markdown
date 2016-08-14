@@ -127,25 +127,25 @@ rightBrace
 backslash
 hash
 inputVerbatim: _markdown-test/127bce8785d826a9ba07a20f6ca866c9.verbatim
-code span: (backslash)(backslash)
-code span: (backslash)`
-code span: (backslash)*
-code span: (backslash)(underscore)
-code span: (backslash)(leftBrace)
-code span: (backslash)(rightBrace)
-code span: (backslash)[
-code span: (backslash)]
-code span: (backslash)(
-code span: (backslash))
-code span: (backslash)>
-code span: (backslash)(hash)
-code span: (backslash).
-code span: (backslash)!
-code span: (backslash)+
-code span: (backslash)-
+codeSpan: (backslash)(backslash)
+codeSpan: (backslash)`
+codeSpan: (backslash)*
+codeSpan: (backslash)(underscore)
+codeSpan: (backslash)(leftBrace)
+codeSpan: (backslash)(rightBrace)
+codeSpan: (backslash)[
+codeSpan: (backslash)]
+codeSpan: (backslash)(
+codeSpan: (backslash))
+codeSpan: (backslash)>
+codeSpan: (backslash)(hash)
+codeSpan: (backslash).
+codeSpan: (backslash)!
+codeSpan: (backslash)+
+codeSpan: (backslash)-
 underscore
 underscore
-code span: (backslash)`
-code span: ticks
+codeSpan: (backslash)`
+codeSpan: ticks
 backslash
 backslash

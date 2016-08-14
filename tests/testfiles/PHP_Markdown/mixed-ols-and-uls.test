@@ -1,0 +1,34 @@
+<<<
+* test
++ test
+- test
+
+1. test
+2. test
+
+* test
++ test
+- test
+
+1. test
+2. test
+
+>>>
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olEndTight
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulEndTight
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olEndTight

@@ -40,5 +40,5 @@ BEGIN link
 - title: 
 END link
 blockQuoteEnd
-code span: <http://example.com/>
+codeSpan: <http://example.com/>
 inputVerbatim: _markdown-test/d65b41d110c17fbc771809f553258ff5.verbatim

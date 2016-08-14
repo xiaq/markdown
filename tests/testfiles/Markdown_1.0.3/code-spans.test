@@ -1,4 +1,4 @@
 <<<
 Here's how you put `` `backticks` `` in a code span.
 >>>
-code span: `backticks`
+codeSpan: `backticks`

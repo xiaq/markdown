@@ -1048,30 +1048,30 @@ emphasis: writing
 emphasis: not
 emphasis: publishing
 emphasis: writing
-code span: <div>
-code span: <table>
-code span: <pre>
-code span: <p>
-code span: <p>
+codeSpan: <div>
+codeSpan: <table>
+codeSpan: <pre>
+codeSpan: <p>
+codeSpan: <p>
 inputVerbatim: _markdown-test/6c0e67934e0358fd4071cf4247bcf221.verbatim
-code span: *emphasis*
-code span: <span>
-code span: <cite>
-code span: <del>
-code span: <a>
-code span: <img>
+codeSpan: *emphasis*
+codeSpan: <span>
+codeSpan: <cite>
+codeSpan: <del>
+codeSpan: <a>
+codeSpan: <img>
 emphasis: is
 headingThree: Automatic Escaping for Special Characters
-code span: <
-code span: (ampersand)
-code span: (ampersand)lt;
-code span: (ampersand)amp;
+codeSpan: <
+codeSpan: (ampersand)
+codeSpan: (ampersand)lt;
+codeSpan: (ampersand)amp;
 ampersand
-code span: AT(ampersand)amp;T
+codeSpan: AT(ampersand)amp;T
 inputVerbatim: _markdown-test/01abe6d069cf62de251cf21f8df1d11f.verbatim
 inputVerbatim: _markdown-test/3bb5e0b18bdd7c9688b9f5df139967f3.verbatim
-code span: href
-code span: (ampersand)amp;
+codeSpan: href
+codeSpan: (ampersand)amp;
 inputVerbatim: _markdown-test/9f3cb292eb01028cce569a08ef6f975b.verbatim
 inputVerbatim: _markdown-test/7cdba89e6cc34bd4841c7c6a41bb4156.verbatim
 inputVerbatim: _markdown-test/c79c1d6af747ea457d80ff723101137a.verbatim
@@ -1083,16 +1083,16 @@ END link
 inputVerbatim: _markdown-test/e76bfed335c678dbe01b3982b9b46fdc.verbatim
 inputVerbatim: _markdown-test/cc7bb6b7c24a66c62c969328036e8f7b.verbatim
 emphasis: always
-code span: <
-code span: (ampersand)
+codeSpan: <
+codeSpan: (ampersand)
 horizontalRule
 headingTwo: Block Elements
 headingThree: Paragraphs and Line Breaks
-code span: <br />
+codeSpan: <br />
 emphasis: do
-code span: <br />
-code span: <br />
-code span: <br />
+codeSpan: <br />
+codeSpan: <br />
+codeSpan: <br />
 BEGIN link
 - label: blockquoting
 - URI: (hash)blockquote
@@ -1115,17 +1115,17 @@ BEGIN link
 - title: 
 END link
 inputVerbatim: _markdown-test/4f59d4e23ef758fd94bd2324643e2f2b.verbatim
-code span: =
-code span: -
+codeSpan: =
+codeSpan: -
 inputVerbatim: _markdown-test/48058b850bf198c75e9571ef25b4174e.verbatim
 inputVerbatim: _markdown-test/37d9f30690dba801bda9a65ec7cfd1be.verbatim
 headingThree: Blockquotes
-code span: >
-code span: >
+codeSpan: >
+codeSpan: >
 inputVerbatim: _markdown-test/a89055d359469d454a801830954a9c6f.verbatim
-code span: >
+codeSpan: >
 inputVerbatim: _markdown-test/944cb176339d03ac7508f0f66090979f.verbatim
-code span: >
+codeSpan: >
 inputVerbatim: _markdown-test/2a3331ca2a955f6ad7da2480f9cda089.verbatim
 inputVerbatim: _markdown-test/539f94bbd698cb75fb0cd1ba51d297b2.verbatim
 headingThree: Lists
@@ -1138,14 +1138,14 @@ inputVerbatim: _markdown-test/68c7899020501a169d9e9ca810aff930.verbatim
 inputVerbatim: _markdown-test/733b6752776567144548322ef66d67e6.verbatim
 inputVerbatim: _markdown-test/3915e80c9e2b1a87599797fb217c295b.verbatim
 inputVerbatim: _markdown-test/35441140ac44d3c2c7b9611d18c6dca4.verbatim
-code span: <p>
+codeSpan: <p>
 inputVerbatim: _markdown-test/92f4628c14a10b92aead4a4ebd01936a.verbatim
 inputVerbatim: _markdown-test/02afc9ab8392711baf578d89e8b624a8.verbatim
 inputVerbatim: _markdown-test/ec0f57523c3541a14df8f17f3c822039.verbatim
 inputVerbatim: _markdown-test/197c8667c0c0307c8174e6a6e07c2a48.verbatim
 inputVerbatim: _markdown-test/a07ba2a71f8cd42180768463fa2e5dad.verbatim
 inputVerbatim: _markdown-test/d56908f0f6e2476a6146ece0fa7e2f32.verbatim
-code span: >
+codeSpan: >
 inputVerbatim: _markdown-test/4c06d5a765803dd6f15378765020443c.verbatim
 emphasis: twice
 inputVerbatim: _markdown-test/d3f24a5ba4f9ebe7c97b690753fef199.verbatim
@@ -1153,19 +1153,19 @@ inputVerbatim: _markdown-test/d87e20aae0facc7fbbc293f790178cf4.verbatim
 emphasis: number-period-space
 inputVerbatim: _markdown-test/ea5e5fa61236c2e31ecb34d484caed78.verbatim
 headingThree: Code Blocks
-code span: <pre>
-code span: <code>
+codeSpan: <pre>
+codeSpan: <code>
 inputVerbatim: _markdown-test/80158a498770adf4d0617503ae558414.verbatim
 inputVerbatim: _markdown-test/35dd5e3b1d316dec464fafbedf53439e.verbatim
 inputVerbatim: _markdown-test/992aa3a21cc79d1a6a7b273173e1cc48.verbatim
 inputVerbatim: _markdown-test/d37edcee91241df6034067902bf7ff5f.verbatim
-code span: (ampersand)
-code span: <
-code span: >
+codeSpan: (ampersand)
+codeSpan: <
+codeSpan: >
 inputVerbatim: _markdown-test/bfd3b2e8e47a22fe0914d55781a73b7c.verbatim
 inputVerbatim: _markdown-test/6a14fbcefad86826e777c27a9000b94a.verbatim
 headingThree: Horizontal Rules
-code span: <hr />
+codeSpan: <hr />
 inputVerbatim: _markdown-test/b3a754721670b6236c8eb8159555f38b.verbatim
 horizontalRule
 headingTwo: Span Elements
@@ -1200,22 +1200,22 @@ inputVerbatim: _markdown-test/0810a7510b5a42a7ec77fd3d55be870e.verbatim
 inputVerbatim: _markdown-test/28d0c5764a38e6b58409f9967ef91bcc.verbatim
 inputVerbatim: _markdown-test/f39ac74789b190c9c1460bd06b2e5f66.verbatim
 headingThree: Emphasis
-code span: *
-code span: (underscore)
-code span: *
-code span: (underscore)
-code span: <em>
-code span: *
-code span: (underscore)
-code span: <strong>
+codeSpan: *
+codeSpan: (underscore)
+codeSpan: *
+codeSpan: (underscore)
+codeSpan: <em>
+codeSpan: *
+codeSpan: (underscore)
+codeSpan: <strong>
 inputVerbatim: _markdown-test/ad2981010cf94e370ccb06c7233f0989.verbatim
 inputVerbatim: _markdown-test/451a1d0edf74505402610a4bae7997d0.verbatim
 inputVerbatim: _markdown-test/3f3996b979db4e11ec6fd9b0232b3d83.verbatim
-code span: *
-code span: (underscore)
+codeSpan: *
+codeSpan: (underscore)
 inputVerbatim: _markdown-test/85d79dd13f594a1dc7dc5b2be403366a.verbatim
 headingThree: Code
-code span: `
+codeSpan: `
 inputVerbatim: _markdown-test/3013bb705f116d1bf7d7506a827cd6f1.verbatim
 inputVerbatim: _markdown-test/0d572dc866bb6649bdedef400a32f2ee.verbatim
 inputVerbatim: _markdown-test/000c6f567a8ecf3820cf43f6b248b303.verbatim
@@ -1232,15 +1232,15 @@ emphasis: reference
 inputVerbatim: _markdown-test/95e477e08806ad17333ef8c62ab1a9bf.verbatim
 ulBeginTight
 ulItem
-code span: !
+codeSpan: !
 ulItem
-code span: alt
+codeSpan: alt
 ulItem
-code span: title
+codeSpan: title
 ulEndTight
 inputVerbatim: _markdown-test/90c3fb2e48c6bc6b5139b7d9fefe33eb.verbatim
 inputVerbatim: _markdown-test/a5bd86aacaa065512fabab353b4646b5.verbatim
-code span: <img>
+codeSpan: <img>
 horizontalRule
 headingTwo: Miscellaneous
 headingThree: Automatic Links
@@ -1249,6 +1249,6 @@ inputVerbatim: _markdown-test/3d59db9474543617b421ad8938c9ad5f.verbatim
 inputVerbatim: _markdown-test/7c01c9510936100673897e413a694f95.verbatim
 inputVerbatim: _markdown-test/57dc30d4baafa58ac03c967e1ffe882b.verbatim
 headingThree: Backslash Escapes
-code span: <em>
+codeSpan: <em>
 inputVerbatim: _markdown-test/ee5b9bd27735fe320e0eb1cd9218539d.verbatim
 inputVerbatim: _markdown-test/4f5715933ffa8d2f20d0360598a68dbb.verbatim

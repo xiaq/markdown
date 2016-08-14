@@ -312,28 +312,28 @@ END link
 headingTwo: Paragraphs, Headers, Blockquotes
 emphasis: Setext
 emphasis: atx
-code span: <h1>
-code span: <h2>
-code span: =
-code span: -
-code span: (hash)
-code span: >
+codeSpan: <h1>
+codeSpan: <h2>
+codeSpan: =
+codeSpan: -
+codeSpan: (hash)
+codeSpan: >
 inputVerbatim: _markdown-test/5ebdf3631f626dba5ee92ee773e97a8f.verbatim
 inputVerbatim: _markdown-test/9347d3cfacf328e3d73c4fe1b4f76524.verbatim
 headingThree: Phrase Emphasis
 inputVerbatim: _markdown-test/495d205391f56da33d355c43c81daa64.verbatim
 inputVerbatim: _markdown-test/60195f0a7c825159eb9156947e6fb71b.verbatim
 headingTwo: Lists
-code span: *
-code span: +
-code span: -
+codeSpan: *
+codeSpan: +
+codeSpan: -
 inputVerbatim: _markdown-test/30a921ea3110056dc221ed257b3c883b.verbatim
 inputVerbatim: _markdown-test/674e077aa8994de8bf541093168d2e29.verbatim
 inputVerbatim: _markdown-test/7ae61eceff910c380dbe3ee9af7b6c4a.verbatim
 inputVerbatim: _markdown-test/b84dd49773de7abaeec71bfa32680045.verbatim
 inputVerbatim: _markdown-test/2a1d33d66339f281e4a171d1eb084b07.verbatim
 inputVerbatim: _markdown-test/430a75a1628ba89cc2b1005bb1e5d932.verbatim
-code span: <p>
+codeSpan: <p>
 inputVerbatim: _markdown-test/e6108616b0422dd64f485971e61ac69c.verbatim
 inputVerbatim: _markdown-test/0bd4d7d78b1cd0e46e78a522f613a6a3.verbatim
 headingThree: Links
@@ -353,13 +353,13 @@ inputVerbatim: _markdown-test/602bb0e325271b2b4dce9175eaed15b1.verbatim
 inputVerbatim: _markdown-test/e5b369214c819b9d9b476b7bb1f5aa53.verbatim
 inputVerbatim: _markdown-test/885cbee5cc0e1fac9ce25c3a9d30034e.verbatim
 headingThree: Code
-code span: (ampersand)
-code span: <
-code span: >
+codeSpan: (ampersand)
+codeSpan: <
+codeSpan: >
 inputVerbatim: _markdown-test/fbcaafb68ad6405619da77e413788d6e.verbatim
 inputVerbatim: _markdown-test/cfc57312a789ed7b4e14f3f56c88381a.verbatim
-code span: (ampersand)
-code span: <
-code span: >
+codeSpan: (ampersand)
+codeSpan: <
+codeSpan: >
 inputVerbatim: _markdown-test/fe59314852dc8de3165464ab451f44a0.verbatim
 inputVerbatim: _markdown-test/3f58f44c2de7257eb42c24e7aee621c5.verbatim

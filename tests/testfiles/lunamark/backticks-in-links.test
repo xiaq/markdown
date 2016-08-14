@@ -2,7 +2,7 @@
 [hi `there] bud`](/url)
 >>>
 BEGIN link
-- label: hi (code span: there] bud)
+- label: hi (codeSpan: there] bud)
 - URI: /url
 - title: 
 END link
