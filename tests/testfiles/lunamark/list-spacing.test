@@ -1,0 +1,30 @@
+<<<
+   * item 1
+ * item 1a
+   * item 2
+* item 2a
+ * item 2b
+  * item 2c
+   * item 3
+
+----
+
+ 8. item 1
+ 9. item 2
+10. item 2a
+>>>
+ulBeginTight
+ulItem
+ulItem
+ulItem
+ulItem
+ulItem
+ulItem
+ulItem
+ulEndTight
+horizontalRule
+olBeginTight
+olItemWithNumber: 8
+olItemWithNumber: 9
+olItemWithNumber: 10
+olEndTight

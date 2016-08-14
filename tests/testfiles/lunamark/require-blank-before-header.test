@@ -1,0 +1,5 @@
+\def\markdownOptionBlankBeforeHeading{true}
+<<<
+Hi
+# No header
+>>>

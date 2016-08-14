@@ -1,0 +1,2 @@
+texexec  --passon="--shell-escape --8bit --interaction=nonstopmode" <FILENAME>
+context                                              --nonstopmode  <FILENAME>

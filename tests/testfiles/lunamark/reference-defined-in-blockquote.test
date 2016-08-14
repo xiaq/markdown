@@ -1,0 +1,11 @@
+<<<
+> [foo]
+>
+> [foo]: /bar
+>>>
+blockQuoteBegin
+link label: foo
+link URI: /bar
+link raw URI: /bar
+link title: 
+blockQuoteEnd

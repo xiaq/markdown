@@ -1,0 +1,14 @@
+<<<
+- one
+- two
+1. one
+2. two
+>>>
+ulBeginTight
+ulItem
+ulItem
+ulEndTight
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olEndTight

@@ -1,0 +1,164 @@
+\def\markdownOptionDefinitionLists{true}
+<<<
+Tight using spaces:
+
+apple
+:   red fruit
+orange
+:   orange fruit
+banana
+:   yellow fruit
+
+Tight using tabs:
+
+apple
+:	red fruit
+orange
+:	orange fruit
+banana
+:	yellow fruit
+
+Loose:
+
+apple
+:   red fruit
+
+orange
+:   orange fruit
+
+banana
+:   yellow fruit
+
+Multiple blocks with italics:
+
+*apple*
+:   red fruit
+
+    contains seeds,
+    crisp, pleasant to taste
+
+*orange*
+:   orange fruit
+
+        { orange code block }
+
+    > orange block quote
+
+Multiple definitions, tight:
+
+apple
+:   red fruit
+:   computer
+orange
+:   orange fruit
+:   bank
+
+Multiple definitions, loose:
+
+apple
+:   red fruit
+
+:   computer
+
+orange
+:   orange fruit
+
+:   bank
+
+Blank line after term, indented marker, alternate markers:
+
+apple
+
+  ~ red fruit
+
+  ~ computer
+
+orange
+
+  ~ orange fruit
+
+    1. sublist
+    2. sublist
+>>>
+dlBeginTight
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: banana
+dlDefinitionBegin
+dlDefinitionEnd
+dlEndTight
+dlBeginTight
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: banana
+dlDefinitionBegin
+dlDefinitionEnd
+dlEndTight
+dlBegin
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: banana
+dlDefinitionBegin
+dlDefinitionEnd
+dlEnd
+dlBegin
+dlItem: (emphasis: apple)
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: (emphasis: orange)
+dlDefinitionBegin
+inputVerbatim: _markdown-test/f9f08689e38f4705165b9018b14b4a09.verbatim
+blockQuoteBegin
+blockQuoteEnd
+dlDefinitionEnd
+dlEnd
+dlBeginTight
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+dlDefinitionEnd
+dlDefinitionBegin
+dlDefinitionEnd
+dlEndTight
+dlBegin
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+dlDefinitionEnd
+dlDefinitionBegin
+dlDefinitionEnd
+dlEnd
+dlBegin
+dlItem: apple
+dlDefinitionBegin
+dlDefinitionEnd
+dlDefinitionBegin
+dlDefinitionEnd
+dlItem: orange
+dlDefinitionBegin
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olEndTight
+dlDefinitionEnd
+dlEnd

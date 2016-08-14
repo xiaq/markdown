@@ -1,0 +1,9 @@
+\def\markdownOptionHashEnumerators{true}
+<<<
+#. one
+#. two
+>>>
+olBeginTight
+olItemWithNumber: 1
+olItemWithNumber: 2
+olEndTight
