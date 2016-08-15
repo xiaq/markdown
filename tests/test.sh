@@ -33,7 +33,7 @@ for TESTFILE; do
           done) >test.tex &&
 
         # Run the test, filter the output and concatenate adjacent lines.
-        eval $COMMAND >/dev/null &&
+        eval $COMMAND >/dev/null 2>&1 &&
         sed -nr '/^\s*TEST INPUT BEGIN\s*$/,/^\s*TEST INPUT END\s*$/{
           /^\s*TEST INPUT (BEGIN|END)\s*$/!H
           /^\s*TEST INPUT END\s*$/{s/.*//;x;s/\n//g;p}

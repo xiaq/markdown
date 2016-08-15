@@ -11,3 +11,10 @@ If a test fails, a `build/` directory containing the TeX source code files
 will be created in this directory. After you have inspected the auxiliary files
 and found the cause of the problem, you may safely delete this directory. It
 will also be deleted the next time a test is run.
+
+Each time a commit is made to the Git repository of the project, this test
+suite is ran by a continuous integration service. The current status is:
+[![CircleCI][badge]][link]
+
+ [badge]: https://circleci.com/gh/Witiko/markdown/tree/master.svg?style=svg
+ [link]:  https://circleci.com/gh/Witiko/markdown/tree/master

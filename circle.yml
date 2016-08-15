@@ -1,0 +1,17 @@
+dependencies:
+  cache_directories:
+    - ~/aptcache
+  override:
+    - mkdir -p                                   ~/aptcache/partial
+    - sudo apt-get -o dir::cache::archives="$HOME"/aptcache update
+    - sudo apt-get -o dir::cache::archives="$HOME"/aptcache install texlive-full
+
+test:
+  override:
+    - xetex markdown.ins
+    - mkdir -p             ~/texmf/tex/{luatex,generic,latex,context/third}/markdown
+    - cp -f markdown.lua   ~/texmf/tex/luatex/markdown/
+    - cp -f markdown.tex   ~/texmf/tex/generic/markdown/
+    - cp -f markdown.sty   ~/texmf/tex/latex/markdown/
+    - cp -f t-markdown.tex ~/texmf/tex/context/third/markdown/
+    - make test
