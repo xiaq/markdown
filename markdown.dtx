@@ -3419,7 +3419,7 @@ local convert = md.new(\markdownLuaOptions)
 % the result into the input line buffer of \TeX{}.
 %  \begin{macrocode}
           if line:match(ending_sequence) then
-            |markdownLuaUnregisterIBCallback
+            |markdownLuaUnregisterIBCallback;
             local input = table.concat(buffer, "\n") .. "\n\n"
             local output = convert(input)
             return [[\markdownInfo{The ending token sequence was found}]] ..
@@ -3641,12 +3641,24 @@ local convert = md.new(\markdownLuaOptions)
 % redefine the \m{markdownLuaRegisterIBCallback} and
 % \m{markdownLuaUnregisterIBCallback} macros accordingly.
 %  \begin{macrocode}
+\let\markdownLuaRegisterIBCallbackPrevious
+  \markdownLuaRegisterIBCallback
+\let\markdownLuaUnregisterIBCallbackPrevious
+  \markdownLuaUnregisterIBCallback
 \renewcommand\markdownLuaRegisterIBCallback[1]{%
-  luatexbase.add_to_callback("process_input_buffer", #1, %
-    "The markdown input processor")}
+  if luatexbase and luatexbase.add_to_callback then
+    luatexbase.add_to_callback("process_input_buffer", #1, %
+      "The markdown input processor")
+  else
+    \markdownLuaRegisterIBCallbackPrevious{#1}
+  end}
 \renewcommand\markdownLuaUnregisterIBCallback{%
-  luatexbase.remove_from_callback("process_input_buffer",%
-    "The markdown input processor")}
+  if luatexbase and luatexbase.add_to_callback then
+    luatexbase.remove_from_callback("process_input_buffer",%
+      "The markdown input processor")
+  else
+    \markdownLuaUnregisterIBCallbackPrevious;
+  end}
 %    \end{macrocode}
 %
 % When buffering user input, we should disable the bytes with the high bit set,
