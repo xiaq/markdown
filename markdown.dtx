@@ -146,7 +146,7 @@
 % \fi
 %  \begin{macrocode}
 if not modules then modules = { } end modules ['markdown'] = {
-    version   = "2.0.1",
+    version   = "2.0.2",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -499,7 +499,7 @@ defaultOptions.tightLists = true
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
 \def\markdownLastModified{2016/08/15}%
-\def\markdownVersion{2.0.1}%
+\def\markdownVersion{2.0.2}%
 %    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
@@ -1303,7 +1303,8 @@ defaultOptions.tightLists = true
 % \ref{sec:texrenderersuser}).
 %  \begin{macrocode}
 \define@key{markdownOptions}{renderers}{%
-  \setkeys{markdownRenderers}{#1}}%
+  \setkeys{markdownRenderers}{#1}%
+  \def\KV@prefix{KV@markdownOptions@}}%
 \define@key{markdownRenderers}{lineBreak}{%
   \renewcommand\markdownRendererLineBreak{#1}}%
 \define@key{markdownRenderers}{ellipsis}{%
@@ -1419,7 +1420,8 @@ defaultOptions.tightLists = true
 % Section \ref{sec:texrendererprototypes}).
 %  \begin{macrocode}
 \define@key{markdownOptions}{rendererPrototypes}{%
-  \setkeys{markdownRendererPrototypes}{#1}}%
+  \setkeys{markdownRendererPrototypes}{#1}%
+  \def\KV@prefix{KV@markdownOptions@}}%
 \define@key{markdownRendererPrototypes}{lineBreak}{%
   \renewcommand\markdownRendererLineBreakPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ellipsis}{%
