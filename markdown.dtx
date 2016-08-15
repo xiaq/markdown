@@ -146,7 +146,7 @@
 % \fi
 %  \begin{macrocode}
 if not modules then modules = { } end modules ['markdown'] = {
-    version   = "1.0.2",
+    version   = "1.0.3",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -498,8 +498,8 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/14}%
-\def\markdownVersion{1.0.2}%
+\def\markdownLastModified{2016/08/15}%
+\def\markdownVersion{1.0.3}%
 %    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
@@ -3154,28 +3154,26 @@ local convert = md.new(\markdownLuaOptions)
 % whether the shell access is enabled (\t`1`), disabled (\t`0`), or restricted
 % (\t`2`).
 % 
-% If Lua is unavailable, inherit the value of the the \m{pdfshellescape}
-% (Lua\TeX{}, \Hologo{pdfTeX}) or the \m{shellescape} (\Hologo{XeTeX})
-% commands. If neither of these commands is defined, act as if the shell access
-% were enabled.
+% Inherit the value of the the \m{pdfshellescape} (Lua\TeX{}, \Hologo{pdfTeX})
+% or the \m{shellescape} (\Hologo{XeTeX}) commands. If neither of these
+% commands is defined and Lua is available, attempt to access the
+% \luam{status.shell_escape} configuration item.
+%
+% If you cannot detect, whether the shell access is enabled, act as if it were.
 %  \begin{macrocode}
-\ifnum\markdownMode=0\relax
-  \ifx\pdfshellescape\undefined
-    \ifx\shellescape\undefined
+\ifx\pdfshellescape\undefined
+  \ifx\shellescape\undefined
+    \ifnum\markdownMode=0\relax
       \def\markdownExecuteShellEscape{1}%
     \else
-      \let\markdownExecuteShellEscape\shellescape
+      \def\markdownExecuteShellEscape{%
+        \directlua{tex.sprint(status.shell_escape or "1")}}%
     \fi
   \else
-    \let\markdownExecuteShellEscape\pdfshellescape
+    \let\markdownExecuteShellEscape\shellescape
   \fi
-%    \end{macrocode}
-% If Lua is available, inherit the value of the \t`status.shell_escape`
-% configuration item.
-%  \begin{macrocode}
 \else
-  \def\markdownExecuteShellEscape{%
-    \directlua{tex.sprint(status.shell_escape)}}%
+  \let\markdownExecuteShellEscape\pdfshellescape
 \fi
 %    \end{macrocode}
 %
