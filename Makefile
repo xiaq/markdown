@@ -9,8 +9,8 @@ DISTARCHIVE=markdown.zip
 ARCHIVES=$(TDSARCHIVE) $(CTANARCHIVE) $(DISTARCHIVE)
 EXAMPLES_SOURCES=examples/context.tex examples/latex.tex examples/tux.pdf \
 	examples/example.md
-EXAMPLES=examples/context.pdf examples/latex-luatex.pdf \
-	examples/latex-pdftex.pdf
+EXAMPLES=examples/context-mkii.pdf examples/context-mkiv.pdf \
+	examples/latex-luatex.pdf examples/latex-pdftex.pdf
 TESTS=tests/test.sh tests/support/*.tex tests/templates/*/*.tex \
 	tests/templates/*/COMMANDS tests/testfiles/*/*.test
 MAKES=Makefile $(addsuffix /Makefile, $(SUBDIRECTORIES))
@@ -69,13 +69,13 @@ $(TDSARCHIVE): $(DTXARCHIVE) $(INSTALLABLES) $(MANUAL)
 # This target produces the distribution archive.
 $(DISTARCHIVE): $(EVERYTHING) $(TDSARCHIVE)
 	ln -s . markdown
-	zip -r -v -nw $@ $(addprefix markdown/,$(EVERYTHING)) $(TDSARCHIVE)
+	zip -MM -r -v -nw $@ $(addprefix markdown/,$(EVERYTHING)) $(TDSARCHIVE)
 	rm markdown
 
 # This target produces the CTAN archive.
 $(CTANARCHIVE): $(RESOURCES) $(TDSARCHIVE)
 	ln -s . markdown
-	zip -r -v -nw $@ $(addprefix markdown/,$(RESOURCES)) $(TDSARCHIVE)
+	zip -MM -r -v -nw $@ $(addprefix markdown/,$(RESOURCES)) $(TDSARCHIVE)
 	rm markdown
 
 # This pseudo-target removes any existing auxiliary files and directories.
