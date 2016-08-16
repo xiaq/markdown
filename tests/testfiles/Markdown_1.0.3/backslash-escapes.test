@@ -120,31 +120,73 @@ This is a tag with unescaped backticks <span attr='`ticks`'>bar</span>.
 
 This is a tag with backslashes <span attr='\\backslashes\\'>bar</span>.
 >>>
+interblockSeparator
 backslash
+interblockSeparator
+interblockSeparator
+interblockSeparator
 underscore
+interblockSeparator
 leftBrace
+interblockSeparator
 rightBrace
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
 hash
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
+interblockSeparator
 inputVerbatim: _markdown-test/127bce8785d826a9ba07a20f6ca866c9.verbatim
+interblockSeparator
+interblockSeparator
 codeSpan: (backslash)(backslash)
+interblockSeparator
 codeSpan: (backslash)`
+interblockSeparator
 codeSpan: (backslash)*
+interblockSeparator
 codeSpan: (backslash)(underscore)
+interblockSeparator
 codeSpan: (backslash)(leftBrace)
+interblockSeparator
 codeSpan: (backslash)(rightBrace)
+interblockSeparator
 codeSpan: (backslash)[
+interblockSeparator
 codeSpan: (backslash)]
+interblockSeparator
 codeSpan: (backslash)(
+interblockSeparator
 codeSpan: (backslash))
+interblockSeparator
 codeSpan: (backslash)>
+interblockSeparator
 codeSpan: (backslash)(hash)
+interblockSeparator
 codeSpan: (backslash).
+interblockSeparator
 codeSpan: (backslash)!
+interblockSeparator
 codeSpan: (backslash)+
+interblockSeparator
 codeSpan: (backslash)-
+interblockSeparator
+interblockSeparator
+interblockSeparator
 underscore
 underscore
+interblockSeparator
+interblockSeparator
 codeSpan: (backslash)`
+interblockSeparator
 codeSpan: ticks
+interblockSeparator
 backslash
 backslash

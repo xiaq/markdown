@@ -15,6 +15,7 @@ following special characters should be processed by lunamark.
  * \char`|
 >>>
 codeSpan: hybrid
+interblockSeparator
 ulBeginTight
 ulItem
 backslash

@@ -7,8 +7,10 @@
 >>>
 ulBegin
 ulItem
+interblockSeparator
 ulBeginTight
 ulItem
 ulEndTight
 ulEnd
+interblockSeparator
 horizontalRule

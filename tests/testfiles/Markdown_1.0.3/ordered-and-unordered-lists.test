@@ -133,81 +133,114 @@ This was an error in Markdown 1.0.1:
 
 >>>
 headingTwo: Unordered
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 ulBegin
 ulItem
 ulItem
 ulItem
 ulEnd
+interblockSeparator
 horizontalRule
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 ulBegin
 ulItem
 ulItem
 ulItem
 ulEnd
+interblockSeparator
 horizontalRule
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 ulBegin
 ulItem
 ulItem
 ulItem
 ulEnd
+interblockSeparator
 headingTwo: Ordered
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEndTight
+interblockSeparator
+interblockSeparator
 olBegin
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEnd
+interblockSeparator
+interblockSeparator
 olBegin
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEnd
+interblockSeparator
+interblockSeparator
 olBegin
 olItemWithNumber: 1
+interblockSeparator
 ampersand
 hash
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEnd
+interblockSeparator
 headingTwo: Nested
+interblockSeparator
 ulBeginTight
 ulItem
+interblockSeparator
 ulBeginTight
 ulItem
+interblockSeparator
 ulBeginTight
 ulItem
 ulEndTight
 ulEndTight
 ulEndTight
+interblockSeparator
 ampersand
 hash
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
@@ -215,9 +248,12 @@ ulItem
 ulEndTight
 olItemWithNumber: 3
 olEndTight
+interblockSeparator
+interblockSeparator
 olBegin
 olItemWithNumber: 1
 olItemWithNumber: 2
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
@@ -225,9 +261,13 @@ ulItem
 ulEndTight
 olItemWithNumber: 3
 olEnd
+interblockSeparator
+interblockSeparator
 ulBegin
 ulItem
+interblockSeparator
 ulBeginTight
 ulItem
 ulEndTight
+interblockSeparator
 ulEnd

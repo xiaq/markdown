@@ -80,6 +80,7 @@ orange
     1. sublist
     2. sublist
 >>>
+interblockSeparator
 dlBeginTight
 dlItem: apple
 dlDefinitionBegin
@@ -91,6 +92,8 @@ dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
 dlEndTight
+interblockSeparator
+interblockSeparator
 dlBeginTight
 dlItem: apple
 dlDefinitionBegin
@@ -102,6 +105,8 @@ dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
 dlEndTight
+interblockSeparator
+interblockSeparator
 dlBegin
 dlItem: apple
 dlDefinitionBegin
@@ -113,17 +118,24 @@ dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
 dlEnd
+interblockSeparator
+interblockSeparator
 dlBegin
 dlItem: (emphasis: apple)
 dlDefinitionBegin
+interblockSeparator
 dlDefinitionEnd
 dlItem: (emphasis: orange)
 dlDefinitionBegin
+interblockSeparator
 inputVerbatim: _markdown-test/f9f08689e38f4705165b9018b14b4a09.verbatim
+interblockSeparator
 blockQuoteBegin
 blockQuoteEnd
 dlDefinitionEnd
 dlEnd
+interblockSeparator
+interblockSeparator
 dlBeginTight
 dlItem: apple
 dlDefinitionBegin
@@ -136,6 +148,8 @@ dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
 dlEndTight
+interblockSeparator
+interblockSeparator
 dlBegin
 dlItem: apple
 dlDefinitionBegin
@@ -148,6 +162,8 @@ dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
 dlEnd
+interblockSeparator
+interblockSeparator
 dlBegin
 dlItem: apple
 dlDefinitionBegin
@@ -156,6 +172,7 @@ dlDefinitionBegin
 dlDefinitionEnd
 dlItem: orange
 dlDefinitionBegin
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2

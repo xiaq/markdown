@@ -81,6 +81,7 @@ _____Cut here_____
 ____Cut here____
 
 >>>
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 strongEmphasis: (emphasis: test test)
@@ -115,6 +116,8 @@ strongEmphasis: test (emphasis: test)
 olItemWithNumber: 16
 emphasis: test (strongEmphasis: test)
 olEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 strongEmphasis: test* test
@@ -134,6 +137,8 @@ strongEmphasis: test (strongEmphasis: test) test
 olItemWithNumber: 8
 strongEmphasis: test (strongEmphasis: test) test
 olEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
@@ -144,6 +149,8 @@ underscore
 olItemWithNumber: 4
 emphasis: (underscore) test (underscore)
 olEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 emphasis: a
@@ -158,6 +165,8 @@ strongEmphasis: b
 olItemWithNumber: 6
 strongEmphasis: b
 olEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 emphasis: a
@@ -172,11 +181,17 @@ strongEmphasis: b
 olItemWithNumber: 6
 strongEmphasis: b
 olEndTight
+interblockSeparator
 emphasis: precious
+interblockSeparator
 headingTwo: Tricky Cases
+interblockSeparator
 strongEmphasis: Test
+interblockSeparator
 strongEmphasis: Test
+interblockSeparator
 headingTwo: Overlong emphasis
+interblockSeparator
 underscore
 underscore
 underscore
@@ -195,6 +210,7 @@ underscore
 underscore
 underscore
 underscore
+interblockSeparator
 underscore
 underscore
 underscore
@@ -205,6 +221,7 @@ underscore
 underscore
 underscore
 underscore
+interblockSeparator
 underscore
 underscore
 underscore

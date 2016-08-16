@@ -19,15 +19,18 @@ ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
 olEndTight
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2

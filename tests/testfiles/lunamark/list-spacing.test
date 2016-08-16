@@ -22,7 +22,9 @@ ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
 horizontalRule
+interblockSeparator
 olBeginTight
 olItemWithNumber: 8
 olItemWithNumber: 9

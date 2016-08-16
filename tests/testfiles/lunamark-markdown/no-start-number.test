@@ -19,11 +19,15 @@ Loose:
 5. five
 >>>
 codeSpan: startNumber
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItem
 olItem
 olItem
 olEndTight
+interblockSeparator
+interblockSeparator
 olBegin
 olItem
 olItem

@@ -17,6 +17,7 @@ processed by lunamark in any way.
  * \char`|
 >>>
 codeSpan: hybrid
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem

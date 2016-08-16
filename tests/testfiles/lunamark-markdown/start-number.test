@@ -17,11 +17,15 @@ Loose:
 5. five
 >>>
 codeSpan: startNumber
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 3
 olItemWithNumber: 4
 olItemWithNumber: 5
 olEndTight
+interblockSeparator
+interblockSeparator
 olBegin
 olItemWithNumber: 3
 olItemWithNumber: 4

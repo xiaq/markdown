@@ -9,6 +9,9 @@ So is ___this___ word.
 
 >>>
 strongEmphasis: (emphasis: This is strong and em.)
+interblockSeparator
 strongEmphasis: (emphasis: this)
+interblockSeparator
 strongEmphasis: (emphasis: This is strong and em.)
+interblockSeparator
 strongEmphasis: (emphasis: this)

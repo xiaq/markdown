@@ -8,6 +8,7 @@ ulBeginTight
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2

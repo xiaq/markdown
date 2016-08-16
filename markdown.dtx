@@ -146,7 +146,7 @@
 % \fi
 %  \begin{macrocode}
 if not modules then modules = { } end modules ['markdown'] = {
-    version   = "2.0.2",
+    version   = "2.1.0",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -498,8 +498,8 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/15}%
-\def\markdownVersion{2.0.2}%
+\def\markdownLastModified{2016/08/16}%
+\def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
@@ -653,6 +653,14 @@ defaultOptions.tightLists = true
 % macros are intended to be redefined by the user who is typesetting a
 % document. By default, they point to the corresponding prototypes (see Section
 % \ref{sec:texrendererprototypes}).
+%
+% \paragraph{Interblock Separator Renderer}
+% The \mdef{markdownRendererInterblockSeparator} macro represents a separator
+% between two markdown block elements. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererInterblockSeparator{%
+  \markdownRendererInterblockSeparatorPrototype}%
+%    \end{macrocode}
 %
 % \paragraph{Line Break Renderer}
 % The \mdef{markdownRendererLineBreak} macro represents a forced line break.
@@ -1000,6 +1008,7 @@ defaultOptions.tightLists = true
 % by the \LaTeX{} and \Hologo{ConTeXt} implementations (see sections
 % \ref{sec:lateximplementation} and \ref{sec:contextimplementation}).
 %  \begin{macrocode}
+\def\markdownRendererInterblockSeparatorPrototype{}%
 \def\markdownRendererLineBreakPrototype{}%
 \def\markdownRendererEllipsisPrototype{}%
 \def\markdownRendererLeftBracePrototype{}%
@@ -1305,6 +1314,8 @@ defaultOptions.tightLists = true
 \define@key{markdownOptions}{renderers}{%
   \setkeys{markdownRenderers}{#1}%
   \def\KV@prefix{KV@markdownOptions@}}%
+\define@key{markdownRenderers}{interblockSeparator}{%
+  \renewcommand\markdownRendererInterblockSeparator{#1}}%
 \define@key{markdownRenderers}{lineBreak}{%
   \renewcommand\markdownRendererLineBreak{#1}}%
 \define@key{markdownRenderers}{ellipsis}{%
@@ -1422,6 +1433,8 @@ defaultOptions.tightLists = true
 \define@key{markdownOptions}{rendererPrototypes}{%
   \setkeys{markdownRendererPrototypes}{#1}%
   \def\KV@prefix{KV@markdownOptions@}}%
+\define@key{markdownRendererPrototypes}{interblockSeparator}{%
+  \renewcommand\markdownRendererInterblockSeparatorPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{lineBreak}{%
   \renewcommand\markdownRendererLineBreakPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ellipsis}{%
@@ -1915,13 +1928,7 @@ function M.writer.new(options)
 % Define \luamdef{writer->interblocksep} as the output format of a block
 % element separator.
 %  \begin{macrocode}
-  self.interblocksep = "\n\n"
-%    \end{macrocode}
-%
-% Define \luamdef{writer->containersep} as the output format of a container
-% separator.
-%  \begin{macrocode}
-  self.containersep = "\n\n"
+  self.interblocksep = "\\markdownRendererInterblockSeparator\n{}"
 %    \end{macrocode}
 %
 % Define \luamdef{writer->eof} as the end of file marker in the output format.
@@ -1931,7 +1938,7 @@ function M.writer.new(options)
 %
 % Define \luamdef{writer->linebreak} as the output format of a forced line break.
 %  \begin{macrocode}
-  self.linebreak = "\\markdownRendererLineBreak "
+  self.linebreak = "\\markdownRendererLineBreak\n{}"
 %    \end{macrocode}
 %
 % Define \luamdef{writer->ellipsis} as the output format of an ellipsis.
@@ -1941,7 +1948,7 @@ function M.writer.new(options)
 %
 % Define \luamdef{writer->hrule} as the output format of a horizontal rule.
 %  \begin{macrocode}
-  self.hrule = "\\markdownRendererHorizontalRule "
+  self.hrule = "\\markdownRendererHorizontalRule{}"
 %    \end{macrocode}
 %
 % Define a table \luamdef{escaped_chars} containing the mapping from special
@@ -2106,7 +2113,7 @@ function M.writer.new(options)
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = dlitem(item.term, item.definitions)
     end
-    local contents = util.intersperse(buffer, self.containersep)
+    local contents = util.intersperse(buffer, "\n")
     if tight and options.tightLists then
       return {"\\markdownRendererDlBeginTight\n\n", contents,
         "\n\n\\markdownRendererDlEndTight\n"}
@@ -3002,6 +3009,7 @@ return M
 % \subsubsection{Token Renderers}
 % The following definitions should be considered placeholder.
 %  \begin{macrocode}
+\def\markdownRendererInterblockSeparatorPrototype{\par}%
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
 \let\markdownRendererEllipsisPrototype\dots
 \def\markdownRendererLeftBracePrototype{\char`{}%

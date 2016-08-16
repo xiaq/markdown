@@ -8,6 +8,7 @@ BEGIN link
 - URI: mailto:michel.fortin@michelf.com
 - title: 
 END link
+interblockSeparator
 BEGIN link
 - label: help@tūdaliņ.lv
 - URI: mailto:help@tūdaliņ.lv

@@ -16,6 +16,7 @@ BEGIN link
 - URI: /'style='color:red
 - title: 
 END link
+interblockSeparator
 BEGIN image
 - label: 
 - URI: /"style="border-color:red;border-size:1px;border-style:solid

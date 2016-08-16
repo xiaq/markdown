@@ -36,31 +36,42 @@ With hyphens
 -
 
 >>>
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEndTight
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
 ulItem
 ulEndTight
+interblockSeparator
+interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 olItemWithNumber: 2
 olItemWithNumber: 3
 olEndTight
+interblockSeparator
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem

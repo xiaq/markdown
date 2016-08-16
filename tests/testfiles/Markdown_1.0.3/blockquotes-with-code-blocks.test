@@ -13,6 +13,9 @@
 
 >>>
 blockQuoteBegin
+interblockSeparator
 inputVerbatim: _markdown-test/702e5d3a17f709c02cee3a2b5e106619.verbatim
+interblockSeparator
+interblockSeparator
 inputVerbatim: _markdown-test/9d7d6b4bdbb0a57a705dc70e6c7f5612.verbatim
 blockQuoteEnd

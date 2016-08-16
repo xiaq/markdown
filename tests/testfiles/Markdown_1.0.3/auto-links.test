@@ -18,11 +18,13 @@ BEGIN link
 - URI: http://example.com/
 - title: 
 END link
+interblockSeparator
 BEGIN link
 - label: http://example.com/?foo=1(ampersand)bar=2
 - URI: http://example.com/?foo=1(ampersand)bar=2
 - title: 
 END link
+interblockSeparator
 ulBeginTight
 ulItem
 ulItem
@@ -33,6 +35,7 @@ BEGIN link
 END link
 ulItem
 ulEndTight
+interblockSeparator
 blockQuoteBegin
 BEGIN link
 - label: http://example.com/
@@ -40,5 +43,7 @@ BEGIN link
 - title: 
 END link
 blockQuoteEnd
+interblockSeparator
 codeSpan: <http://example.com/>
+interblockSeparator
 inputVerbatim: _markdown-test/d65b41d110c17fbc771809f553258ff5.verbatim

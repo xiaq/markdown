@@ -7,6 +7,7 @@ following list should be tight.
 5. five
 >>>
 codeSpan: tightLists
+interblockSeparator
 olBeginTight
 olItemWithNumber: 3
 olItemWithNumber: 4
