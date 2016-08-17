@@ -896,19 +896,23 @@ BEGIN link
 - URI: (hash)philosophy
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Inline HTML
 - URI: (hash)html
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Automatic Escaping for Special Characters
 - URI: (hash)autoescape
 - title: 
 END link
+ulItemEnd
 ulEndTight
+ulItemEnd
 ulItem
 BEGIN link
 - label: Block Elements
@@ -923,37 +927,44 @@ BEGIN link
 - URI: (hash)p
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Headers
 - URI: (hash)header
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Blockquotes
 - URI: (hash)blockquote
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Lists
 - URI: (hash)list
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Code Blocks
 - URI: (hash)precode
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Horizontal Rules
 - URI: (hash)hr
 - title: 
 END link
+ulItemEnd
 ulEndTight
+ulItemEnd
 ulItem
 BEGIN link
 - label: Span Elements
@@ -968,25 +979,30 @@ BEGIN link
 - URI: (hash)link
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Emphasis
 - URI: (hash)em
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Code
 - URI: (hash)code
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Images
 - URI: (hash)img
 - title: 
 END link
+ulItemEnd
 ulEndTight
+ulItemEnd
 ulItem
 BEGIN link
 - label: Miscellaneous
@@ -1001,13 +1017,16 @@ BEGIN link
 - URI: (hash)backslash
 - title: 
 END link
+ulItemEnd
 ulItem
 BEGIN link
 - label: Automatic Links
 - URI: (hash)autolink
 - title: 
 END link
+ulItemEnd
 ulEndTight
+ulItemEnd
 ulEndTight
 interblockSeparator
 strongEmphasis: Note:
@@ -1329,10 +1348,15 @@ interblockSeparator
 interblockSeparator
 ulBeginTight
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulEndTight
 interblockSeparator
 interblockSeparator
@@ -1447,10 +1471,13 @@ interblockSeparator
 ulBeginTight
 ulItem
 codeSpan: !
+ulItemEnd
 ulItem
 codeSpan: alt
+ulItemEnd
 ulItem
 codeSpan: title
+ulItemEnd
 ulEndTight
 interblockSeparator
 interblockSeparator

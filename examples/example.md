@@ -77,12 +77,15 @@ Term 1
     
     Third paragraph of Definition 2.
 
+:   Definition 3
+
 This is a compact definition list:
 
 Term 1
 :   Definition 1
 *Term 2*
 :   Definition 2
+:   Definition 3
 
 This is a block quote:
 

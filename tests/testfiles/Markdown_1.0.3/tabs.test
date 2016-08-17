@@ -24,7 +24,9 @@ And:
 >>>
 ulBegin
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulEnd
 interblockSeparator
 interblockSeparator

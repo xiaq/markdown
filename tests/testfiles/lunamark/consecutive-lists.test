@@ -6,10 +6,14 @@
 >>>
 ulBeginTight
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulEndTight
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
+olItemEnd
 olItemWithNumber: 2
+olItemEnd
 olEndTight

@@ -85,12 +85,15 @@ dlBeginTight
 dlItem: apple
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlEndTight
 interblockSeparator
 interblockSeparator
@@ -98,12 +101,15 @@ dlBeginTight
 dlItem: apple
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlEndTight
 interblockSeparator
 interblockSeparator
@@ -111,12 +117,15 @@ dlBegin
 dlItem: apple
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: banana
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlEnd
 interblockSeparator
 interblockSeparator
@@ -125,6 +134,7 @@ dlItem: (emphasis: apple)
 dlDefinitionBegin
 interblockSeparator
 dlDefinitionEnd
+dlItemEnd
 dlItem: (emphasis: orange)
 dlDefinitionBegin
 interblockSeparator
@@ -133,6 +143,7 @@ interblockSeparator
 blockQuoteBegin
 blockQuoteEnd
 dlDefinitionEnd
+dlItemEnd
 dlEnd
 interblockSeparator
 interblockSeparator
@@ -142,11 +153,13 @@ dlDefinitionBegin
 dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlEndTight
 interblockSeparator
 interblockSeparator
@@ -156,11 +169,13 @@ dlDefinitionBegin
 dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlEnd
 interblockSeparator
 interblockSeparator
@@ -170,12 +185,16 @@ dlDefinitionBegin
 dlDefinitionEnd
 dlDefinitionBegin
 dlDefinitionEnd
+dlItemEnd
 dlItem: orange
 dlDefinitionBegin
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
+olItemEnd
 olItemWithNumber: 2
+olItemEnd
 olEndTight
 dlDefinitionEnd
+dlItemEnd
 dlEnd

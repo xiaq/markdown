@@ -15,18 +15,28 @@
 >>>
 ulBeginTight
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulItem
+ulItemEnd
 ulEndTight
 interblockSeparator
 horizontalRule
 interblockSeparator
 olBeginTight
 olItemWithNumber: 8
+olItemEnd
 olItemWithNumber: 9
+olItemEnd
 olItemWithNumber: 10
+olItemEnd
 olEndTight

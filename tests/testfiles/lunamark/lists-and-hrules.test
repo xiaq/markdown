@@ -10,7 +10,9 @@ ulItem
 interblockSeparator
 ulBeginTight
 ulItem
+ulItemEnd
 ulEndTight
+ulItemEnd
 ulEnd
 interblockSeparator
 horizontalRule

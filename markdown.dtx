@@ -498,7 +498,7 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/16}%
+\def\markdownLastModified{2016/08/17}%
 \def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
@@ -757,11 +757,17 @@ defaultOptions.tightLists = true
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlItem} macro represents an item in a bulleted
-% list.
-% The macro receives no arguments.
+% list. The macro receives no arguments.
 %  \begin{macrocode}
 \def\markdownRendererUlItem{%
   \markdownRendererUlItemPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererUlItemEnd} macro represents the end of an item in a
+% bulleted list. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererUlItemEnd{%
+  \markdownRendererUlItemEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererUlEnd} macro represents the end of a bulleted list
@@ -805,6 +811,13 @@ defaultOptions.tightLists = true
 %  \begin{macrocode}
 \def\markdownRendererOlItem{%
   \markdownRendererOlItemPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererOlItemEnd} macro represents the end of an item in
+% an ordered list. The macro receives no arguments.
+%  \begin{macrocode}
+\def\markdownRendererOlItemEnd{%
+  \markdownRendererOlItemEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererOlItemWithNumber} macro represents an item in an
@@ -859,6 +872,13 @@ defaultOptions.tightLists = true
 %  \begin{macrocode}
 \def\markdownRendererDlItem{%
   \markdownRendererDlItemPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererDlItemEnd} macro represents the end of a list of
+% definitions for a single term.
+%  \begin{macrocode}
+\def\markdownRendererDlItemEnd{%
+  \markdownRendererDlItemEndPrototype}%
 %    \end{macrocode}
 %
 % The \mdef{markdownRendererDlDefinitionBegin} macro represents the beginning
@@ -1028,17 +1048,20 @@ defaultOptions.tightLists = true
 \def\markdownRendererUlBeginPrototype{}%
 \def\markdownRendererUlBeginTightPrototype{}%
 \def\markdownRendererUlItemPrototype{}%
+\def\markdownRendererUlItemEndPrototype{}%
 \def\markdownRendererUlEndPrototype{}%
 \def\markdownRendererUlEndTightPrototype{}%
 \def\markdownRendererOlBeginPrototype{}%
 \def\markdownRendererOlBeginTightPrototype{}%
 \def\markdownRendererOlItemPrototype{}%
 \long\def\markdownRendererOlItemWithNumberPrototype#1{}%
+\def\markdownRendererOlItemEndPrototype{}%
 \def\markdownRendererOlEndPrototype{}%
 \def\markdownRendererOlEndTightPrototype{}%
 \def\markdownRendererDlBeginPrototype{}%
 \def\markdownRendererDlBeginTightPrototype{}%
 \long\def\markdownRendererDlItemPrototype#1{}%
+\def\markdownRendererDlItemEndPrototype{}%
 \def\markdownRendererDlDefinitionBeginPrototype{}%
 \def\markdownRendererDlDefinitionEndPrototype{}%
 \def\markdownRendererDlEndPrototype{}%
@@ -1354,6 +1377,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererUlBeginTight{#1}}%
 \define@key{markdownRenderers}{ulItem}{%
   \renewcommand\markdownRendererUlItem{#1}}%
+\define@key{markdownRenderers}{ulItemEnd}{%
+  \renewcommand\markdownRendererUlItemEnd{#1}}%
 \define@key{markdownRenderers}{ulEnd}{%
   \renewcommand\markdownRendererUlEnd{#1}}%
 \define@key{markdownRenderers}{ulEndTight}{%
@@ -1366,6 +1391,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererOlItem{#1}}%
 \define@key{markdownRenderers}{olItemWithNumber}{%
   \renewcommand\markdownRendererOlItemWithNumber[1]{#1}}%
+\define@key{markdownRenderers}{olItemEnd}{%
+  \renewcommand\markdownRendererOlItemEnd{#1}}%
 \define@key{markdownRenderers}{olEnd}{%
   \renewcommand\markdownRendererOlEnd{#1}}%
 \define@key{markdownRenderers}{olEndTight}{%
@@ -1376,6 +1403,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererDlBeginTight{#1}}%
 \define@key{markdownRenderers}{dlItem}{%
   \renewcommand\markdownRendererDlItem[1]{#1}}%
+\define@key{markdownRenderers}{dlItemEnd}{%
+  \renewcommand\markdownRendererDlItemEnd{#1}}%
 \define@key{markdownRenderers}{dlDefinitionBegin}{%
   \renewcommand\markdownRendererDlDefinitionBegin{#1}}%
 \define@key{markdownRenderers}{dlDefinitionEnd}{%
@@ -1473,6 +1502,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererUlBeginTightPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ulItem}{%
   \renewcommand\markdownRendererUlItemPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{ulItemEnd}{%
+  \renewcommand\markdownRendererUlItemEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ulEnd}{%
   \renewcommand\markdownRendererUlEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ulEndTight}{%
@@ -1485,6 +1516,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererOlItemPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{olItemWithNumber}{%
   \renewcommand\markdownRendererOlItemWithNumberPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{olItemEnd}{%
+  \renewcommand\markdownRendererOlItemEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{olEnd}{%
   \renewcommand\markdownRendererOlEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{olEndTight}{%
@@ -1495,6 +1528,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererDlBeginTightPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlItem}{%
   \renewcommand\markdownRendererDlItemPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{dlItemEnd}{%
+  \renewcommand\markdownRendererDlItemEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlDefinitionBegin}{%
   \renewcommand\markdownRendererDlDefinitionBeginPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{dlDefinitionEnd}{%
@@ -2040,7 +2075,8 @@ function M.writer.new(options)
 % items and \t`tight` specifies, whether the list is tight or not.
 %  \begin{macrocode}
   local function ulitem(s)
-    return {"\\markdownRendererUlItem ",s}
+    return {"\\markdownRendererUlItem ",s,
+            "\\markdownRendererUlItemEnd "}
   end
 
   function self.bulletlist(items,tight)
@@ -2067,9 +2103,11 @@ function M.writer.new(options)
 %  \begin{macrocode}
   local function olitem(s,num)
     if num ~= nil then
-      return {"\\markdownRendererOlItemWithNumber{",num,"}",s}
+      return {"\\markdownRendererOlItemWithNumber{",num,"}",s,
+              "\\markdownRendererOlItemEnd "}
     else
-      return {"\\markdownRendererOlItem ",s}
+      return {"\\markdownRendererOlItem ",s,
+              "\\markdownRendererOlItemEnd "}
     end
   end
 
@@ -2105,6 +2143,7 @@ function M.writer.new(options)
       retVal[#retVal+1] = {"\\markdownRendererDlDefinitionBegin ",def,
                            "\\markdownRendererDlDefinitionEnd "}
     end
+    retVal[#retVal+1] = "\\markdownRendererDlItemEnd "
     return retVal
   end
 
@@ -2113,13 +2152,12 @@ function M.writer.new(options)
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = dlitem(item.term, item.definitions)
     end
-    local contents = util.intersperse(buffer, "\n")
     if tight and options.tightLists then
-      return {"\\markdownRendererDlBeginTight\n\n", contents,
-        "\n\n\\markdownRendererDlEndTight\n"}
+      return {"\\markdownRendererDlBeginTight\n", buffer,
+        "\n\\markdownRendererDlEndTight"}
     else
-      return {"\\markdownRendererDlBegin\n\n", contents,
-        "\n\n\\markdownRendererDlEnd\n"}
+      return {"\\markdownRendererDlBegin\n", buffer,
+        "\n\\markdownRendererDlEnd"}
     end
   end
 %    \end{macrocode}
@@ -3029,17 +3067,20 @@ return M
 \def\markdownRendererUlBeginPrototype{}%
 \def\markdownRendererUlBeginTightPrototype{}%
 \def\markdownRendererUlItemPrototype{}%
+\def\markdownRendererUlItemEndPrototype{}%
 \def\markdownRendererUlEndPrototype{}%
 \def\markdownRendererUlEndTightPrototype{}%
 \def\markdownRendererOlBeginPrototype{}%
 \def\markdownRendererOlBeginTightPrototype{}%
 \def\markdownRendererOlItemPrototype{}%
 \long\def\markdownRendererOlItemWithNumberPrototype#1{}%
+\def\markdownRendererOlItemEndPrototype{}%
 \def\markdownRendererOlEndPrototype{}%
 \def\markdownRendererOlEndTightPrototype{}%
 \def\markdownRendererDlBeginPrototype{}%
 \def\markdownRendererDlBeginTightPrototype{}%
 \long\def\markdownRendererDlItemPrototype#1{#1}%
+\def\markdownRendererDlItemEndPrototype{}%
 \def\markdownRendererDlDefinitionBeginPrototype{}%
 \def\markdownRendererDlDefinitionEndPrototype{\par}%
 \def\markdownRendererDlEndPrototype{}%
@@ -3806,7 +3847,7 @@ local convert = md.new(\markdownLuaOptions)
 \def\markdownRendererOlEndPrototype{\stopitemize}%
 \def\markdownRendererOlEndTightPrototype{\stopitemize}%
 \definedescription
-  [markdownConTeXtDlItemPrototype]
+  [MarkdownConTeXtDlItemPrototype]
   [location=hanging,
    margin=standard,
    headstyle=bold]%
@@ -3823,7 +3864,9 @@ local convert = md.new(\markdownLuaOptions)
 \def\markdownRendererDlBeginTightPrototype{%
   \startMarkdownConTeXtDlTightPrototype}%
 \long\def\markdownRendererDlItemPrototype#1{%
-  \markdownConTeXtDlItemPrototype{#1}}%
+  \startMarkdownConTeXtDlItemPrototype{#1}}%
+\def\markdownRendererDlItemEndPrototype{%
+  \stopMarkdownConTeXtDlItemPrototype}%
 \def\markdownRendererDlEndPrototype{%
   \stopMarkdownConTeXtDlPrototype}%
 \def\markdownRendererDlEndTightPrototype{%

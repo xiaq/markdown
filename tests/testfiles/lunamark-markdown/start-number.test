@@ -21,13 +21,19 @@ interblockSeparator
 interblockSeparator
 olBeginTight
 olItemWithNumber: 3
+olItemEnd
 olItemWithNumber: 4
+olItemEnd
 olItemWithNumber: 5
+olItemEnd
 olEndTight
 interblockSeparator
 interblockSeparator
 olBegin
 olItemWithNumber: 3
+olItemEnd
 olItemWithNumber: 4
+olItemEnd
 olItemWithNumber: 5
+olItemEnd
 olEnd

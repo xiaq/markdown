@@ -5,5 +5,7 @@
 >>>
 olBeginTight
 olItemWithNumber: 1
+olItemEnd
 olItemWithNumber: 2
+olItemEnd
 olEndTight

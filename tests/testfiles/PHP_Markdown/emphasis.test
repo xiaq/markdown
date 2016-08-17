@@ -85,101 +85,141 @@ interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 strongEmphasis: (emphasis: test test)
+olItemEnd
 olItemWithNumber: 2
 strongEmphasis: (emphasis: test test)
+olItemEnd
 olItemWithNumber: 3
 emphasis: test (strongEmphasis: test)
+olItemEnd
 olItemWithNumber: 4
 strongEmphasis: test (emphasis: test)
+olItemEnd
 olItemWithNumber: 5
 strongEmphasis: (emphasis: test) test
+olItemEnd
 olItemWithNumber: 6
 emphasis: (strongEmphasis: test) test
+olItemEnd
 olItemWithNumber: 7
 strongEmphasis: (emphasis: test) test
+olItemEnd
 olItemWithNumber: 8
 strongEmphasis: test (emphasis: test)
+olItemEnd
 olItemWithNumber: 9
 emphasis: test (strongEmphasis: test)
+olItemEnd
 olItemWithNumber: 10
 emphasis: test (strongEmphasis: test)
+olItemEnd
 olItemWithNumber: 11
 strongEmphasis: test (emphasis: test)
+olItemEnd
 olItemWithNumber: 12
 strongEmphasis: (emphasis: test) test
+olItemEnd
 olItemWithNumber: 13
 emphasis: (strongEmphasis: test) test
+olItemEnd
 olItemWithNumber: 14
 strongEmphasis: (emphasis: test) test
+olItemEnd
 olItemWithNumber: 15
 strongEmphasis: test (emphasis: test)
+olItemEnd
 olItemWithNumber: 16
 emphasis: test (strongEmphasis: test)
+olItemEnd
 olEndTight
 interblockSeparator
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 strongEmphasis: test* test
+olItemEnd
 olItemWithNumber: 2
 underscore
 strongEmphasis: test(underscore) test
+olItemEnd
 olItemWithNumber: 3
 emphasis: (emphasis: test (emphasis: test)) test
+olItemEnd
 olItemWithNumber: 4
 emphasis: (emphasis: test (emphasis: test)) test
+olItemEnd
 olItemWithNumber: 5
 emphasis: test (emphasis: test) test
+olItemEnd
 olItemWithNumber: 6
 emphasis: test (emphasis: test) test
+olItemEnd
 olItemWithNumber: 7
 strongEmphasis: test (strongEmphasis: test) test
+olItemEnd
 olItemWithNumber: 8
 strongEmphasis: test (strongEmphasis: test) test
+olItemEnd
 olEndTight
 interblockSeparator
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
+olItemEnd
 olItemWithNumber: 2
 emphasis: * test *
+olItemEnd
 olItemWithNumber: 3
 underscore
 underscore
+olItemEnd
 olItemWithNumber: 4
 emphasis: (underscore) test (underscore)
+olItemEnd
 olEndTight
 interblockSeparator
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 emphasis: a
+olItemEnd
 olItemWithNumber: 2
 emphasis: b
+olItemEnd
 olItemWithNumber: 3
 emphasis: b
+olItemEnd
 olItemWithNumber: 4
 strongEmphasis: a
+olItemEnd
 olItemWithNumber: 5
 strongEmphasis: b
+olItemEnd
 olItemWithNumber: 6
 strongEmphasis: b
+olItemEnd
 olEndTight
 interblockSeparator
 interblockSeparator
 olBeginTight
 olItemWithNumber: 1
 emphasis: a
+olItemEnd
 olItemWithNumber: 2
 emphasis: b
+olItemEnd
 olItemWithNumber: 3
 emphasis: b
+olItemEnd
 olItemWithNumber: 4
 strongEmphasis: a
+olItemEnd
 olItemWithNumber: 5
 strongEmphasis: b
+olItemEnd
 olItemWithNumber: 6
 strongEmphasis: b
+olItemEnd
 olEndTight
 interblockSeparator
 emphasis: precious

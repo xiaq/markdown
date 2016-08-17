@@ -10,6 +10,9 @@ codeSpan: tightLists
 interblockSeparator
 olBeginTight
 olItemWithNumber: 3
+olItemEnd
 olItemWithNumber: 4
+olItemEnd
 olItemWithNumber: 5
+olItemEnd
 olEndTight
