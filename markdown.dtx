@@ -489,6 +489,42 @@ defaultOptions.startNumber = true
 %  \begin{macrocode}
 defaultOptions.tightLists = true
 %    \end{macrocode}
+%
+%   \Optitem[false]{citations}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the pandoc citation syntax extension:
+%         \begin{Verbatim}
+% Here is a simple parenthetical citation [@doe99] and here
+% is a string of several [see @doe99, pp. 33-35; also
+% @smith04, chap. 1].
+% 
+% A parenthetical citation can have a [prenote @doe99] and
+% a [@smith04 postnote]. The name of the author can be
+% suppressed by inserting a dash before the name of an
+% author as follows: [-@smith04].
+%
+% Here is a simple text citation @doe99 and here is one
+% with a postnote @smith04 [chap. 1]. Here is one with the
+% name of the author suppressed -@doe99.
+%         \end{Verbatim}
+%       \item[false] Disable the pandoc citation syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.citations = false
+%    \end{macrocode}
+%
+%   \Optitem[false]{citationNbsps}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Replace regular spaces with non-breakable spaces inside the
+%         prenotes and postnotes of citations produced via the pandoc citation
+%         syntax extension.
+%       \item[false] Do not replace regular spaces with non-breakable spaces
+%         inside the prenotes and postnotes of citations produced via the pandoc
+%         citation syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.citationNbsps = true
+%    \end{macrocode}
 % \end{optionlist}
 % 
 % \iffalse
@@ -1939,6 +1975,12 @@ function M.writer.new(options)
   self.space = " "
 %    \end{macrocode}
 %
+% Define \luamdef{writer->nbsp} as the output format of a non-breaking space
+% character.
+%  \begin{macrocode}
+  self.nbsp = "~"
+%    \end{macrocode}
+%
 % Define \luamdef{writer->plain} as a function that will transform an input
 % plain text block \t`s` to the output format.
 %  \begin{macrocode}
@@ -2232,7 +2274,7 @@ function M.writer.new(options)
   end
 %    \end{macrocode}
 %
-% Define \luamdef{writer->citation} as a function that will transform an
+% Define \luamdef{writer->citations} as a function that will transform an
 % input array of citations \t`cites` to the output format. If \t`text_cites`
 % is \t`true`, the citations should be rendered in-text, when applicable.
 % The \t`cites` array contains tables with the following keys and values:
@@ -2246,12 +2288,12 @@ function M.writer.new(options)
 %   \item\t`name` -- The value of this key is the citation name.
 % \end{itemize}
 %  \begin{macrocode}
-  function self.citation(text_cites, cites)
+  function self.citations(text_cites, cites)
     local buffer = {"\\markdownRenderer", text_cites and "TextCite" or "Cite",
       "{", #cites, "}"}
     for _,cite in ipairs(cites) do
-      buffer[#buffer+1] = {cite.suppress_author and "-" or "+", "[",
-        cite.pre or "", "][", cite.post or "", "]{", cite.name, "}"}
+      buffer[#buffer+1] = {cite.suppress_author and "-" or "+", "{",
+        cite.prenote or "", "}{", cite.postnote or "", "}{", cite.name, "}"}
     end
     return buffer
   end
@@ -2326,39 +2368,27 @@ function M.reader.new(writer, options)
 %  \begin{macrocode}
   local syntax
   local blocks
-  local inlines
+  local inlines, inlines_no_link, inlines_nbsp
 
-  local parse_blocks =
-    function(str)
-      local res = lpeg.match(blocks, str)
+  local function create_parser(name, grammar)
+    return function(str)
+      local res = lpeg.match(grammar(), str)
       if res == nil then
-        error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        error(format("%s failed on:\n%s", name, str:sub(1,20)))
       else
         return res
       end
     end
-
-  local parse_inlines =
-    function(str)
-      local res = lpeg.match(inlines, str)
-      if res == nil then
-        error(format("parse_inlines failed on:\n%s",
-        str:sub(1,20)))
-      else
-        return res
-      end
-    end
-
-  local parse_inlines_no_link =
-    function(str)
-      local res = lpeg.match(inlines_no_link, str)
-      if res == nil then
-        error(format("parse_inlines_no_link failed on:\n%s",
-        str:sub(1,20)))
-      else
-        return res
-      end
-    end
+  end
+    
+  local parse_blocks = create_parser("parse_blocks",
+    function() return blocks end)
+  local parse_inlines = create_parser("parse_inlines",
+    function() return inlines end)
+  local parse_inlines_no_link = create_parser("parse_inlines_no_link",
+    function() return inlines_no_link end)
+  local parse_inlines_nbsp = create_parser("parse_inlines_nbsp",
+    function() return inlines_nbsp end)
 %    \end{macrocode}
 % \paragraph{Generic \acro{peg} Patterns}
 %  \begin{macrocode}
@@ -2393,6 +2423,7 @@ function M.reader.new(writer, options)
   local letter                 = R("AZ","az")
   local alphanumeric           = R("AZ","az","09")
   local keyword                = letter * alphanumeric^0
+  local punctuation            = S("!?,.:;")
 
   local doubleasterisks        = P("**")
   local doubleunderscores      = P("__")
@@ -2402,7 +2433,7 @@ function M.reader.new(writer, options)
   local fail                   = any - 1
   local always                 = P("")
 
-  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^@")
+  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^@;")
 
   local anyescaped             = P("\\") / "" * escapable
                                + any
@@ -2414,11 +2445,14 @@ function M.reader.new(writer, options)
   local nonspacechar           = any - spacing
   local tightblocksep          = P("\001")
 
-  local specialchar            = S("*_`&[]<!\\.")
+  local specialchar            = S("*_`&[]<!\\.@-")
 
   local normalchar             = any -
                                  (specialchar + spacing + tightblocksep)
   local optionalspace          = spacechar^0
+  local optionalspaceor = function(pattern)
+    return                      (spacechar + pattern)^0
+  end
   local spaces                 = spacechar^1
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
@@ -2433,6 +2467,10 @@ function M.reader.new(writer, options)
   local optionallyindentedline = indent^-1 /"" * C(linechar^1 * newline^-1)
   local sp                     = spacing^0
   local spnl                   = optionalspace * (newline * optionalspace)^-1
+  local spnlor = function(pattern)
+    local optional = optionalspaceor(pattern)
+    return                       optional * (newline * optional)^-1
+  end
   local line                   = linechar^0 * newline
                                + linechar^1 * eof
   local nonemptyline           = line - blankline
@@ -2541,6 +2579,41 @@ function M.reader.new(writer, options)
   local optionaltitle = spnl * title * spacechar^0
                       + Cc("")
 %    \end{macrocode}
+% \paragraph{Citation \acro{peg} Patterns}
+%  \begin{macrocode}
+  local citation_name = (Cs(dash^-1)
+                      * at * Cs((anyescaped
+                           - (rbracket + spacing + punctuation + semicolon))^1))
+
+  local citation_body_prenote
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + semicolon + blankline^2))
+                           - (spnl * dash^-1 * at))^0)
+
+  local citation_body_postnote
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + semicolon + blankline^2))
+                           - (spnl * rbracket))^0)
+
+  local citation_body_chunk
+                      = citation_body_prenote
+                      * spnl * citation_name
+                      * spnlor(punctuation - (semicolon + rbracket))
+                      * citation_body_postnote
+
+  local citation_body = citation_body_chunk
+                      * (semicolon * spnl * citation_body_chunk)^0
+
+  local citation_headless_body
+                      = citation_body_postnote
+                      * (sp * semicolon * spnl * citation_body_chunk)^0
+%    \end{macrocode}
 % \paragraph{Footnote \acro{peg} Patterns}
 %  \begin{macrocode}
   local rawnotes = {}
@@ -2581,16 +2654,49 @@ function M.reader.new(writer, options)
 %    \end{macrocode}
 % \paragraph{Citations \acro{peg} Patterns}
 %  \begin{macrocode}
-  local RawCiteRef = #(lbracket * at) * tag / strip_first_char
+  local function citations(text_cites, raw_cites)
+      local function normalize(str)
+          if str == "" then
+              str = nil
+          else
+              str = (options.citationNbsps and parse_inlines_nbsp or
+                parse_inlines)(str)
+          end
+          return str
+      end
 
-  local CiteRef    = RawCiteRef / function(ref)
-                                    return writer.citation(false, {{
-                                      suppress_author = false,
-                                      prenote = nil,
-                                      postnote = nil,
-                                      name = ref,
-                                    }})
-                                  end
+      local cites = {}
+      for i = 1,#raw_cites,4 do
+          cites[#cites+1] = {
+              prenote = normalize(raw_cites[i]),
+              suppress_author = raw_cites[i+1] == "-",
+              name = writer.string(raw_cites[i+2]),
+              postnote = normalize(raw_cites[i+3]),
+          }
+      end
+      return writer.citations(text_cites, cites)
+  end
+
+  local TextCitations = Ct(Cc("")
+                      * citation_name
+                      * ((spnl
+                           * lbracket
+                           * citation_headless_body
+                           * rbracket) + Cc(""))) /
+                        function(raw_cites)
+                            return citations(true, raw_cites)
+                        end
+  
+  local ParenthesizedCitations
+                      = Ct(lbracket
+                      * citation_body
+                      * rbracket) /
+                        function(raw_cites)
+                            return citations(false, raw_cites)
+                        end
+
+  local Citations     = TextCitations + ParenthesizedCitations
+
 %    \end{macrocode}
 % \paragraph{Link and Image \acro{peg} Patterns}
 %  \begin{macrocode}
@@ -2700,6 +2806,11 @@ function M.reader.new(writer, options)
   local Space     = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
+
+  local NonbreakingSpace
+                  = spacechar^2 * Endline / writer.linebreak
+                  + spacechar^1 * Endline^-1 * eof / ""
+                  + spacechar^1 * Endline^-1 * optionalspace / writer.nbsp
 
   -- parse many p between starter and ender
   local function between(p, starter, ender)
@@ -2963,7 +3074,7 @@ function M.reader.new(writer, options)
                             + V("Strong")
                             + V("Emph")
                             + V("NoteRef")
-                            + V("CiteRef")
+                            + V("Citations")
                             + V("Link")
                             + V("Image")
                             + V("Code")
@@ -2980,7 +3091,7 @@ function M.reader.new(writer, options)
       Strong                = Strong,
       Emph                  = Emph,
       NoteRef               = NoteRef,
-      CiteRef               = CiteRef,
+      Citations             = Citations,
       Link                  = Link,
       Image                 = Image,
       Code                  = Code,
@@ -2998,7 +3109,7 @@ function M.reader.new(writer, options)
   end
 
   if not options.citations then
-    syntax.CiteRef = fail
+    syntax.Citations = fail
   end
 
   if not options.footnotes then
@@ -3016,9 +3127,13 @@ function M.reader.new(writer, options)
   inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
   inlines = Ct(inlines_t)
 
-  inlines_no_link_t = util.table_copy(inlines_t)
+  local inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
+
+  local inlines_nbsp_t = util.table_copy(inlines_t)
+  inlines_nbsp_t.Space = NonbreakingSpace
+  inlines_nbsp = Ct(inlines_nbsp_t)
 %    \end{macrocode}
 %
 % \paragraph{Exported Conversion Function}
