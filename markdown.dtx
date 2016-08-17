@@ -2224,11 +2224,36 @@ function M.writer.new(options)
   end
 %    \end{macrocode}
 %
-% Define \luamdef{writer->footnote} as a function that will transform an
+% Define \luamdef{writer->note} as a function that will transform an
 % input footnote \t`s` to the output format.
 %  \begin{macrocode}
   function self.note(s)
     return {"\\markdownRendererFootnote{",s,"}"}
+  end
+%    \end{macrocode}
+%
+% Define \luamdef{writer->citation} as a function that will transform an
+% input array of citations \t`cites` to the output format. If \t`text_cites`
+% is \t`true`, the citations should be rendered in-text, when applicable.
+% The \t`cites` array contains tables with the following keys and values:
+% \begin{itemize}
+%   \item\t`suppress_author` -- If the value of the key is true, then the
+%     author of the work should be omitted in the citation, when applicable.
+%   \item\t`prenote` -- The value of the key is either \t`nil` or a string
+%     that should be inserted before the citation.
+%   \item\t`postnote` -- The value of the key is either \t`nil` or a string
+%     that should be inserted after the citation.
+%   \item\t`name` -- The value of this key is the citation name.
+% \end{itemize}
+%  \begin{macrocode}
+  function self.citation(text_cites, cites)
+    local buffer = {"\\markdownRenderer", text_cites and "TextCite" or "Cite",
+      "{", #cites, "}"}
+    for _,cite in ipairs(cites) do
+      buffer[#buffer+1] = {cite.suppress_author and "-" or "+", "[",
+        cite.pre or "", "][", cite.post or "", "]{", cite.name, "}"}
+    end
+    return buffer
   end
 
   return self
@@ -2338,6 +2363,7 @@ function M.reader.new(writer, options)
 % \paragraph{Generic \acro{peg} Patterns}
 %  \begin{macrocode}
   local percent                = P("%")
+  local at                     = P("@")
   local asterisk               = P("*")
   local dash                   = P("-")
   local plus                   = P("+")
@@ -2376,7 +2402,8 @@ function M.reader.new(writer, options)
   local fail                   = any - 1
   local always                 = P("")
 
-  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
+  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^@")
+
   local anyescaped             = P("\\") / "" * escapable
                                + any
 
@@ -2387,12 +2414,7 @@ function M.reader.new(writer, options)
   local nonspacechar           = any - spacing
   local tightblocksep          = P("\001")
 
-  local specialchar
-  if options.smartEllipses then
-    specialchar                = S("*_`&[]<!\\.")
-  else
-    specialchar                = S("*_`&[]<!\\")
-  end
+  local specialchar            = S("*_`&[]<!\\.")
 
   local normalchar             = any -
                                  (specialchar + spacing + tightblocksep)
@@ -2556,6 +2578,19 @@ function M.reader.new(writer, options)
   else
     NoteBlock = fail
   end
+%    \end{macrocode}
+% \paragraph{Citations \acro{peg} Patterns}
+%  \begin{macrocode}
+  local RawCiteRef = #(lbracket * at) * tag / strip_first_char
+
+  local CiteRef    = RawCiteRef / function(ref)
+                                    return writer.citation(false, {{
+                                      suppress_author = false,
+                                      prenote = nil,
+                                      postnote = nil,
+                                      name = ref,
+                                    }})
+                                  end
 %    \end{macrocode}
 % \paragraph{Link and Image \acro{peg} Patterns}
 %  \begin{macrocode}
@@ -2928,6 +2963,7 @@ function M.reader.new(writer, options)
                             + V("Strong")
                             + V("Emph")
                             + V("NoteRef")
+                            + V("CiteRef")
                             + V("Link")
                             + V("Image")
                             + V("Code")
@@ -2944,6 +2980,7 @@ function M.reader.new(writer, options)
       Strong                = Strong,
       Emph                  = Emph,
       NoteRef               = NoteRef,
+      CiteRef               = CiteRef,
       Link                  = Link,
       Image                 = Image,
       Code                  = Code,
@@ -2958,6 +2995,10 @@ function M.reader.new(writer, options)
 
   if not options.definitionLists then
     syntax.DefinitionList = fail
+  end
+
+  if not options.citations then
+    syntax.CiteRef = fail
   end
 
   if not options.footnotes then
