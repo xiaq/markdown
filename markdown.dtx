@@ -3002,7 +3002,7 @@ function M.reader.new(writer, options)
 % method, and return the result.
 %  \begin{macrocode}
     local name = util.cache(options.cacheDir, input, salt, function(input)
-        return util.rope_to_string(parse_blocks(input)) .. writer.eof
+        return util.rope_to_string(parse_blocks(input .. "\n\n")) .. writer.eof
       end, ".md" .. writer.suffix)
     return writer.pack(name)
   end
@@ -3471,7 +3471,7 @@ local convert = md.new(\markdownLuaOptions)
 %  \begin{macrocode}
           if line:match(ending_sequence) then
             |markdownLuaUnregisterIBCallback;
-            local input = table.concat(buffer, "\n") .. "\n\n"
+            local input = table.concat(buffer, "\n")
             local output = convert(input)
             return [[\markdownInfo{The ending token sequence was found}]] ..
               output .. [[\markdownReadAndConvertAfter]]
@@ -3514,7 +3514,7 @@ local convert = md.new(\markdownLuaOptions)
     |markdownInfo{Including markdown document "#1"}%
     |markdownLuaExecute{%
       |markdownPrepare
-      local input = assert(io.open("#1","r")):read("*a") .. "\n\n"
+      local input = assert(io.open("#1","r")):read("*a")
 %    \end{macrocode}
 % Since the Lua converter expects \acro{unix} line endings, normalize the
 % input.
