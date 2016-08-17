@@ -1197,7 +1197,9 @@ defaultOptions.tightLists = true
 % \textbackslash{}usepackage[\textrm{\meta{options}}]\{markdown\}
 % \end{Verbatim}
 % where \meta{options} are the \LaTeX{} interface options (see Section
-% \ref{sec:latexoptions}).
+% \ref{sec:latexoptions}). Note that \meta{options} may not contain the special
+% plain \TeX{} character \t`\#1` due to the way \LaTeX{} parses package
+% options.
 %
 % \subsubsection{Typesetting Markdown}
 % The interface exposes the \envmdef{markdown} and \envmdef{markdown*}
@@ -1571,7 +1573,7 @@ defaultOptions.tightLists = true
 % markdown token renderer prototypes.
 % \begin{Verbatim}
 % \markdownSetup{
-%   renderers = {
+%   rendererPrototypes = {
 %     image = {\includegraphics{#2}},
 %     codeSpan = {\texttt{#1}},    % Render inline code via `\texttt`.
 %   }

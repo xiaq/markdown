@@ -55,8 +55,11 @@ for TESTFILE; do
 
         # Clean up the testing directory.
         cd .. && rm -rf build/ || { printf 'ERROR\n'; exit 1; }
+#         && break
 
       done || exit $?
+#       && break
     done
+#     && break
   done
 done
