@@ -145,13 +145,15 @@
 %<*lua>
 % \fi
 %  \begin{macrocode}
-if not modules then modules = { } end modules ['markdown'] = {
+local metadata = {
     version   = "2.1.0",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
     license   = "LPPL 1.3"
 }
+if not modules then modules = { } end
+modules['markdown'] = metadata
 %    \end{macrocode}
 %
 % \subsection{Feedback}
@@ -2987,8 +2989,9 @@ function M.reader.new(writer, options)
     references = {}
 %    \end{macrocode}
 % When determining the name of the cache file, create salt for the hashing
-% function out of the passed options recognized by the Lua interface (see
-% Section \ref{sec:luaoptions}). The \Opt{cacheDir} option is disregarded.
+% function out of the package version and the passed options recognized by the
+% Lua interface (see Section \ref{sec:luaoptions}). The \Opt{cacheDir} option
+% is disregarded.
 %  \begin{macrocode}
     local opt_string = {}
     for k,_ in pairs(defaultOptions) do
@@ -2998,7 +3001,7 @@ function M.reader.new(writer, options)
       end
     end
     table.sort(opt_string)
-    local salt = table.concat(opt_string, ",")
+    local salt = table.concat(opt_string, ",") .. "," .. metadata.version
 %    \end{macrocode}
 % Produce the cache file, transform its filename via the \luam{writer->pack}
 % method, and return the result.
