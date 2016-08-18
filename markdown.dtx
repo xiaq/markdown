@@ -501,11 +501,12 @@ defaultOptions.tightLists = true
 % A parenthetical citation can have a [prenote @doe99] and
 % a [@smith04 postnote]. The name of the author can be
 % suppressed by inserting a dash before the name of an
-% author as follows: [-@smith04].
+% author as follows [-@smith04].
 %
-% Here is a simple text citation @doe99 and here is one
-% with a postnote @smith04 [chap. 1]. Here is one with the
-% name of the author suppressed -@doe99.
+% Here is a simple text citation @doe99 and here is
+% a string of several @doe99 [pp. 33-35; also @smith04,
+% chap. 1]. Here is one with the name of the author
+% suppressed -@doe99.
 %         \end{Verbatim}
 %       \item[false] Disable the pandoc citation syntax extension.
 %     \end{valuelist}
@@ -536,7 +537,7 @@ defaultOptions.citationNbsps = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/17}%
+\def\markdownLastModified{2016/08/18}%
 \def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
@@ -682,6 +683,8 @@ defaultOptions.citationNbsps = true
 \let\markdownOptionSmartEllipses\undefined
 \let\markdownOptionStartNumber\undefined
 \let\markdownOptionTightLists\undefined
+\let\markdownOptionFootnotes\undefined
+\let\markdownOptionFootnoteNbsps\undefined
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
@@ -715,6 +718,13 @@ defaultOptions.citationNbsps = true
 %  \begin{macrocode}
 \def\markdownRendererEllipsis{%
   \markdownRendererEllipsisPrototype}%
+%    \end{macrocode}
+%
+% \paragraph{Non-breaking Space Renderer}
+% The \mdef{markdownRendererNbsp} macro represents a non-breaking space.
+%  \begin{macrocode}
+\def\markdownRendererNbsp{%
+  \markdownRendererNbspPrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Special Character Renderers}
@@ -1058,6 +1068,31 @@ defaultOptions.citationNbsps = true
   \markdownRendererFootnotePrototype}%
 %    \end{macrocode}
 %
+% \paragraph{Parenthesized Citations Renderer}
+% The \mdef{markdownRendererCite} macro represents a string of one or more
+% parenthetical citations. This macro will only be produced, when the
+% \Opt{citations} option is \t`true`. The macro receives the parameter
+% \t`\textbraceleft`\meta{number of citations}\t`\textbraceright` followed by
+% \meta{suppress author}\t`\textbraceleft`\meta{prenote}\t`\textbraceright^^A
+% \textbraceleft`\meta{postnote}\t`\textbraceright\textbraceleft`\meta{name}^^A
+% \t`\textbraceright` repeated \meta{number of citations} times. The
+% \meta{suppress author} parameter is either the token \t`-`, when the author's
+% name is to be suppressed, or \t`+` otherwise.
+%  \begin{macrocode}
+\def\markdownRendererCite{%
+  \markdownRendererCitePrototype}%
+%    \end{macrocode}
+%
+% \paragraph{Text Citations Renderer}
+% The \mdef{markdownRendererTextCite} macro represents a string of one or more
+% text citations. This macro will only be produced, when the
+% \Opt{citations} option is \t`true`. The macro receives parameters in the same 
+% format as the \m{markdownRendererCite} macro.
+%  \begin{macrocode}
+\def\markdownRendererTextCite{%
+  \markdownRendererTextCitePrototype}%
+%    \end{macrocode}
+%
 % \subsubsection{Token Renderer Prototypes}\label{sec:texrendererprototypes}
 % The following \TeX{} macros provide definitions for the token renderers (see
 % Section \ref{sec:texrenderersuser}) that have not been redefined by the
@@ -1069,6 +1104,7 @@ defaultOptions.citationNbsps = true
 \def\markdownRendererInterblockSeparatorPrototype{}%
 \def\markdownRendererLineBreakPrototype{}%
 \def\markdownRendererEllipsisPrototype{}%
+\def\markdownRendererNbspPrototype{}%
 \def\markdownRendererLeftBracePrototype{}%
 \def\markdownRendererRightBracePrototype{}%
 \def\markdownRendererDollarSignPrototype{}%
@@ -1117,6 +1153,8 @@ defaultOptions.citationNbsps = true
 \def\markdownRendererHeadingSixPrototype#1{}%
 \def\markdownRendererHorizontalRulePrototype{}%
 \def\markdownRendererFootnotePrototype#1{}%
+\def\markdownRendererCitePrototype#1{}%
+\def\markdownRendererTextCitePrototype#1{}%
 %    \end{macrocode}
 %
 % \subsubsection{Logging Facilities}
@@ -1236,7 +1274,8 @@ defaultOptions.citationNbsps = true
 % \end{Verbatim}
 % where \meta{options} are the \LaTeX{} interface options (see Section
 % \ref{sec:latexoptions}). Note that \meta{options} may not contain the special
-% plain \TeX{} character \t`\#1` due to the way \LaTeX{} parses package
+% plain \TeX{} character \t`\#` and its contents may not span multiple
+% paragraphs. These limitations are due to the way \LaTeX{} parses package
 % options.
 %
 % \subsubsection{Typesetting Markdown}
@@ -1350,11 +1389,15 @@ defaultOptions.citationNbsps = true
 % If the \t`tightLists=false` option is specified, when loading the package,
 % then the \pkg{paralist} package for typesetting tight lists will not be
 % automatically loaded. This precaution is meant to minimize the footprint of
-% this package, since some documentclasses (\pkg{beamer}) do not play nice
+% this package, since some documentclasses (\pkg{beamer}) experience clashes
 % with the \pkg{paralist} package.
 %  \begin{macrocode}
 \define@key{markdownOptions}{tightLists}[true]{%
   \def\markdownOptionTightLists{#1}}%
+\define@key{markdownOptions}{citations}[true]{%
+  \def\markdownOptionCitations{#1}}%
+\define@key{markdownOptions}{citationNbsps}[true]{%
+  \def\markdownOptionCitationNbsps{#1}}%
 %    \end{macrocode}
 %
 % The following example \LaTeX{} code showcases a possible configuration of
@@ -1383,6 +1426,8 @@ defaultOptions.citationNbsps = true
   \renewcommand\markdownRendererLineBreak{#1}}%
 \define@key{markdownRenderers}{ellipsis}{%
   \renewcommand\markdownRendererEllipsis{#1}}%
+\define@key{markdownRenderers}{nbsp}{%
+  \renewcommand\markdownRendererNbsp{#1}}%
 \define@key{markdownRenderers}{leftBrace}{%
   \renewcommand\markdownRendererLeftBrace{#1}}%
 \define@key{markdownRenderers}{rightBrace}{%
@@ -1479,6 +1524,10 @@ defaultOptions.citationNbsps = true
   \renewcommand\markdownRendererHorizontalRule{#1}}%
 \define@key{markdownRenderers}{footnote}{%
   \renewcommand\markdownRendererFootnote[1]{#1}}%
+\define@key{markdownRenderers}{cite}{%
+  \renewcommand\markdownRendererCite[1]{#1}}%
+\define@key{markdownRenderers}{textCite}{%
+  \renewcommand\markdownRendererTextCite[1]{#1}}%
 %    \end{macrocode}
 %
 % The following example \LaTeX{} code showcases a possible configuration of the
@@ -1508,6 +1557,8 @@ defaultOptions.citationNbsps = true
   \renewcommand\markdownRendererLineBreakPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{ellipsis}{%
   \renewcommand\markdownRendererEllipsisPrototype{#1}}%
+\define@key{markdownRendererPrototypes}{nbsp}{%
+  \renewcommand\markdownRendererNbspPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{leftBrace}{%
   \renewcommand\markdownRendererLeftBracePrototype{#1}}%
 \define@key{markdownRendererPrototypes}{rightBrace}{%
@@ -1604,6 +1655,10 @@ defaultOptions.citationNbsps = true
   \renewcommand\markdownRendererHorizontalRulePrototype{#1}}%
 \define@key{markdownRendererPrototypes}{footnote}{%
   \renewcommand\markdownRendererFootnotePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{cite}{%
+  \renewcommand\markdownRendererCitePrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{textCite}{%
+  \renewcommand\markdownRendererTextCitePrototype[1]{#1}}%
 %    \end{macrocode}
 %
 % The following example \LaTeX{} code showcases a possible configuration of the
@@ -1978,7 +2033,7 @@ function M.writer.new(options)
 % Define \luamdef{writer->nbsp} as the output format of a non-breaking space
 % character.
 %  \begin{macrocode}
-  self.nbsp = "~"
+  self.nbsp = "\\markdownRendererNbsp{}"
 %    \end{macrocode}
 %
 % Define \luamdef{writer->plain} as a function that will transform an input
@@ -3205,12 +3260,13 @@ return M
   \errmessage{(l.\the\inputlineno) markdown.tex error: #1}}%
 %    \end{macrocode}
 %
-% \subsubsection{Token Renderers}
+% \subsubsection{Token Renderer Prototypes}
 % The following definitions should be considered placeholder.
 %  \begin{macrocode}
 \def\markdownRendererInterblockSeparatorPrototype{\par}%
 \def\markdownRendererLineBreakPrototype{\hfil\break}%
 \let\markdownRendererEllipsisPrototype\dots
+\def\markdownRendererNbspPrototype{~}%
 \def\markdownRendererLeftBracePrototype{\char`{}%
 \def\markdownRendererRightBracePrototype{\char`}}%
 \def\markdownRendererDollarSignPrototype{\char`$}%
@@ -3260,6 +3316,8 @@ return M
 \def\markdownRendererHeadingSixPrototype#1{#1}%
 \def\markdownRendererHorizontalRulePrototype{}%
 \def\markdownRendererFootnotePrototype#1{#1}%
+\def\markdownRendererCitePrototype#1{}%
+\def\markdownRendererTextCitePrototype#1{}%
 %    \end{macrocode}
 %
 % \subsubsection{Lua Snippets}
@@ -3302,6 +3360,12 @@ return M
 \fi
 \ifx\markdownOptionTightLists\undefined\else
   tightLists = \markdownOptionTightLists,
+\fi
+\ifx\markdownOptionCitations\undefined\else
+  citations = \markdownOptionCitations,
+\fi
+\ifx\markdownOptionCitationNbsps\undefined\else
+  citationNbsps = \markdownOptionCitationNbsps,
 \fi}
 }%
 %    \end{macrocode}
@@ -3755,6 +3819,7 @@ local convert = md.new(\markdownLuaOptions)
 \ProcessOptions\relax
 %    \end{macrocode}
 %
+% \subsubsection{Token Renderer Prototypes}
 % The following configuration should be considered placeholder.
 %  \begin{macrocode}
 \RequirePackage{url}
@@ -3821,24 +3886,79 @@ local convert = md.new(\markdownLuaOptions)
   blockQuoteEnd = {\end{quotation}},
   inputVerbatim = {\VerbatimInput{#1}},
   horizontalRule = {\noindent\rule[0.5ex]{\linewidth}{1pt}},
-  footnote = {\footnote{#1}}}}%
+  footnote = {\footnote{#1}}}}
 
 \ifx\chapter\undefined
-  \markdownSetup{rendererPrototypes={
+  \markdownSetup{rendererPrototypes = {
     headingOne = {\section{#1}},
     headingTwo = {\subsection{#1}},
     headingThree = {\subsubsection{#1}},
     headingFour = {\paragraph{#1}},
-    headingFive = {\subparagraph{#1}}}}%
+    headingFive = {\subparagraph{#1}}}}
 \else
-  \markdownSetup{rendererPrototypes={
+  \markdownSetup{rendererPrototypes = {
     headingOne = {\chapter{#1}},
     headingTwo = {\section{#1}},
     headingThree = {\subsection{#1}},
     headingFour = {\subsubsection{#1}},
     headingFive = {\paragraph{#1}},
-    headingSix = {\subparagraph{#1}}}}%
+    headingSix = {\subparagraph{#1}}}}
 \fi
+%    \end{macrocode}
+%
+% There is a basic implementation for citations that uses the \LaTeX{} \m{cite}
+% macro. There is also a more advanced implementation that uses the Bib\LaTeX{}
+% \m{autocites} and \m{textcites} macros. This implementation will be used, when
+% Bib\LaTeX{} is loaded.
+%  \begin{macrocode}
+\newcount\markdownLaTeXCitationsCounter
+
+% Basic implementation
+\def\markdownLaTeXBasicCitations#1#2#3#4{%
+  \advance\markdownLaTeXCitationsCounter by 1\relax
+  \ifx\relax#2\relax\else#2~\fi\cite[#3]{#4}%
+  \ifnum\markdownLaTeXCitationsCounter>\markdownLaTeXCitationsTotal\relax
+    \expandafter\@gobble
+  \fi\markdownLaTeXBasicCitations}
+\let\markdownLaTeXBasicTextCitations\markdownLaTeXBasicCitations
+
+% BibLaTeX implementation
+\def\markdownLaTeXBibLaTeXCitations#1#2#3#4#5{%
+  \advance\markdownLaTeXCitationsCounter by 1\relax
+  \ifnum\markdownLaTeXCitationsCounter>\markdownLaTeXCitationsTotal\relax
+    \autocites#1[#3][#4]{#5}%
+    \expandafter\@gobbletwo
+  \fi\markdownLaTeXBibLaTeXCitations{#1[#3][#4]{#5}}}
+\def\markdownLaTeXBibLaTeXTextCitations#1#2#3#4#5{%
+  \advance\markdownLaTeXCitationsCounter by 1\relax
+  \ifnum\markdownLaTeXCitationsCounter>\markdownLaTeXCitationsTotal\relax
+    \textcites#1[#3][#4]{#5}%
+    \expandafter\@gobbletwo
+  \fi\markdownLaTeXBibLaTeXTextCitations{#1[#3][#4]{#5}}}
+
+\markdownSetup{rendererPrototypes = {
+  cite = {%
+    \markdownLaTeXCitationsCounter=1%
+    \def\markdownLaTeXCitationsTotal{#1}%
+    \ifx\autocites\undefined
+      \expandafter
+      \markdownLaTeXBasicCitations
+    \else
+      \expandafter\expandafter\expandafter
+      \markdownLaTeXBibLaTeXCitations
+      \expandafter{\expandafter}%
+    \fi},
+  textCite = {%
+    \markdownLaTeXCitationsCounter=1%
+    \def\markdownLaTeXCitationsTotal{#1}%
+    \ifx\textcites\undefined
+      \expandafter
+      \markdownLaTeXBasicTextCitations
+    \else
+      \expandafter\expandafter\expandafter
+      \markdownLaTeXBibLaTeXTextCitations
+      \expandafter{\expandafter}%
+    \fi}}}
 %    \end{macrocode}
 %
 % \subsubsection{Miscellanea}
@@ -3944,7 +4064,7 @@ local convert = md.new(\markdownLuaOptions)
 % macro, so that the pipe character (\t`|`) is inactive during the scanning.
 % This is necessary, since the character is active in \Hologo{ConTeXt}.
 %  \begin{macrocode}
-\ifnum\markdownMode<2
+\ifnum\markdownMode<2\relax
   \def\markdownMakeOther{%
     \catcode`|=12}%
 \fi
@@ -3978,7 +4098,7 @@ local convert = md.new(\markdownLuaOptions)
 |endgroup
 %    \end{macrocode}
 %
-% \subsubsection{Options}
+% \subsubsection{Token Renderer Prototypes}
 % The following configuration should be considered placeholder.
 %  \begin{macrocode}
 \def\markdownRendererLineBreakPrototype{\blank}%

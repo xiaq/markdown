@@ -8,6 +8,9 @@ renderers = {%
   ellipsis = {%
     \TYPE{ellipsis}%
     \GOBBLE},
+  nbsp = {%
+    \TYPE{nbsp}%
+    \GOBBLE},
   leftBrace = {%
     \TYPE{leftBrace}%
     \GOBBLE},
@@ -123,4 +126,8 @@ renderers = {%
     \TYPE{horizontalRule}},
   footnote = {%
     \TYPE{footnote:         #1}},
+  cite = {%
+    \CITATIONS{#1}},
+  textCite = {%
+    \TEXTCITATIONS{#1}},
 }
