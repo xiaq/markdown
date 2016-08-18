@@ -2707,52 +2707,6 @@ function M.reader.new(writer, options)
     NoteBlock = fail
   end
 %    \end{macrocode}
-% \paragraph{Citations \acro{peg} Patterns}
-%  \begin{macrocode}
-  local function citations(text_cites, raw_cites)
-      local function normalize(str)
-          if str == "" then
-              str = nil
-          else
-              str = (options.citationNbsps and parse_inlines_nbsp or
-                parse_inlines)(str)
-          end
-          return str
-      end
-
-      local cites = {}
-      for i = 1,#raw_cites,4 do
-          cites[#cites+1] = {
-              prenote = normalize(raw_cites[i]),
-              suppress_author = raw_cites[i+1] == "-",
-              name = writer.string(raw_cites[i+2]),
-              postnote = normalize(raw_cites[i+3]),
-          }
-      end
-      return writer.citations(text_cites, cites)
-  end
-
-  local TextCitations = Ct(Cc("")
-                      * citation_name
-                      * ((spnl
-                           * lbracket
-                           * citation_headless_body
-                           * rbracket) + Cc(""))) /
-                        function(raw_cites)
-                            return citations(true, raw_cites)
-                        end
-  
-  local ParenthesizedCitations
-                      = Ct(lbracket
-                      * citation_body
-                      * rbracket) /
-                        function(raw_cites)
-                            return citations(false, raw_cites)
-                        end
-
-  local Citations     = TextCitations + ParenthesizedCitations
-
-%    \end{macrocode}
 % \paragraph{Link and Image \acro{peg} Patterns}
 %  \begin{macrocode}
   -- List of references defined in the document
@@ -2818,20 +2772,8 @@ function M.reader.new(writer, options)
     end
   end
 %    \end{macrocode}
-% \paragraph{Inline Element \acro{peg} Patterns}
+% \paragraph{Spacing \acro{peg} Patterns}
 %  \begin{macrocode}
-  local Inline    = V("Inline")
-
-  local Str       = normalchar^1 / writer.string
-
-  local Ellipsis  = P("...") / writer.ellipsis
-
-  local Smart     = Ellipsis
-
-  local Symbol    = (specialchar - tightblocksep) / writer.string
-
-  local Code      = inticks / writer.code
-
   local bqstart      = more
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
@@ -2843,7 +2785,31 @@ function M.reader.new(writer, options)
   if options.blankBeforeHeading then
     headerstart = fail
   end
+%    \end{macrocode}
+% \paragraph{String \acro{peg} Rules}
+%  \begin{macrocode}
+  local Inline    = V("Inline")
 
+  local Str       = normalchar^1 / writer.string
+
+  local Symbol    = (specialchar - tightblocksep) / writer.string
+%    \end{macrocode}
+% \paragraph{Ellipsis \acro{peg} Rules}
+%  \begin{macrocode}
+  local Ellipsis  = P("...") / writer.ellipsis
+
+  local Smart     = Ellipsis
+%    \end{macrocode}
+% \paragraph{Inline Code Block \acro{peg} Rules}
+%  \begin{macrocode}
+  local Code      = inticks / writer.code
+%    \end{macrocode}
+% \paragraph{Spacing \acro{peg} Rules}
+% Make two and more trailing spaces before a newline produce a forced line
+% break, throw away one or more trailing spaces and an optional newline at the
+% end of a file, and reduce one or more spaces and an optional newline into a
+% single space.
+%  \begin{macrocode}
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
                       + tightblocksep  -- nested list
@@ -2851,13 +2817,6 @@ function M.reader.new(writer, options)
                       + bqstart
                       + headerstart
                     ) * spacechar^0 / writer.space
-
-%    \end{macrocode}
-% Make two and more trailing spaces before a newline produce a forced line
-% break, throw away one or more trailing spaces and an optional newline at the
-% end of a file, and reduce one or more spaces and an optional newline into a
-% single space.
-%  \begin{macrocode}
   local Space     = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
@@ -2872,7 +2831,9 @@ function M.reader.new(writer, options)
       local ender2 = B(nonspacechar) * ender
       return (starter * #nonspacechar * Ct(p * (p - ender2)^0) * ender2)
   end
-
+%    \end{macrocode}
+% \paragraph{Emphasis \acro{peg} Rules}
+%  \begin{macrocode}
   local Strong = ( between(Inline, doubleasterisks, doubleasterisks)
                  + between(Inline, doubleunderscores, doubleunderscores)
                  ) / writer.strong
@@ -2880,7 +2841,9 @@ function M.reader.new(writer, options)
   local Emph   = ( between(Inline, asterisk, asterisk)
                  + between(Inline, underscore, underscore)
                  ) / writer.emphasis
-
+%    \end{macrocode}
+% \paragraph{Link \acro{peg} Rules}
+%  \begin{macrocode}
   local urlchar = anyescaped - newline - more
 
   local AutoLinkUrl   = less
@@ -2910,7 +2873,9 @@ function M.reader.new(writer, options)
 
   -- parse a link or image (direct or indirect)
   local Link          = DirectLink + IndirectLink
-
+%    \end{macrocode}
+% \paragraph{Image \acro{peg} Rules}
+%  \begin{macrocode}
   local DirectImage   = exclamation
                       * (tag / parse_inlines)
                       * spnl
@@ -2924,20 +2889,69 @@ function M.reader.new(writer, options)
                          indirect_image
 
   local Image         = DirectImage + IndirectImage
-
+%    \end{macrocode}
+% \paragraph{Miscellaneous Inline \acro{peg} Rules}
+%  \begin{macrocode}
   -- avoid parsing long strings of * or _ as emph/strong
   local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
 
   local EscapedChar   = S("\\") * C(escapable) / writer.string
 %    \end{macrocode}
-% \paragraph{Block Element \acro{peg} Patterns}
+% \paragraph{Citations \acro{peg} Rules}
+%  \begin{macrocode}
+  local function citations(text_cites, raw_cites)
+      local function normalize(str)
+          if str == "" then
+              str = nil
+          else
+              str = (options.citationNbsps and parse_inlines_nbsp or
+                parse_inlines)(str)
+          end
+          return str
+      end
+
+      local cites = {}
+      for i = 1,#raw_cites,4 do
+          cites[#cites+1] = {
+              prenote = normalize(raw_cites[i]),
+              suppress_author = raw_cites[i+1] == "-",
+              name = writer.string(raw_cites[i+2]),
+              postnote = normalize(raw_cites[i+3]),
+          }
+      end
+      return writer.citations(text_cites, cites)
+  end
+
+  local TextCitations = Ct(Cc("")
+                      * citation_name
+                      * ((spnl
+                           * lbracket
+                           * citation_headless_body
+                           * rbracket) + Cc(""))) /
+                        function(raw_cites)
+                            return citations(true, raw_cites)
+                        end
+  
+  local ParenthesizedCitations
+                      = Ct(lbracket
+                      * citation_body
+                      * rbracket) /
+                        function(raw_cites)
+                            return citations(false, raw_cites)
+                        end
+
+  local Citations     = TextCitations + ParenthesizedCitations
+%    \end{macrocode}
+% \paragraph{Code Block \acro{peg} Rules}
 %  \begin{macrocode}
   local Block          = V("Block")
 
   local Verbatim       = Cs( (blanklines
                            * ((indentedline - blankline))^1)^1
                            ) / expandtabs / writer.verbatim
-
+%    \end{macrocode}
+% \paragraph{Blockquote \acro{peg} Patterns}
+%  \begin{macrocode}
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
@@ -2948,24 +2962,15 @@ function M.reader.new(writer, options)
   local function lineof(c)
       return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
   end
-
+%    \end{macrocode}
+% \paragraph{Horizontal Rule \acro{peg} Rules}
+%  \begin{macrocode}
   local HorizontalRule = ( lineof(asterisk)
                          + lineof(dash)
                          + lineof(underscore)
                          ) / writer.hrule
-
-  local Reference      = define_reference_parser / register_link
-
-  local Paragraph      = nonindentspace * Ct(Inline^1) * newline
-                       * ( blankline^1
-                         + #hash
-                         + #(leader * more * space^-1)
-                         )
-                       / writer.paragraph
-
-  local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
 %    \end{macrocode}
-% \paragraph{List \acro{peg} Patterns}
+% \paragraph{List \acro{peg} Rules}
 %  \begin{macrocode}
   local starter = bullet + enumerator
 
@@ -3053,14 +3058,26 @@ function M.reader.new(writer, options)
                                 -DefinitionListItemLoose * Cc(true))
                           ) / writer.definitionlist
 %    \end{macrocode}
-% \paragraph{Blank \acro{peg} Patterns}
+% \paragraph{Blank Line \acro{peg} Rules}
 %  \begin{macrocode}
+  local Reference      = define_reference_parser / register_link
   local Blank          = blankline / ""
                        + NoteBlock
                        + Reference
                        + (tightblocksep / "\n")
 %    \end{macrocode}
-% \paragraph{Heading \acro{peg} Patterns}
+% \paragraph{Paragraph \acro{peg} Rules}
+%  \begin{macrocode}
+  local Paragraph      = nonindentspace * Ct(Inline^1) * newline
+                       * ( blankline^1
+                         + #hash
+                         + #(leader * more * space^-1)
+                         )
+                       / writer.paragraph
+
+  local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
+%    \end{macrocode}
+% \paragraph{Heading \acro{peg} Rules}
 %  \begin{macrocode}
   -- parse Atx heading start and return level
   local HeadingStart = #hash * C(hash^-6) * -hash / length
@@ -3085,6 +3102,8 @@ function M.reader.new(writer, options)
                      * HeadingLevel
                      * optionalspace * newline
                      / writer.heading
+
+  local Heading = AtxHeading + SetextHeading
 %    \end{macrocode}
 % \paragraph{Top Level \acro{peg} Specification}
 %  \begin{macrocode}
@@ -3116,7 +3135,7 @@ function M.reader.new(writer, options)
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
-      Heading               = AtxHeading + SetextHeading,
+      Heading               = Heading,
       DefinitionList        = DefinitionList,
       DisplayHtml           = DisplayHtml,
       Paragraph             = Paragraph,
