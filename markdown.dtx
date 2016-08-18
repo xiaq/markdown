@@ -365,6 +365,43 @@ defaultOptions.blankBeforeHeading = false
 defaultOptions.cacheDir = "."
 %    \end{macrocode}
 %
+%   \Optitem[false]{citationNbsps}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Replace regular spaces with non-breakable spaces inside the
+%         prenotes and postnotes of citations produced via the pandoc citation
+%         syntax extension.
+%       \item[false] Do not replace regular spaces with non-breakable spaces
+%         inside the prenotes and postnotes of citations produced via the pandoc
+%         citation syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.citationNbsps = true
+%    \end{macrocode}
+%
+%   \Optitem[false]{citations}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the pandoc citation syntax extension:
+%         \begin{Verbatim}
+% Here is a simple parenthetical citation [@doe99] and here
+% is a string of several [see @doe99, pp. 33-35; also
+% @smith04, chap. 1].
+% 
+% A parenthetical citation can have a [prenote @doe99] and
+% a [@smith04 postnote]. The name of the author can be
+% suppressed by inserting a dash before the name of an
+% author as follows [-@smith04].
+%
+% Here is a simple text citation @doe99 and here is
+% a string of several @doe99 [pp. 33-35; also @smith04,
+% chap. 1]. Here is one with the name of the author
+% suppressed -@doe99.
+%         \end{Verbatim}
+%       \item[false] Disable the pandoc citation syntax extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.citations = false
+%    \end{macrocode}
+%
 %   \Optitem[false]{definitionLists}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the pandoc definition list syntax extension:
@@ -488,43 +525,6 @@ defaultOptions.startNumber = true
 %     \end{valuelist}
 %  \begin{macrocode}
 defaultOptions.tightLists = true
-%    \end{macrocode}
-%
-%   \Optitem[false]{citations}{\opt{true}, \opt{false}}
-%     \begin{valuelist}
-%       \item[true] Enable the pandoc citation syntax extension:
-%         \begin{Verbatim}
-% Here is a simple parenthetical citation [@doe99] and here
-% is a string of several [see @doe99, pp. 33-35; also
-% @smith04, chap. 1].
-% 
-% A parenthetical citation can have a [prenote @doe99] and
-% a [@smith04 postnote]. The name of the author can be
-% suppressed by inserting a dash before the name of an
-% author as follows [-@smith04].
-%
-% Here is a simple text citation @doe99 and here is
-% a string of several @doe99 [pp. 33-35; also @smith04,
-% chap. 1]. Here is one with the name of the author
-% suppressed -@doe99.
-%         \end{Verbatim}
-%       \item[false] Disable the pandoc citation syntax extension.
-%     \end{valuelist}
-%  \begin{macrocode}
-defaultOptions.citations = false
-%    \end{macrocode}
-%
-%   \Optitem[false]{citationNbsps}{\opt{true}, \opt{false}}
-%     \begin{valuelist}
-%       \item[true] Replace regular spaces with non-breakable spaces inside the
-%         prenotes and postnotes of citations produced via the pandoc citation
-%         syntax extension.
-%       \item[false] Do not replace regular spaces with non-breakable spaces
-%         inside the prenotes and postnotes of citations produced via the pandoc
-%         citation syntax extension.
-%     \end{valuelist}
-%  \begin{macrocode}
-defaultOptions.citationNbsps = true
 %    \end{macrocode}
 % \end{optionlist}
 % 
@@ -675,16 +675,16 @@ defaultOptions.citationNbsps = true
 %  \begin{macrocode}
 \let\markdownOptionBlankBeforeBlockquote\undefined
 \let\markdownOptionBlankBeforeHeading\undefined
+\let\markdownOptionCitations\undefined
+\let\markdownOptionCitationNbsps\undefined
 \let\markdownOptionDefinitionLists\undefined
+\let\markdownOptionFootnotes\undefined
 \let\markdownOptionHashEnumerators\undefined
 \let\markdownOptionHybrid\undefined
-\let\markdownOptionFootnotes\undefined
 \let\markdownOptionPreserveTabs\undefined
 \let\markdownOptionSmartEllipses\undefined
 \let\markdownOptionStartNumber\undefined
 \let\markdownOptionTightLists\undefined
-\let\markdownOptionFootnotes\undefined
-\let\markdownOptionFootnoteNbsps\undefined
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderers}\label{sec:texrenderersuser}
@@ -1369,16 +1369,20 @@ defaultOptions.citationNbsps = true
   \def\markdownOptionBlankBeforeBlockquote{#1}}%
 \define@key{markdownOptions}{blankBeforeHeading}[true]{%
   \def\markdownOptionBlankBeforeHeading{#1}}%
+\define@key{markdownOptions}{citations}[true]{%
+  \def\markdownOptionCitations{#1}}%
+\define@key{markdownOptions}{citationNbsps}[true]{%
+  \def\markdownOptionCitationNbsps{#1}}%
 \define@key{markdownOptions}{cacheDir}{%
   \def\markdownOptionCacheDir{#1}}%
 \define@key{markdownOptions}{definitionLists}[true]{%
   \def\markdownOptionDefinitionLists{#1}}%
+\define@key{markdownOptions}{footnotes}[true]{%
+  \def\markdownOptionFootnotes{#1}}%
 \define@key{markdownOptions}{hashEnumerators}[true]{%
   \def\markdownOptionHashEnumerators{#1}}%
 \define@key{markdownOptions}{hybrid}[true]{%
   \def\markdownOptionHybrid{#1}}%
-\define@key{markdownOptions}{footnotes}[true]{%
-  \def\markdownOptionFootnotes{#1}}%
 \define@key{markdownOptions}{preserveTabs}[true]{%
   \def\markdownOptionPreserveTabs{#1}}%
 \define@key{markdownOptions}{smartEllipses}[true]{%
@@ -1394,10 +1398,6 @@ defaultOptions.citationNbsps = true
 %  \begin{macrocode}
 \define@key{markdownOptions}{tightLists}[true]{%
   \def\markdownOptionTightLists{#1}}%
-\define@key{markdownOptions}{citations}[true]{%
-  \def\markdownOptionCitations{#1}}%
-\define@key{markdownOptions}{citationNbsps}[true]{%
-  \def\markdownOptionCitationNbsps{#1}}%
 %    \end{macrocode}
 %
 % The following example \LaTeX{} code showcases a possible configuration of
@@ -3356,17 +3356,23 @@ return M
 \ifx\markdownOptionCacheDir\undefined\else
   cacheDir = "\markdownOptionCacheDir",
 \fi
+\ifx\markdownOptionCitations\undefined\else
+  citations = \markdownOptionCitations,
+\fi
+\ifx\markdownOptionCitationNbsps\undefined\else
+  citationNbsps = \markdownOptionCitationNbsps,
+\fi
 \ifx\markdownOptionDefinitionLists\undefined\else
   definitionLists = \markdownOptionDefinitionLists,
+\fi
+\ifx\markdownOptionFootnotes\undefined\else
+  footnotes = \markdownOptionFootnotes,
 \fi
 \ifx\markdownOptionHashEnumerators\undefined\else
   hashEnumerators = \markdownOptionHashEnumerators,
 \fi
 \ifx\markdownOptionHybrid\undefined\else
   hybrid = \markdownOptionHybrid,
-\fi
-\ifx\markdownOptionFootnotes\undefined\else
-  footnotes = \markdownOptionFootnotes,
 \fi
 \ifx\markdownOptionPreserveTabs\undefined\else
   preserveTabs = \markdownOptionPreserveTabs,
@@ -3379,12 +3385,6 @@ return M
 \fi
 \ifx\markdownOptionTightLists\undefined\else
   tightLists = \markdownOptionTightLists,
-\fi
-\ifx\markdownOptionCitations\undefined\else
-  citations = \markdownOptionCitations,
-\fi
-\ifx\markdownOptionCitationNbsps\undefined\else
-  citationNbsps = \markdownOptionCitationNbsps,
 \fi}
 }%
 %    \end{macrocode}
