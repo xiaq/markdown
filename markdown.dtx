@@ -2963,7 +2963,8 @@ function M.reader.new(writer, options)
           )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
-      return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
+      return (leader * (P(c) * optionalspace)^3 * (newline * blankline^1
+          + newline^-1 * eof))
   end
 %    \end{macrocode}
 % \paragraph{Horizontal Rule \acro{peg} Rules}
@@ -3254,8 +3255,7 @@ function M.reader.new(writer, options)
 % method, and return the result.
 %  \begin{macrocode}
     local name = util.cache(options.cacheDir, input, salt, function(input)
-        return util.rope_to_string(parse_blocks_toplevel(input .. "\n\n")) ..
-          writer.eof
+        return util.rope_to_string(parse_blocks_toplevel(input)) .. writer.eof
       end, ".md" .. writer.suffix)
     return writer.pack(name)
   end
