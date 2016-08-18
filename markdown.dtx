@@ -3615,7 +3615,6 @@ local convert = md.new(\markdownLuaOptions)
 %  \begin{macrocode}
         |def^^M{%
           |markdownInfo{The ending token sequence was found}%
-          |immediate|write|markdownLuaExecuteFileStream{}%
           |immediate|closeout|markdownLuaExecuteFileStream%
           |endgroup%
           |markdownInput|markdownOptionInputTempFileName%
@@ -3733,7 +3732,7 @@ local convert = md.new(\markdownLuaOptions)
 %  \begin{macrocode}
           if line:match(ending_sequence) then
             |markdownLuaUnregisterIBCallback;
-            local input = table.concat(buffer, "\n")
+            local input = table.concat(buffer, "\n") .. "\n"
             local output = convert(input)
             return [[\markdownInfo{The ending token sequence was found}]] ..
               output .. [[\markdownReadAndConvertAfter]]
