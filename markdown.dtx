@@ -2422,6 +2422,7 @@ function M.reader.new(writer, options)
 % \paragraph{Top Level Parsing Functions}
 %  \begin{macrocode}
   local syntax
+  local blocks_toplevel
   local blocks
   local inlines, inlines_no_link, inlines_nbsp
 
@@ -2438,6 +2439,8 @@ function M.reader.new(writer, options)
     
   local parse_blocks = create_parser("parse_blocks",
     function() return blocks end)
+  local parse_blocks_toplevel = create_parser("parse_blocks_toplevel",
+    function() return blocks_toplevel end)
   local parse_inlines = create_parser("parse_inlines",
     function() return inlines end)
   local parse_inlines_no_link = create_parser("parse_inlines_no_link",
@@ -2682,7 +2685,7 @@ function M.reader.new(writer, options)
     return function()
       local found = rawnotes[normalize_tag(ref)]
       if found then
-        return writer.note(parse_blocks(found))
+        return writer.note(parse_blocks_toplevel(found))
       else
         return {"[", parse_inlines("^" .. ref), "]"}
       end
@@ -2957,7 +2960,7 @@ function M.reader.new(writer, options)
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
           * blankline^0
-          )^1) / parse_blocks / writer.blockquote
+          )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
       return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
@@ -3042,7 +3045,7 @@ function M.reader.new(writer, options)
   local DefinitionListItemLoose = C(line) * skipblanklines
                            * Ct((defstart *
                                  indented_blocks(dlchunk) /
-                                 parse_blocks)^1)
+                                 parse_blocks_toplevel)^1)
                            * Cc(false)
                            / definition_list_item
 
@@ -3073,6 +3076,16 @@ function M.reader.new(writer, options)
                          + #hash
                          + #(leader * more * space^-1)
                          )
+                       / writer.paragraph
+
+  local ToplevelParagraph
+                       = nonindentspace * Ct(Inline^1) * (newline
+                       * ( blankline^1
+                         + #hash
+                         + #(leader * more * space^-1)
+                         + eof
+                         )
+                       + eof )
                        / writer.paragraph
 
   local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
@@ -3194,6 +3207,10 @@ function M.reader.new(writer, options)
     syntax.Smart = fail
   end
 
+  local blocks_toplevel_t = util.table_copy(syntax)
+  blocks_toplevel_t.Paragraph = ToplevelParagraph
+  blocks_toplevel = Ct(blocks_toplevel_t)
+
   blocks = Ct(syntax)
 
   local inlines_t = util.table_copy(syntax)
@@ -3237,7 +3254,8 @@ function M.reader.new(writer, options)
 % method, and return the result.
 %  \begin{macrocode}
     local name = util.cache(options.cacheDir, input, salt, function(input)
-        return util.rope_to_string(parse_blocks(input .. "\n\n")) .. writer.eof
+        return util.rope_to_string(parse_blocks_toplevel(input .. "\n\n")) ..
+          writer.eof
       end, ".md" .. writer.suffix)
     return writer.pack(name)
   end
