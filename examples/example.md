@@ -13,13 +13,18 @@ This is a text paragraph containing an ellipsis ... and followed by a horizontal
 
 ***
 
-This is a text paragraph containing text characters that need to be escaped before being processed {}$%&_#^\\~| and followed by a block of code containing the same characters.
-
-    {}$%&_#^\~|
-
 This is inline `code`. This is a [link](http://google.cz "Google").  _This is an *emphasized* span of text_. __This is a **strongly emphasized** span of text__.
 
   ![tux](tux.pdf "Tux by Larry Ewing <lewing@isc.tamu.edu> (created in GIMP)")
+
+This is a fenced code block:
+
+``` latex
+\documentclass{article}
+\begin{document}
+  Hello world!
+\end{document}
+```
 
 This is a bullet list:
 

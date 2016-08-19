@@ -342,6 +342,17 @@ local defaultOptions = {}
 defaultOptions.blankBeforeBlockquote = false
 %    \end{macrocode}
 %
+%   \Optitem[false]{blankBeforeCodeFence}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Require a blank line between a paragraph and the following
+%         fenced code block.
+%       \item[false] Do not require a blank line between a paragraph and the
+%         following fenced code block.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.blankBeforeCodeFence = false
+%    \end{macrocode}
+%
 %   \Optitem[false]{blankBeforeHeading}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Require a blank line between a paragraph and the following
@@ -453,6 +464,33 @@ defaultOptions.hashEnumerators = false
 defaultOptions.hybrid = false
 %    \end{macrocode}
 %
+%   \Optitem[false]{fencedCode}{\opt{true}, \opt{false}}
+%     \begin{valuelist}
+%       \item[true] Enable the commonmark fenced code block extension:
+%         \begin{Verbatim}
+% ~~~ js
+% if (a > 3) {
+%     moveShip(5 * gravity, DOWN);
+% }
+% ~~~~~~
+%
+%   ``` html
+%   <pre>
+%     <code>
+%       // Some comments
+%       line 1 of code
+%       line 2 of code
+%       line 3 of code
+%     </code>
+%   </pre>
+%   ```
+%         \end{Verbatim}
+%       \item[true] Disable the commonmark fenced code block extension.
+%     \end{valuelist}
+%  \begin{macrocode}
+defaultOptions.fencedCode = false
+%    \end{macrocode}
+%
 %   \Optitem[false]{footnotes}{\opt{true}, \opt{false}}
 %     \begin{valuelist}
 %       \item[true] Enable the pandoc footnote syntax extension:
@@ -537,7 +575,7 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/18}%
+\def\markdownLastModified{2016/08/20}%
 \def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
@@ -674,11 +712,13 @@ defaultOptions.tightLists = true
 % makes them fall back to the default values provided by the Lua interface.
 %  \begin{macrocode}
 \let\markdownOptionBlankBeforeBlockquote\undefined
+\let\markdownOptionBlankBeforeCodeFence\undefined
 \let\markdownOptionBlankBeforeHeading\undefined
 \let\markdownOptionCitations\undefined
 \let\markdownOptionCitationNbsps\undefined
 \let\markdownOptionDefinitionLists\undefined
 \let\markdownOptionFootnotes\undefined
+\let\markdownOptionFencedCode\undefined
 \let\markdownOptionHashEnumerators\undefined
 \let\markdownOptionHybrid\undefined
 \let\markdownOptionPreserveTabs\undefined
@@ -994,13 +1034,22 @@ defaultOptions.tightLists = true
   \markdownRendererBlockQuoteEndPrototype}%
 %    \end{macrocode}
 %
-% \paragraph{Code Block Renderer}
+% \paragraph{Code Block Renderers}
 % The \mdef{markdownRendererInputVerbatim} macro represents a code
 % block. The macro receives a single argument that corresponds to the
-% filename of a file contaning the code block to input.
+% filename of a file contaning the code block contents.
 %  \begin{macrocode}
 \def\markdownRendererInputVerbatim{%
   \markdownRendererInputVerbatimPrototype}%
+%    \end{macrocode}
+%
+% The \mdef{markdownRendererInputFencedCode} macro represents a fenced code
+% block. This macro will only be produced, when the \Opt{fencedCode} option is
+% \t`true`. The macro receives two arguments that correspond to the filename of
+% a file contaning the code block contents and to the code fence infostring.
+%  \begin{macrocode}
+\def\markdownRendererInputFencedCode{%
+  \markdownRendererInputFencedCodePrototype}%
 %    \end{macrocode}
 %
 % \paragraph{Heading Renderers}
@@ -1145,6 +1194,7 @@ defaultOptions.tightLists = true
 \def\markdownRendererBlockQuoteBeginPrototype{}%
 \def\markdownRendererBlockQuoteEndPrototype{}%
 \def\markdownRendererInputVerbatimPrototype#1{}%
+\def\markdownRendererInputFencedCodePrototype#1#2{}%
 \def\markdownRendererHeadingOnePrototype#1{}%
 \def\markdownRendererHeadingTwoPrototype#1{}%
 \def\markdownRendererHeadingThreePrototype#1{}%
@@ -1367,6 +1417,8 @@ defaultOptions.tightLists = true
   \def\markdownOptionOutputTempFileName{#1}}%
 \define@key{markdownOptions}{blankBeforeBlockquote}[true]{%
   \def\markdownOptionBlankBeforeBlockquote{#1}}%
+\define@key{markdownOptions}{blankBeforeCodeFence}[true]{%
+  \def\markdownOptionBlankBeforeCodeFence{#1}}%
 \define@key{markdownOptions}{blankBeforeHeading}[true]{%
   \def\markdownOptionBlankBeforeHeading{#1}}%
 \define@key{markdownOptions}{citations}[true]{%
@@ -1379,6 +1431,8 @@ defaultOptions.tightLists = true
   \def\markdownOptionDefinitionLists{#1}}%
 \define@key{markdownOptions}{footnotes}[true]{%
   \def\markdownOptionFootnotes{#1}}%
+\define@key{markdownOptions}{fencedCode}[true]{%
+  \def\markdownOptionFencedCode{#1}}%
 \define@key{markdownOptions}{hashEnumerators}[true]{%
   \def\markdownOptionHashEnumerators{#1}}%
 \define@key{markdownOptions}{hybrid}[true]{%
@@ -1508,6 +1562,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererBlockQuoteEnd{#1}}%
 \define@key{markdownRenderers}{inputVerbatim}{%
   \renewcommand\markdownRendererInputVerbatim[1]{#1}}%
+\define@key{markdownRenderers}{inputFencedCode}{%
+  \renewcommand\markdownRendererInputFencedCode[2]{#1}}%
 \define@key{markdownRenderers}{headingOne}{%
   \renewcommand\markdownRendererHeadingOne[1]{#1}}%
 \define@key{markdownRenderers}{headingTwo}{%
@@ -1639,6 +1695,8 @@ defaultOptions.tightLists = true
   \renewcommand\markdownRendererBlockQuoteEndPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{inputVerbatim}{%
   \renewcommand\markdownRendererInputVerbatimPrototype[1]{#1}}%
+\define@key{markdownRendererPrototypes}{inputFencedCode}{%
+  \renewcommand\markdownRendererInputFencedCodePrototype[2]{#1}}%
 \define@key{markdownRendererPrototypes}{headingOne}{%
   \renewcommand\markdownRendererHeadingOnePrototype[1]{#1}}%
 \define@key{markdownRendererPrototypes}{headingTwo}{%
@@ -2297,6 +2355,16 @@ function M.writer.new(options)
   end
 %    \end{macrocode}
 %
+% Define \luamdef{writer->codeFence} as a function that will transform an
+% input fenced code block \t`s` with the infostring \t`i` to the output
+% format.
+%  \begin{macrocode}
+  function self.fencedCode(i, s)
+    local name = util.cache(options.cacheDir, s, nil, nil, ".verbatim")
+    return {"\\markdownRendererInputFencedCode{",name,"}{",i,"}"}
+  end
+%    \end{macrocode}
+%
 % Define \luamdef{writer->heading} as a function that will transform an
 % input heading \t`s` at level \t`level` to the output format.
 %  \begin{macrocode}
@@ -2475,6 +2543,7 @@ function M.reader.new(writer, options)
   local colon                  = P(":")
   local semicolon              = P(";")
   local exclamation            = P("!")
+  local tilde                  = P("~")
 
   local digit                  = R("09")
   local hexdigit               = R("09","af","AF")
@@ -2511,7 +2580,6 @@ function M.reader.new(writer, options)
   local optionalspaceor = function(pattern)
     return                      (spacechar + pattern)^0
   end
-  local spaces                 = spacechar^1
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
   local indent                 = space^-3 * tab
@@ -2583,6 +2651,37 @@ function M.reader.new(writer, options)
                     + (backtick^1 - closeticks)
 
   local inticks     = openticks * space^-1 * C(intickschar^0) * closeticks
+% \paragraph{Fenced Code \acro{peg} Patterns}
+%  \begin{macrocode}
+  local function captures_geq_length(s,i,a,b)
+    return #a >= #b and i
+  end
+
+  local infostring     = (linechar - (backtick + space^1 * (newline + eof)))^0
+
+  local fenceindent
+  local function fencehead(char)
+    return               C(nonindentspace) / function(s) fenceindent = #s end
+                       * Cg(char^3, "fencelength")
+                       * optionalspace * C(infostring) * optionalspace
+                       * (newline + eof)
+  end
+
+  local function fencetail(char)
+    return               nonindentspace
+                       * Cmt(C(char^3) * Cb("fencelength"),
+                             captures_geq_length)
+                       * optionalspace * (newline + eof)
+                       + eof
+  end
+
+  local function fencedline(char)
+    return               C(line - fencetail(char))
+                       / function(s)
+                             return s:gsub("^" .. string.rep(" ?",
+                                 fenceindent), "")
+                         end
+  end
 %    \end{macrocode}
 % \paragraph{Tag \acro{peg} Patterns}
 %  \begin{macrocode}
@@ -2780,6 +2879,7 @@ function M.reader.new(writer, options)
   local bqstart      = more
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
+  local fencestart   = fencehead(backtick) + fencehead(tilde)
 
   if options.blankBeforeBlockquote then
     bqstart = fail
@@ -2787,6 +2887,10 @@ function M.reader.new(writer, options)
 
   if options.blankBeforeHeading then
     headerstart = fail
+  end
+
+  if not options.fencedCode or options.blankBeforeCodeFence then
+    fencestart = fail
   end
 %    \end{macrocode}
 % \paragraph{String \acro{peg} Rules}
@@ -2808,10 +2912,6 @@ function M.reader.new(writer, options)
   local Code      = inticks / writer.code
 %    \end{macrocode}
 % \paragraph{Spacing \acro{peg} Rules}
-% Make two and more trailing spaces before a newline produce a forced line
-% break, throw away one or more trailing spaces and an optional newline at the
-% end of a file, and reduce one or more spaces and an optional newline into a
-% single space.
 %  \begin{macrocode}
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
@@ -2819,7 +2919,9 @@ function M.reader.new(writer, options)
                       + eof       -- end of document
                       + bqstart
                       + headerstart
+                      + fencestart
                     ) * spacechar^0 / writer.space
+
   local Space     = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
@@ -2952,6 +3054,23 @@ function M.reader.new(writer, options)
   local Verbatim       = Cs( (blanklines
                            * ((indentedline - blankline))^1)^1
                            ) / expandtabs / writer.verbatim
+  
+  local TildeFencedCode
+                       = fencehead(tilde)
+                       * Cs(fencedline(tilde)^0)
+                       * fencetail(tilde)
+
+  local BacktickFencedCode
+                       = fencehead(backtick)
+                       * Cs(fencedline(backtick)^0)
+                       * fencetail(backtick)
+
+  local FencedCode     = (TildeFencedCode + BacktickFencedCode)
+                       / function(infostring, code)
+                             return writer.fencedCode(
+                                 writer.string(infostring),
+                                 expandtabs(code))
+                         end
 %    \end{macrocode}
 % \paragraph{Blockquote \acro{peg} Patterns}
 %  \begin{macrocode}
@@ -3136,6 +3255,7 @@ function M.reader.new(writer, options)
 
       Block                 = V("Blockquote")
                             + V("Verbatim")
+                            + V("FencedCode")
                             + V("HorizontalRule")
                             + V("BulletList")
                             + V("OrderedList")
@@ -3146,6 +3266,7 @@ function M.reader.new(writer, options)
 
       Blockquote            = Blockquote,
       Verbatim              = Verbatim,
+      FencedCode            = FencedCode,
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
@@ -3194,6 +3315,10 @@ function M.reader.new(writer, options)
 
   if not options.definitionLists then
     syntax.DefinitionList = fail
+  end
+
+  if not options.fencedCode then
+    syntax.FencedCode = fail
   end
 
   if not options.citations then
@@ -3344,7 +3469,9 @@ return M
 \def\markdownRendererBlockQuoteBeginPrototype{\par\begingroup\it}%
 \def\markdownRendererBlockQuoteEndPrototype{\endgroup\par}%
 \def\markdownRendererInputVerbatimPrototype#1{%
-\par{\tt\input"#1"\relax}\par}%
+  \par{\tt\input"#1"\relax}\par}%
+\def\markdownRendererInputFencedCodePrototype#1#2{%
+  \markdownRendererInputVerbatimPrototype{#1}}%
 \def\markdownRendererHeadingOnePrototype#1{#1}%
 \def\markdownRendererHeadingTwoPrototype#1{#1}%
 \def\markdownRendererHeadingThreePrototype#1{#1}%
@@ -3368,6 +3495,9 @@ return M
 \ifx\markdownOptionBlankBeforeBlockquote\undefined\else
   blankBeforeBlockquote = \markdownOptionBlankBeforeBlockquote,
 \fi
+\ifx\markdownOptionBlankBeforeCodeFence\undefined\else
+  blankBeforeCodeFence = \markdownOptionBlankBeforeCodeFence,
+\fi
 \ifx\markdownOptionBlankBeforeHeading\undefined\else
   blankBeforeHeading = \markdownOptionBlankBeforeHeading,
 \fi
@@ -3385,6 +3515,9 @@ return M
 \fi
 \ifx\markdownOptionFootnotes\undefined\else
   footnotes = \markdownOptionFootnotes,
+\fi
+\ifx\markdownOptionFencedCode\undefined\else
+  fencedCode = \markdownOptionFencedCode,
 \fi
 \ifx\markdownOptionHashEnumerators\undefined\else
   hashEnumerators = \markdownOptionHashEnumerators,
@@ -3921,6 +4054,27 @@ local convert = md.new(\markdownLuaOptions)
   blockQuoteBegin = {\begin{quotation}},
   blockQuoteEnd = {\end{quotation}},
   inputVerbatim = {\VerbatimInput{#1}},
+  inputFencedCode = {%
+    \ifx\relax#2\relax
+      \VerbatimInput{#1}%
+    \else
+      \ifx\minted@jobname\undefined
+        \ifx\lst@version\undefined
+          \markdownRendererInputFencedCode{#1}{}%
+%    \end{macrocode}
+% When the \pkg{listings} package is loaded, use it for syntax highlighting.
+%  \begin{macrocode}
+        \else
+          \lstinputlisting[language=#2]{#1}%
+        \fi
+%    \end{macrocode}
+% When the \pkg{minted} package is loaded, use it for syntax highlighting.
+% The \pkg{minted} package is preferred over \pkg{listings}.
+%  \begin{macrocode}
+      \else
+        \inputminted{#2}{#1}%
+      \fi
+    \fi},
   horizontalRule = {\noindent\rule[0.5ex]{\linewidth}{1pt}},
   footnote = {\footnote{#1}}}}
 
@@ -4193,6 +4347,33 @@ local convert = md.new(\markdownLuaOptions)
 \def\markdownRendererBlockQuoteBeginPrototype{\startquotation}%
 \def\markdownRendererBlockQuoteEndPrototype{\stopquotation}%
 \def\markdownRendererInputVerbatimPrototype#1{\typefile{#1}}%
+\def\markdownRendererInputFencedCodePrototype#1#2{%
+  \ifx\relax#2\relax
+    \typefile{#1}%
+  \else
+%    \end{macrocode}
+% The code fence infostring is used as a name from the \Hologo{ConTeXt}
+% \m{definetyping} command. This allows the user to set up code highlighting
+% mapping as follows:
+% \begin{Verbatim}
+% % Map the `TEX` syntax highlighter to the `latex` infostring.
+% \definetyping [latex]
+% \setuptyping  [latex] [option=TEX]
+% 
+% \starttext
+%   \startmarkdown
+% ~~~ latex
+% \documentclass{article}
+% \begin{document}
+%   Hello world!
+% \end{document}
+% ~~~
+%   \stopmarkdown
+% \stoptext
+% \end{Verbatim}
+%  \begin{macrocode}
+    \typefile[#2][]{#1}%
+  \fi}%
 \def\markdownRendererHeadingOnePrototype#1{\chapter{#1}}%
 \def\markdownRendererHeadingTwoPrototype#1{\section{#1}}%
 \def\markdownRendererHeadingThreePrototype#1{\subsection{#1}}%

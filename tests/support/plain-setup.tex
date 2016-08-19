@@ -94,6 +94,11 @@
   \TYPE{blockQuoteEnd}}%
 \def\markdownRendererInputVerbatim#1{%
   \TYPE{inputVerbatim:    #1}}%
+\def\markdownRendererInputFencedCode#1#2{%
+  \TYPE{BEGIN fencedCode}%
+  \TYPE{- src:            #1}%
+  \TYPE{- infostring:     #2}%
+  \TYPE{END fencedCode}}%
 \def\markdownRendererHeadingOne#1{%
   \TYPE{headingOne:       #1}}%
 \def\markdownRendererHeadingTwo#1{%

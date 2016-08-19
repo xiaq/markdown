@@ -110,6 +110,11 @@ renderers = {%
     \TYPE{blockQuoteEnd}},
   inputVerbatim = {%
     \TYPE{inputVerbatim:    #1}},
+  inputFencedCode = {%
+    \TYPE{BEGIN fencedCode}%
+    \TYPE{- src:            #1}%
+    \TYPE{- infostring:     #2}%
+    \TYPE{END fencedCode}},
   headingOne = {%
     \TYPE{headingOne:       #1}},
   headingTwo = {%
