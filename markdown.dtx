@@ -2582,7 +2582,7 @@ function M.reader.new(writer, options)
                     + (space - closeticks)
                     + (backtick^1 - closeticks)
 
-  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
+  local inticks     = openticks * space^-1 * C(intickschar^0) * closeticks
 %    \end{macrocode}
 % \paragraph{Tag \acro{peg} Patterns}
 %  \begin{macrocode}
