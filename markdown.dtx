@@ -1323,10 +1323,11 @@ defaultOptions.tightLists = true
 % \textbackslash{}usepackage[\textrm{\meta{options}}]\{markdown\}
 % \end{Verbatim}
 % where \meta{options} are the \LaTeX{} interface options (see Section
-% \ref{sec:latexoptions}). Note that \meta{options} may not contain the special
-% plain \TeX{} character \t`\#` and its contents may not span multiple
-% paragraphs. These limitations are due to the way \LaTeX{} parses package
-% options.
+% \ref{sec:latexoptions}). Note that \meta{options} inside the \m{usepackage}
+% macro may not set the \t`markdownRenderers` (see Section
+% \ref{sec:latexrenderers}) and \t`markdownRendererPrototypes` (see Section
+% \ref{sec:latexrendererprototypes}) keys. This limitation is due to the way
+% \Hologo{LaTeX2e} parses package options.
 %
 % \subsubsection{Typesetting Markdown}
 % The interface exposes the \envmdef{markdown} and \envmdef{markdown*}
@@ -1465,15 +1466,12 @@ defaultOptions.tightLists = true
 % }
 % \end{Verbatim}
 %
-% \paragraph{Plain \TeX{} Markdown Token Renderers}
+% \paragraph{Plain \TeX{} Markdown Token Renderers}\label{sec:latexrenderers}
 % The \LaTeX{} interface recognizes an option with the \t`renderers` key,
 % whose value must be a list of options that map directly to the markdown token
 % renderer macros exposed by the plain \TeX{} interface (see Section
 % \ref{sec:texrenderersuser}).
 %  \begin{macrocode}
-\define@key{markdownOptions}{renderers}{%
-  \setkeys{markdownRenderers}{#1}%
-  \def\KV@prefix{KV@markdownOptions@}}%
 \define@key{markdownRenderers}{interblockSeparator}{%
   \renewcommand\markdownRendererInterblockSeparator{#1}}%
 \define@key{markdownRenderers}{lineBreak}{%
@@ -1599,14 +1597,12 @@ defaultOptions.tightLists = true
 % \end{Verbatim}
 %
 % \paragraph{Plain \TeX{} Markdown Token Renderer Prototypes}
+% \label{sec:latexrendererprototypes}
 % The \LaTeX{} interface recognizes an option with the \t`rendererPrototypes`
 % key, whose value must be a list of options that map directly to the markdown
 % token renderer prototype macros exposed by the plain \TeX{} interface (see
 % Section \ref{sec:texrendererprototypes}).
 %  \begin{macrocode}
-\define@key{markdownOptions}{rendererPrototypes}{%
-  \setkeys{markdownRendererPrototypes}{#1}%
-  \def\KV@prefix{KV@markdownOptions@}}%
 \define@key{markdownRendererPrototypes}{interblockSeparator}{%
   \renewcommand\markdownRendererInterblockSeparatorPrototype{#1}}%
 \define@key{markdownRendererPrototypes}{lineBreak}{%
@@ -3986,6 +3982,16 @@ local convert = md.new(\markdownLuaOptions)
 \DeclareOption*{%
   \expandafter\markdownSetup\expandafter{\CurrentOption}}%
 \ProcessOptions\relax
+%    \end{macrocode}
+% After processing the options, activate the \t`renderers` and
+% \t`rendererPrototypes` keys.
+%  \begin{macrocode}
+\define@key{markdownOptions}{renderers}{%
+  \setkeys{markdownRenderers}{#1}%
+  \def\KV@prefix{KV@markdownOptions@}}%
+\define@key{markdownOptions}{rendererPrototypes}{%
+  \setkeys{markdownRendererPrototypes}{#1}%
+  \def\KV@prefix{KV@markdownOptions@}}%
 %    \end{macrocode}
 %
 % \subsubsection{Token Renderer Prototypes}
