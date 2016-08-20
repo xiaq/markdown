@@ -111,7 +111,7 @@ BEGIN link
 END link
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown-test/b0cba64633d2a9eac28ca9e3fa500018.verbatim
+inputVerbatim: _markdown_test/b0cba64633d2a9eac28ca9e3fa500018.verbatim
 interblockSeparator
 horizontalRule
 interblockSeparator

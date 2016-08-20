@@ -36,4 +36,4 @@ headingThree: Header "quoted(backslash)" again (backslash)""
 interblockSeparator
 codeSpan: (underscore)Detab
 interblockSeparator
-inputVerbatim: _markdown-test/58f5a43337a97a77594d067c159d772c.verbatim
+inputVerbatim: _markdown_test/58f5a43337a97a77594d067c159d772c.verbatim

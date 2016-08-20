@@ -138,7 +138,7 @@ dlItemEnd
 dlItem: (emphasis: orange)
 dlDefinitionBegin
 interblockSeparator
-inputVerbatim: _markdown-test/f9f08689e38f4705165b9018b14b4a09.verbatim
+inputVerbatim: _markdown_test/f9f08689e38f4705165b9018b14b4a09.verbatim
 interblockSeparator
 blockQuoteBegin
 blockQuoteEnd

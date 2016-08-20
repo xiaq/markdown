@@ -164,42 +164,42 @@ aaa
 >>>
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/40aeb3c06faa194425865c43b0818cf3.verbatim
+- src: _markdown_test/40aeb3c06faa194425865c43b0818cf3.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/40aeb3c06faa194425865c43b0818cf3.verbatim
+- src: _markdown_test/40aeb3c06faa194425865c43b0818cf3.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/162c3a1e89dc98bb7c0e223462144172.verbatim
+- src: _markdown_test/162c3a1e89dc98bb7c0e223462144172.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/a109a04c348f12d1fc1e55dc6cd3153d.verbatim
+- src: _markdown_test/a109a04c348f12d1fc1e55dc6cd3153d.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/a109a04c348f12d1fc1e55dc6cd3153d.verbatim
+- src: _markdown_test/a109a04c348f12d1fc1e55dc6cd3153d.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/162c3a1e89dc98bb7c0e223462144172.verbatim
+- src: _markdown_test/162c3a1e89dc98bb7c0e223462144172.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 blockQuoteBegin
 BEGIN fencedCode
-- src: _markdown-test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
+- src: _markdown_test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
 - infostring: 
 END fencedCode
 blockQuoteEnd
@@ -207,49 +207,49 @@ interblockSeparator
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/e1c06d85ae7b8b032bef47e42e4c08f9.verbatim
+- src: _markdown_test/e1c06d85ae7b8b032bef47e42e4c08f9.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/d41d8cd98f00b204e9800998ecf8427e.verbatim
+- src: _markdown_test/d41d8cd98f00b204e9800998ecf8427e.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/4b44563cc9886576b6589dd730cbc397.verbatim
+- src: _markdown_test/4b44563cc9886576b6589dd730cbc397.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/f084b3953e4a48b5425a11074ae99e3c.verbatim
+- src: _markdown_test/f084b3953e4a48b5425a11074ae99e3c.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/8a70ce8c35179c24412d9271f69da1fd.verbatim
+- src: _markdown_test/8a70ce8c35179c24412d9271f69da1fd.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown-test/04338967b57abaf5489d4de2ca3d5d75.verbatim
+inputVerbatim: _markdown_test/04338967b57abaf5489d4de2ca3d5d75.verbatim
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
+- src: _markdown_test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
+- src: _markdown_test/5c9597f3c8245907ea71a89d9d39d08e.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/5fcf96d052f67d3d8a648cb90cc39193.verbatim
+- src: _markdown_test/5fcf96d052f67d3d8a648cb90cc39193.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
@@ -257,18 +257,18 @@ interblockSeparator
 codeSpan: 
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/baeea0ffee491579d17a52cb85675edf.verbatim
+- src: _markdown_test/baeea0ffee491579d17a52cb85675edf.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/42935760431e4eb4ddd8a8bcc5e54a23.verbatim
+- src: _markdown_test/42935760431e4eb4ddd8a8bcc5e54a23.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/c157a79031e1c40f85931829bc5fc552.verbatim
+- src: _markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
@@ -277,7 +277,7 @@ interblockSeparator
 headingTwo: foo
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/c157a79031e1c40f85931829bc5fc552.verbatim
+- src: _markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
@@ -285,17 +285,17 @@ headingOne: baz
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/22bc2a65d877cb1e2a14deece6005742.verbatim
+- src: _markdown_test/22bc2a65d877cb1e2a14deece6005742.verbatim
 - infostring: ruby
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/22bc2a65d877cb1e2a14deece6005742.verbatim
+- src: _markdown_test/22bc2a65d877cb1e2a14deece6005742.verbatim
 - infostring: ruby startline=3 (dollarSign)(percentSign)@(hash)(dollarSign)
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/d41d8cd98f00b204e9800998ecf8427e.verbatim
+- src: _markdown_test/d41d8cd98f00b204e9800998ecf8427e.verbatim
 - infostring: ;
 END fencedCode
 interblockSeparator
@@ -304,12 +304,12 @@ codeSpan: aa
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/e1ff8c7886d18f6b5499b096584e13bf.verbatim
+- src: _markdown_test/e1ff8c7886d18f6b5499b096584e13bf.verbatim
 - infostring: 
 END fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown-test/ab4c9bee663124ac417409b22e2af252.verbatim
+- src: _markdown_test/ab4c9bee663124ac417409b22e2af252.verbatim
 - infostring: 
 END fencedCode

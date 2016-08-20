@@ -697,12 +697,12 @@ defaultOptions.tightLists = true
 %
 % The \mdef{markdownOptionCacheDir} macro corresponds to the Lua interface
 % \Opt{cacheDir} option that sets the name of the directory that will contain
-% the produced cache files. The option defaults to \t`_markdown-`\m{jobname},
+% the produced cache files. The option defaults to \t`_markdown_`\m{jobname},
 % which is a similar naming scheme to the one used by the \pkg{minted} \LaTeX{}
 % package. The same limitations apply here as in the case of the
 % \m{markdownOptionHelperScriptFileName} macro.
 %  \begin{macrocode}
-\def\markdownOptionCacheDir{_markdown-\jobname}%
+\def\markdownOptionCacheDir{_markdown_\jobname}%
 %    \end{macrocode}
 %
 % \paragraph{Lua Interface Options}
