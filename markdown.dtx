@@ -74,9 +74,10 @@
 \begin{filecontents}{markdown.bib}
   @book{luatex16,
     author    = {{Lua\TeX{} development team}},
-    title     = {Lua\TeX{} reference manual (0.95.0)},
+    title     = {Lua\TeX{} reference manual (0.98.3)},
+    date      = {2016-08-23},
     url       = {http://www.luatex.org/svn/trunk/manual/luatex.pdf},
-    urldate   = {2016-05-12}}
+    urldate   = {2016-08-30}}
   @book{latex16,
     author    = {Braams, Johannes and Carlisle, David and Jeffrey, Alan and
                  Lamport, Leslie and Mittelbach, Frank and Rowley, Chris and
@@ -182,53 +183,60 @@ modules['markdown'] = metadata
 % This section gives an overview of all resources required by the package.
 %
 % \subsubsection{Lua Prerequisites}\label{sec:luaprerequisites}
-% The Lua part of the package requires the following Lua modules:
+% The Lua part of the package requires that the following Lua modules are
+% available from within the Lua\TeX{} engine:
 % \begin{description}
-%   \item[\pkg{LPeg}] A pattern-matching library for the writing of recursive
-%     descent parsers via the Parsing Expression Grammars (\acro{peg}s). It is
-%     used by the \pkg{Lunamark} library to parse the markdown input.
+%   \item[\pkg{LPeg${}\geq{}$0.10}] A pattern-matching library for the writing
+%     of recursive descent parsers via the Parsing Expression Grammars
+%     (\acro{peg}s). It is used by the \pkg{Lunamark} library to parse the
+%     markdown input. \pkg{LPeg${}\geq{}$0.10} is included in
+%     Lua\TeX${}\geq{}$0.72.0 (\TeX Live${}\geq{}2013$).
 %  \begin{macrocode}
 local lpeg = require("lpeg")
 %    \end{macrocode}
 %   \item[\pkg{Selene Unicode}] A library that provides support for the
 %     processing of wide strings. It is used by the \pkg{Lunamark} library to
-%     cast image, link, and footnote tags to the lower case.
+%     cast image, link, and footnote tags to the lower case. \pkg{Selene
+%     Unicode} is included in all releases of Lua\TeX{} (\TeX
+%     Live${}\geq{}2008$).
 %  \begin{macrocode}
 local unicode = require("unicode")
 %    \end{macrocode}
 %   \item[\pkg{MD5}] A library that provides \acro{md5} crypto functions. It is
 %     used by the \pkg{Lunamark} library to compute the digest of the input for
-%     caching purposes. 
+%     caching purposes. \pkg{MD5} is included in all releases of Lua\TeX{}
+%     (\TeX Live${}\geq{}2008$).
 %  \begin{macrocode}
 local md5 = require("md5")
 %    \end{macrocode}
 % \end{description}
-% All the abovelisted modules are statically linked into the Lua\TeX{} engine
-% (see \cite[Section~3.3]{luatex16}).
+% All the abovelisted modules are statically linked into the current version of
+% the Lua\TeX{} engine (see \cite[Section~3.3]{luatex16}).
 %
 % \iffalse
 %</lua>
 %<*tex>
 % \fi
 % \subsubsection{Plain \TeX{} Prerequisites}\label{sec:texprerequisites}
-% The plain \TeX{} part of the package requires the following Lua module:
+% The plain \TeX{} part of the package requires that the plain \TeX{}
+% format (or its superset) is loaded, all the Lua prerequisites (see
+% Section \ref{sec:luaprerequisites}) and the following Lua module:
 % \begin{description}
 %   \item[\pkg{Lua File System}] A library that provides access to the
 %     filesystem via \acro{os}-specific syscalls. It is used by the plain
 %     \TeX{} code to create the cache directory specified by the
 %     \m{markdownOptionCacheDir} macro before interfacing with the
-%     \pkg{Lunamark} library.
+%     \pkg{Lunamark} library. \pkg{Lua File System} is included in all releases
+%     of Lua\TeX{} (\TeX Live${}\geq{}2008$).
 %
 %     The plain \TeX{} code makes use of the \luam{isdir} method that was added
-%     to the module by the Lua\TeX{} engine developers (see
-%     \cite[Section~3.2]{luatex16}). This method is not present in the base
-%     library.
+%     to the \pkg{Lua File System} library by the Lua\TeX{} engine developers
+%     (see \cite[Section~3.2]{luatex16}).
 % \end{description}
 % The \pkg{Lua File System} module is statically linked into the Lua\TeX{}
 % engine (see \cite[Section~3.3]{luatex16}).
 %
-% The plain \TeX{} part of the package also requires that the plain \TeX{}
-% format (or its superset) is loaded and that either the Lua\TeX{}
+% The plain \TeX{} part of the package also requires that either the Lua\TeX{}
 % \m{directlua} primitive or the shell access file stream 18 is available.
 %
 % \iffalse
@@ -237,13 +245,12 @@ local md5 = require("md5")
 % \fi
 % \subsubsection{\LaTeX{} Prerequisites}\label{sec:latexprerequisites}
 % The \LaTeX{} part of the package requires that the \Hologo{LaTeX2e} format is
-% loaded and also, since it uses the plain \TeX{} implementation, all the plain
-% \TeX{} prerequisites (see Section \ref{sec:texprerequisites}).
+% loaded,
 %  \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}%
 %    \end{macrocode}
-%
-% The following \Hologo{LaTeX2e} packages are also required:
+% all the plain \TeX{} prerequisites (see Section \ref{sec:texprerequisites}),
+% and the following \Hologo{LaTeX2e} packages:
 % \begin{description}
 %   \item[\pkg{keyval}] A package that enables the creation of parameter sets.
 %     This package is used to provide the \m{markdownSetup} macro, the package
@@ -276,9 +283,8 @@ local md5 = require("md5")
 % \fi
 % \subsubsection{\Hologo{ConTeXt} prerequisites}
 % The \Hologo{ConTeXt} part of the package requires that either the Mark II or
-% the Mark IV format is loaded and also, since it uses the plain \TeX{}
-% implementation, all the plain \TeX{} prerequisites (see Section
-% \ref{sec:texprerequisites}).
+% the Mark IV format is loaded and all the plain \TeX{} prerequisites (see
+% Section \ref{sec:texprerequisites}).
 %
 % \section{User Guide}\label{sec:interfaces}
 % This part of the manual describes the interfaces exposed by the package
