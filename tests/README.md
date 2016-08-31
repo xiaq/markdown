@@ -14,7 +14,6 @@ will also be deleted the next time a test is run.
 
 Each time a commit is made to the Git repository of the project, this test
 suite is ran by a continuous integration service. The current status is:
-[![CircleCI][badge]][link]
+[![CircleCI](https://circleci.com/gh/Witiko/markdown/tree/master.svg)][link]
 
- [badge]: https://circleci.com/gh/Witiko/markdown/tree/master.svg?style=svg
- [link]:  https://circleci.com/gh/Witiko/markdown/tree/master
+ [link]: https://circleci.com/gh/Witiko/markdown/tree/master

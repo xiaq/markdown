@@ -43,9 +43,9 @@ legacy TeX distributions.
 # Further information #
 
 For further information, consult the package documentation, which can be
-typeset by running the [LaTeXMK] tool on the `markdown.dtx` file
-(`latexmk -pdf markdown.dtx`). [LaTeXMK] should be included in your TeX
-distribution. The typeset documentation will reside in the file
+typeset by running the [LaTeXMK][LaTeXMK] tool on the `markdown.dtx` file
+(`latexmk -pdf markdown.dtx`). [LaTeXMK][LaTeXMK] should be included in your
+TeX distribution. The typeset documentation will reside in the file
 `markdown.pdf`.
 
  [LaTeXMK]: https://www.ctan.org/pkg/latexmk/
