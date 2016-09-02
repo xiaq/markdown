@@ -581,7 +581,7 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/08/20}%
+\def\markdownLastModified{2016/09/02}%
 \def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
@@ -2522,6 +2522,7 @@ function M.reader.new(writer, options)
 %  \begin{macrocode}
   local percent                = P("%")
   local at                     = P("@")
+  local comma                  = P(",")
   local asterisk               = P("*")
   local dash                   = P("-")
   local plus                   = P("+")
@@ -2552,7 +2553,7 @@ function M.reader.new(writer, options)
   local letter                 = R("AZ","az")
   local alphanumeric           = R("AZ","az","09")
   local keyword                = letter * alphanumeric^0
-  local punctuation            = S("!?,.:;")
+  local internal_punctuation   = S(":;,.#$%&-+?<>~/")
 
   local doubleasterisks        = P("**")
   local doubleunderscores      = P("__")
@@ -2579,9 +2580,6 @@ function M.reader.new(writer, options)
   local normalchar             = any -
                                  (specialchar + spacing + tightblocksep)
   local optionalspace          = spacechar^0
-  local optionalspaceor = function(pattern)
-    return                      (spacechar + pattern)^0
-  end
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
   local indent                 = space^-3 * tab
@@ -2595,10 +2593,6 @@ function M.reader.new(writer, options)
   local optionallyindentedline = indent^-1 /"" * C(linechar^1 * newline^-1)
   local sp                     = spacing^0
   local spnl                   = optionalspace * (newline * optionalspace)^-1
-  local spnlor = function(pattern)
-    local optional = optionalspaceor(pattern)
-    return                       optional * (newline * optional)^-1
-  end
   local line                   = linechar^0 * newline
                                + linechar^1 * eof
   local nonemptyline           = line - blankline
@@ -2740,9 +2734,10 @@ function M.reader.new(writer, options)
 %    \end{macrocode}
 % \paragraph{Citation \acro{peg} Patterns}
 %  \begin{macrocode}
-  local citation_name = (Cs(dash^-1)
-                      * at * Cs((anyescaped
-                           - (rbracket + spacing + punctuation + semicolon))^1))
+  local citation_name = Cs(dash^-1) * at
+                      * Cs(alphanumeric
+                          * (alphanumeric + internal_punctuation
+                              - comma - semicolon)^0)
 
   local citation_body_prenote
                       = Cs((alphanumeric^1
@@ -2763,7 +2758,7 @@ function M.reader.new(writer, options)
   local citation_body_chunk
                       = citation_body_prenote
                       * spnl * citation_name
-                      * spnlor(punctuation - (semicolon + rbracket))
+                      * (comma * spnl)^-1
                       * citation_body_postnote
 
   local citation_body = citation_body_chunk
