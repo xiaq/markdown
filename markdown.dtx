@@ -581,7 +581,7 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/09/02}%
+\def\markdownLastModified{2016/09/03}%
 \def\markdownVersion{2.1.0}%
 %    \end{macrocode}
 %
@@ -2744,7 +2744,7 @@ function M.reader.new(writer, options)
                            + bracketed
                            + inticks
                            + (anyescaped
-                               - (rbracket + semicolon + blankline^2))
+                               - (rbracket + blankline^2))
                            - (spnl * dash^-1 * at))^0)
 
   local citation_body_postnote
@@ -2764,8 +2764,16 @@ function M.reader.new(writer, options)
   local citation_body = citation_body_chunk
                       * (semicolon * spnl * citation_body_chunk)^0
 
+  local citation_headless_body_postnote
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + at + semicolon + blankline^2))
+                           - (spnl * rbracket))^0)
+
   local citation_headless_body
-                      = citation_body_postnote
+                      = citation_headless_body_postnote
                       * (sp * semicolon * spnl * citation_body_chunk)^0
 %    \end{macrocode}
 % \paragraph{Footnote \acro{peg} Patterns}
