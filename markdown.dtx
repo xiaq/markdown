@@ -147,7 +147,7 @@
 % \fi
 %  \begin{macrocode}
 local metadata = {
-    version   = "2.1.0",
+    version   = "2.1.1",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -581,8 +581,8 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/09/03}%
-\def\markdownVersion{2.1.0}%
+\def\markdownLastModified{2016/09/06}%
+\def\markdownVersion{2.1.1}%
 %    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
@@ -2931,6 +2931,16 @@ function M.reader.new(writer, options)
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
 
+  local NonbreakingEndline
+                  = newline * -( -- newline, but not before...
+                        blankline -- paragraph break
+                      + tightblocksep  -- nested list
+                      + eof       -- end of document
+                      + bqstart
+                      + headerstart
+                      + fencestart
+                    ) * spacechar^0 / writer.nbsp
+
   local NonbreakingSpace
                   = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
@@ -3354,6 +3364,7 @@ function M.reader.new(writer, options)
   inlines_no_link = Ct(inlines_no_link_t)
 
   local inlines_nbsp_t = util.table_copy(inlines_t)
+  inlines_nbsp_t.Endline = NonbreakingEndline
   inlines_nbsp_t.Space = NonbreakingSpace
   inlines_nbsp = Ct(inlines_nbsp_t)
 %    \end{macrocode}
