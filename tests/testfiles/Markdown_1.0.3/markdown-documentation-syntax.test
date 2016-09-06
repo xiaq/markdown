@@ -1091,7 +1091,7 @@ codeSpan: <p>
 codeSpan: <p>
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/6c0e67934e0358fd4071cf4247bcf221.verbatim
+inputVerbatim: ./_markdown_test/6c0e67934e0358fd4071cf4247bcf221.verbatim
 interblockSeparator
 codeSpan: *emphasis*
 interblockSeparator
@@ -1113,23 +1113,23 @@ interblockSeparator
 ampersand
 codeSpan: AT(ampersand)amp;T
 interblockSeparator
-inputVerbatim: _markdown_test/01abe6d069cf62de251cf21f8df1d11f.verbatim
+inputVerbatim: ./_markdown_test/01abe6d069cf62de251cf21f8df1d11f.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/3bb5e0b18bdd7c9688b9f5df139967f3.verbatim
+inputVerbatim: ./_markdown_test/3bb5e0b18bdd7c9688b9f5df139967f3.verbatim
 interblockSeparator
 codeSpan: href
 interblockSeparator
 codeSpan: (ampersand)amp;
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/9f3cb292eb01028cce569a08ef6f975b.verbatim
+inputVerbatim: ./_markdown_test/9f3cb292eb01028cce569a08ef6f975b.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/7cdba89e6cc34bd4841c7c6a41bb4156.verbatim
+inputVerbatim: ./_markdown_test/7cdba89e6cc34bd4841c7c6a41bb4156.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/c79c1d6af747ea457d80ff723101137a.verbatim
+inputVerbatim: ./_markdown_test/c79c1d6af747ea457d80ff723101137a.verbatim
 interblockSeparator
 BEGIN link
 - label: inline HTML
@@ -1137,10 +1137,10 @@ BEGIN link
 - title: 
 END link
 interblockSeparator
-inputVerbatim: _markdown_test/e76bfed335c678dbe01b3982b9b46fdc.verbatim
+inputVerbatim: ./_markdown_test/e76bfed335c678dbe01b3982b9b46fdc.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/cc7bb6b7c24a66c62c969328036e8f7b.verbatim
+inputVerbatim: ./_markdown_test/cc7bb6b7c24a66c62c969328036e8f7b.verbatim
 interblockSeparator
 emphasis: always
 codeSpan: <
@@ -1185,102 +1185,102 @@ BEGIN link
 END link
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/4f59d4e23ef758fd94bd2324643e2f2b.verbatim
+inputVerbatim: ./_markdown_test/4f59d4e23ef758fd94bd2324643e2f2b.verbatim
 interblockSeparator
 codeSpan: =
 codeSpan: -
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/48058b850bf198c75e9571ef25b4174e.verbatim
+inputVerbatim: ./_markdown_test/48058b850bf198c75e9571ef25b4174e.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/37d9f30690dba801bda9a65ec7cfd1be.verbatim
+inputVerbatim: ./_markdown_test/37d9f30690dba801bda9a65ec7cfd1be.verbatim
 interblockSeparator
 headingThree: Blockquotes
 interblockSeparator
 codeSpan: >
 codeSpan: >
 interblockSeparator
-inputVerbatim: _markdown_test/a89055d359469d454a801830954a9c6f.verbatim
+inputVerbatim: ./_markdown_test/a89055d359469d454a801830954a9c6f.verbatim
 interblockSeparator
 codeSpan: >
 interblockSeparator
-inputVerbatim: _markdown_test/944cb176339d03ac7508f0f66090979f.verbatim
+inputVerbatim: ./_markdown_test/944cb176339d03ac7508f0f66090979f.verbatim
 interblockSeparator
 codeSpan: >
 interblockSeparator
-inputVerbatim: _markdown_test/2a3331ca2a955f6ad7da2480f9cda089.verbatim
+inputVerbatim: ./_markdown_test/2a3331ca2a955f6ad7da2480f9cda089.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/539f94bbd698cb75fb0cd1ba51d297b2.verbatim
+inputVerbatim: ./_markdown_test/539f94bbd698cb75fb0cd1ba51d297b2.verbatim
 interblockSeparator
 interblockSeparator
 headingThree: Lists
 interblockSeparator
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/7667e2408d637a1e3ca69ccc1ce50809.verbatim
+inputVerbatim: ./_markdown_test/7667e2408d637a1e3ca69ccc1ce50809.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/f9c93344b256fc419363b5137a49888e.verbatim
+inputVerbatim: ./_markdown_test/f9c93344b256fc419363b5137a49888e.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/0ae7b8161204fb8d79d287ece754d868.verbatim
+inputVerbatim: ./_markdown_test/0ae7b8161204fb8d79d287ece754d868.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/5159786425bde2cec7e20b79500dde54.verbatim
+inputVerbatim: ./_markdown_test/5159786425bde2cec7e20b79500dde54.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/9679de8f4110a0e2906694aa1804cbf0.verbatim
+inputVerbatim: ./_markdown_test/9679de8f4110a0e2906694aa1804cbf0.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/68c7899020501a169d9e9ca810aff930.verbatim
+inputVerbatim: ./_markdown_test/68c7899020501a169d9e9ca810aff930.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/733b6752776567144548322ef66d67e6.verbatim
+inputVerbatim: ./_markdown_test/733b6752776567144548322ef66d67e6.verbatim
 interblockSeparator
 interblockSeparator
 interblockSeparator
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/3915e80c9e2b1a87599797fb217c295b.verbatim
+inputVerbatim: ./_markdown_test/3915e80c9e2b1a87599797fb217c295b.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/35441140ac44d3c2c7b9611d18c6dca4.verbatim
+inputVerbatim: ./_markdown_test/35441140ac44d3c2c7b9611d18c6dca4.verbatim
 interblockSeparator
 codeSpan: <p>
 interblockSeparator
-inputVerbatim: _markdown_test/92f4628c14a10b92aead4a4ebd01936a.verbatim
+inputVerbatim: ./_markdown_test/92f4628c14a10b92aead4a4ebd01936a.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/02afc9ab8392711baf578d89e8b624a8.verbatim
+inputVerbatim: ./_markdown_test/02afc9ab8392711baf578d89e8b624a8.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/ec0f57523c3541a14df8f17f3c822039.verbatim
+inputVerbatim: ./_markdown_test/ec0f57523c3541a14df8f17f3c822039.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/197c8667c0c0307c8174e6a6e07c2a48.verbatim
+inputVerbatim: ./_markdown_test/197c8667c0c0307c8174e6a6e07c2a48.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/a07ba2a71f8cd42180768463fa2e5dad.verbatim
+inputVerbatim: ./_markdown_test/a07ba2a71f8cd42180768463fa2e5dad.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/d56908f0f6e2476a6146ece0fa7e2f32.verbatim
+inputVerbatim: ./_markdown_test/d56908f0f6e2476a6146ece0fa7e2f32.verbatim
 interblockSeparator
 codeSpan: >
 interblockSeparator
-inputVerbatim: _markdown_test/4c06d5a765803dd6f15378765020443c.verbatim
+inputVerbatim: ./_markdown_test/4c06d5a765803dd6f15378765020443c.verbatim
 interblockSeparator
 emphasis: twice
 interblockSeparator
-inputVerbatim: _markdown_test/d3f24a5ba4f9ebe7c97b690753fef199.verbatim
+inputVerbatim: ./_markdown_test/d3f24a5ba4f9ebe7c97b690753fef199.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/d87e20aae0facc7fbbc293f790178cf4.verbatim
+inputVerbatim: ./_markdown_test/d87e20aae0facc7fbbc293f790178cf4.verbatim
 interblockSeparator
 emphasis: number-period-space
 interblockSeparator
-inputVerbatim: _markdown_test/ea5e5fa61236c2e31ecb34d484caed78.verbatim
+inputVerbatim: ./_markdown_test/ea5e5fa61236c2e31ecb34d484caed78.verbatim
 interblockSeparator
 headingThree: Code Blocks
 interblockSeparator
@@ -1288,33 +1288,33 @@ codeSpan: <pre>
 codeSpan: <code>
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/80158a498770adf4d0617503ae558414.verbatim
+inputVerbatim: ./_markdown_test/80158a498770adf4d0617503ae558414.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/35dd5e3b1d316dec464fafbedf53439e.verbatim
+inputVerbatim: ./_markdown_test/35dd5e3b1d316dec464fafbedf53439e.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/992aa3a21cc79d1a6a7b273173e1cc48.verbatim
+inputVerbatim: ./_markdown_test/992aa3a21cc79d1a6a7b273173e1cc48.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/d37edcee91241df6034067902bf7ff5f.verbatim
+inputVerbatim: ./_markdown_test/d37edcee91241df6034067902bf7ff5f.verbatim
 interblockSeparator
 interblockSeparator
 codeSpan: (ampersand)
 codeSpan: <
 codeSpan: >
 interblockSeparator
-inputVerbatim: _markdown_test/bfd3b2e8e47a22fe0914d55781a73b7c.verbatim
+inputVerbatim: ./_markdown_test/bfd3b2e8e47a22fe0914d55781a73b7c.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/6a14fbcefad86826e777c27a9000b94a.verbatim
+inputVerbatim: ./_markdown_test/6a14fbcefad86826e777c27a9000b94a.verbatim
 interblockSeparator
 interblockSeparator
 headingThree: Horizontal Rules
 interblockSeparator
 codeSpan: <hr />
 interblockSeparator
-inputVerbatim: _markdown_test/b3a754721670b6236c8eb8159555f38b.verbatim
+inputVerbatim: ./_markdown_test/b3a754721670b6236c8eb8159555f38b.verbatim
 interblockSeparator
 horizontalRule
 interblockSeparator
@@ -1328,22 +1328,22 @@ interblockSeparator
 interblockSeparator
 emphasis: optional
 interblockSeparator
-inputVerbatim: _markdown_test/1414e8798e8df1116073e37e18480580.verbatim
+inputVerbatim: ./_markdown_test/1414e8798e8df1116073e37e18480580.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/fee0581724d177221ef58d9e6a498b35.verbatim
+inputVerbatim: ./_markdown_test/fee0581724d177221ef58d9e6a498b35.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/be45edb9cb5e6fb760f9805ffc37b64b.verbatim
+inputVerbatim: ./_markdown_test/be45edb9cb5e6fb760f9805ffc37b64b.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/00842bca924b6e825c555a0866ba0488.verbatim
+inputVerbatim: ./_markdown_test/00842bca924b6e825c555a0866ba0488.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/525e6727b97cbbb73ce96c0ba62e8eb6.verbatim
+inputVerbatim: ./_markdown_test/525e6727b97cbbb73ce96c0ba62e8eb6.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/a35af952f6f3a307982ea5250cfb72de.verbatim
+inputVerbatim: ./_markdown_test/a35af952f6f3a307982ea5250cfb72de.verbatim
 interblockSeparator
 interblockSeparator
 ulBeginTight
@@ -1360,42 +1360,42 @@ ulItemEnd
 ulEndTight
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/59be3295fa322e809f4138ef7500798a.verbatim
+inputVerbatim: ./_markdown_test/59be3295fa322e809f4138ef7500798a.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/a39ca11b40fca9daced4a3b44b1fc1a3.verbatim
+inputVerbatim: ./_markdown_test/a39ca11b40fca9daced4a3b44b1fc1a3.verbatim
 interblockSeparator
 interblockSeparator
 emphasis: not
 interblockSeparator
-inputVerbatim: _markdown_test/a943d1cc49e6963c7bcb45acfebf321f.verbatim
+inputVerbatim: ./_markdown_test/a943d1cc49e6963c7bcb45acfebf321f.verbatim
 interblockSeparator
 interblockSeparator
 emphasis: implicit link name
 interblockSeparator
-inputVerbatim: _markdown_test/c2c38dc7e1a41ddb3d50c965e569aab4.verbatim
+inputVerbatim: ./_markdown_test/c2c38dc7e1a41ddb3d50c965e569aab4.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/17194fe133f07ed35b959c9108de4cec.verbatim
+inputVerbatim: ./_markdown_test/17194fe133f07ed35b959c9108de4cec.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/1a7658c341b463a9232093771a413acc.verbatim
+inputVerbatim: ./_markdown_test/1a7658c341b463a9232093771a413acc.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/65aaecc2b48f0d27de8de608c27ed6e7.verbatim
+inputVerbatim: ./_markdown_test/65aaecc2b48f0d27de8de608c27ed6e7.verbatim
 interblockSeparator
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/31285fcec3a6ea99b4694d3e6750fc60.verbatim
+inputVerbatim: ./_markdown_test/31285fcec3a6ea99b4694d3e6750fc60.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/0810a7510b5a42a7ec77fd3d55be870e.verbatim
+inputVerbatim: ./_markdown_test/0810a7510b5a42a7ec77fd3d55be870e.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/28d0c5764a38e6b58409f9967ef91bcc.verbatim
+inputVerbatim: ./_markdown_test/28d0c5764a38e6b58409f9967ef91bcc.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/f39ac74789b190c9c1460bd06b2e5f66.verbatim
+inputVerbatim: ./_markdown_test/f39ac74789b190c9c1460bd06b2e5f66.verbatim
 interblockSeparator
 interblockSeparator
 interblockSeparator
@@ -1410,53 +1410,53 @@ codeSpan: *
 codeSpan: (underscore)
 codeSpan: <strong>
 interblockSeparator
-inputVerbatim: _markdown_test/ad2981010cf94e370ccb06c7233f0989.verbatim
+inputVerbatim: ./_markdown_test/ad2981010cf94e370ccb06c7233f0989.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/451a1d0edf74505402610a4bae7997d0.verbatim
+inputVerbatim: ./_markdown_test/451a1d0edf74505402610a4bae7997d0.verbatim
 interblockSeparator
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/3f3996b979db4e11ec6fd9b0232b3d83.verbatim
+inputVerbatim: ./_markdown_test/3f3996b979db4e11ec6fd9b0232b3d83.verbatim
 interblockSeparator
 codeSpan: *
 codeSpan: (underscore)
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/85d79dd13f594a1dc7dc5b2be403366a.verbatim
+inputVerbatim: ./_markdown_test/85d79dd13f594a1dc7dc5b2be403366a.verbatim
 interblockSeparator
 headingThree: Code
 interblockSeparator
 codeSpan: `
 interblockSeparator
-inputVerbatim: _markdown_test/3013bb705f116d1bf7d7506a827cd6f1.verbatim
+inputVerbatim: ./_markdown_test/3013bb705f116d1bf7d7506a827cd6f1.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/0d572dc866bb6649bdedef400a32f2ee.verbatim
+inputVerbatim: ./_markdown_test/0d572dc866bb6649bdedef400a32f2ee.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/000c6f567a8ecf3820cf43f6b248b303.verbatim
+inputVerbatim: ./_markdown_test/000c6f567a8ecf3820cf43f6b248b303.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/a499280e33397f3bd9ec1415835a1c04.verbatim
+inputVerbatim: ./_markdown_test/a499280e33397f3bd9ec1415835a1c04.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/56cb72e47c0ff4e11b252117ed9d7c15.verbatim
+inputVerbatim: ./_markdown_test/56cb72e47c0ff4e11b252117ed9d7c15.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/2624fb4324d31d847556b8cf06cc71a3.verbatim
+inputVerbatim: ./_markdown_test/2624fb4324d31d847556b8cf06cc71a3.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/7e31b58c38fbe808c13ae0c21943fdbb.verbatim
+inputVerbatim: ./_markdown_test/7e31b58c38fbe808c13ae0c21943fdbb.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/775e317bc6e9bac7e3a3a3f44dade6d1.verbatim
+inputVerbatim: ./_markdown_test/775e317bc6e9bac7e3a3a3f44dade6d1.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/b71470703a2237b352df145a688666b9.verbatim
+inputVerbatim: ./_markdown_test/b71470703a2237b352df145a688666b9.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/c7d2bf55eba7aa8ecd26cc75c0116ecd.verbatim
+inputVerbatim: ./_markdown_test/c7d2bf55eba7aa8ecd26cc75c0116ecd.verbatim
 interblockSeparator
 headingThree: Images
 interblockSeparator
@@ -1465,7 +1465,7 @@ emphasis: inline
 emphasis: reference
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/95e477e08806ad17333ef8c62ab1a9bf.verbatim
+inputVerbatim: ./_markdown_test/95e477e08806ad17333ef8c62ab1a9bf.verbatim
 interblockSeparator
 interblockSeparator
 ulBeginTight
@@ -1481,10 +1481,10 @@ ulItemEnd
 ulEndTight
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/90c3fb2e48c6bc6b5139b7d9fefe33eb.verbatim
+inputVerbatim: ./_markdown_test/90c3fb2e48c6bc6b5139b7d9fefe33eb.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/a5bd86aacaa065512fabab353b4646b5.verbatim
+inputVerbatim: ./_markdown_test/a5bd86aacaa065512fabab353b4646b5.verbatim
 interblockSeparator
 codeSpan: <img>
 interblockSeparator
@@ -1495,16 +1495,16 @@ interblockSeparator
 headingThree: Automatic Links
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/ba84105470e6c3ca4640b0165ba73e28.verbatim
+inputVerbatim: ./_markdown_test/ba84105470e6c3ca4640b0165ba73e28.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/3d59db9474543617b421ad8938c9ad5f.verbatim
+inputVerbatim: ./_markdown_test/3d59db9474543617b421ad8938c9ad5f.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/7c01c9510936100673897e413a694f95.verbatim
+inputVerbatim: ./_markdown_test/7c01c9510936100673897e413a694f95.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/57dc30d4baafa58ac03c967e1ffe882b.verbatim
+inputVerbatim: ./_markdown_test/57dc30d4baafa58ac03c967e1ffe882b.verbatim
 interblockSeparator
 interblockSeparator
 interblockSeparator
@@ -1512,7 +1512,7 @@ headingThree: Backslash Escapes
 interblockSeparator
 codeSpan: <em>
 interblockSeparator
-inputVerbatim: _markdown_test/ee5b9bd27735fe320e0eb1cd9218539d.verbatim
+inputVerbatim: ./_markdown_test/ee5b9bd27735fe320e0eb1cd9218539d.verbatim
 interblockSeparator
 interblockSeparator
-inputVerbatim: _markdown_test/4f5715933ffa8d2f20d0360598a68dbb.verbatim
+inputVerbatim: ./_markdown_test/4f5715933ffa8d2f20d0360598a68dbb.verbatim

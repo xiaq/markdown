@@ -17,11 +17,11 @@ codeSpan: fencedCode
 interblockSeparator
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
+- src: ./_markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
 - infostring: foo
 END fencedCode
 interblockSeparator
 BEGIN fencedCode
-- src: _markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
+- src: ./_markdown_test/c157a79031e1c40f85931829bc5fc552.verbatim
 - infostring: foo
 END fencedCode
