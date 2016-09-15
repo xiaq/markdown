@@ -147,7 +147,7 @@
 % \fi
 %  \begin{macrocode}
 local metadata = {
-    version   = "2.1.2",
+    version   = "2.1.3",
     comment   = "A module for the conversion from markdown to plain TeX",
     author    = "John MacFarlane, Hans Hagen, Vít Novotný",
     copyright = "2009-2016 John MacFarlane, Hans Hagen; 2016 Vít Novotný",
@@ -586,8 +586,8 @@ defaultOptions.tightLists = true
 % \ref{sec:luaoptions}) used during the conversion from markdown to plain
 % \TeX{}, and for changing the way markdown the tokens are rendered.
 %  \begin{macrocode}
-\def\markdownLastModified{2016/09/13}%
-\def\markdownVersion{2.1.2}%
+\def\markdownLastModified{2016/09/15}%
+\def\markdownVersion{2.1.3}%
 %    \end{macrocode}
 %
 % The plain \TeX{} interface is implemented by the \t`markdown.tex` file that
@@ -1455,13 +1455,6 @@ defaultOptions.tightLists = true
   \def\markdownOptionSmartEllipses{#1}}%
 \define@key{markdownOptions}{startNumber}[true]{%
   \def\markdownOptionStartNumber{#1}}%
-%    \end{macrocode}
-% If the \t`tightLists=false` option is specified, when loading the package,
-% then the \pkg{paralist} package for typesetting tight lists will not be
-% automatically loaded. This precaution is meant to minimize the footprint of
-% this package, since some documentclasses (\pkg{beamer}) experience clashes
-% with the \pkg{paralist} package.
-%  \begin{macrocode}
 \define@key{markdownOptions}{tightLists}[true]{%
   \def\markdownOptionTightLists{#1}}%
 %    \end{macrocode}
@@ -4028,14 +4021,39 @@ local convert = md.new(\markdownLuaOptions)
 % If the \m{markdownOptionTightLists} macro expands to \t`false`, do not load
 % the \pkg{paralist} package. This is necessary for \Hologo{LaTeX2e} document
 % classes that do not play nice with \pkg{paralist}, such as \pkg{beamer}.
+% If the \m{markdownOptionTightLists} is undefined and the \pkg{beamer}
+% document class is in use, then do not load the \pkg{paralist} package either.
 %  \begin{macrocode}
 \RequirePackage{ifthen}
 \ifx\markdownOptionTightLists\undefined
-  \RequirePackage{paralist}
+  \@ifclassloaded{beamer}{}{
+    \RequirePackage{paralist}}
 \else
   \ifthenelse{\equal{\markdownOptionTightLists}{false}}{}{
     \RequirePackage{paralist}}
 \fi
+%    \end{macrocode}
+% If we loaded the \pkg{paralist} package, define the respective renderer
+% prototypes to make use of the capabilities of the package. Otherwise,
+% define the renderer prototypes to fall back on the corresponding renderers
+% for the non-tight lists.
+%  \begin{macrocode}
+\@ifpackageloaded{paralist}{
+  \markdownSetup{rendererPrototypes={
+    ulBeginTight = {\begin{compactitem}},
+    ulEndTight = {\end{compactitem}},
+    olBeginTight = {\begin{compactenum}},
+    olEndTight = {\end{compactenum}},
+    dlBeginTight = {\begin{compactdesc}},
+    dlEndTight = {\end{compactdesc}}}}
+}{
+  \markdownSetup{rendererPrototypes={
+    ulBeginTight = {\markdownRendererUlBegin},
+    ulEndTight = {\markdownRendererUlEnd},
+    olBeginTight = {\markdownRendererOlBegin},
+    olEndTight = {\markdownRendererOlEnd},
+    dlBeginTight = {\markdownRendererDlBegin},
+    dlEndTight = {\markdownRendererDlEnd}}}}
 \RequirePackage{fancyvrb}
 \markdownSetup{rendererPrototypes={
   lineBreak = {\\},
@@ -4060,21 +4078,15 @@ local convert = md.new(\markdownLuaOptions)
       \label{fig:#1}%
     \end{figure}},
   ulBegin = {\begin{itemize}},
-  ulBeginTight = {\begin{compactitem}},
   ulItem = {\item},
   ulEnd = {\end{itemize}},
-  ulEndTight = {\end{compactitem}},
   olBegin = {\begin{enumerate}},
-  olBeginTight = {\begin{compactenum}},
   olItem = {\item},
   olItemWithNumber = {\item[#1.]},
   olEnd = {\end{enumerate}},
-  olEndTight = {\end{compactenum}},
   dlBegin = {\begin{description}},
-  dlBeginTight = {\begin{compactdesc}},
   dlItem = {\item[#1]},
   dlEnd = {\end{description}},
-  dlEndTight = {\end{compactdesc}},
   emphasis = {\emph{#1}},
   strongEmphasis = {%
     \ifx\alert\undefined
